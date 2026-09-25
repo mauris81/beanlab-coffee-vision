@@ -457,3 +457,25 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 .botao-classe__nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .botao-classe .chip-classe__cor { width: 16px; height: 16px; }
 
+
+/* --- Tabela ------------------------------------------------------------------ */
+/* Use dentro de .tabela-rolagem (tabindex="0" role="region") para rolar no celular. */
+.tabela-rolagem { overflow-x: auto; border: 1px solid var(--cor-borda); border-radius: var(--raio-lg); background: var(--cor-superficie); }
+.tabela-rolagem:focus-visible { outline-offset: 2px; }
+.tabela { width: 100%; border-collapse: collapse; }
+.tabela th, .tabela td { padding: var(--espaco-3) var(--espaco-4); text-align: left; vertical-align: middle; border-bottom: 1px solid var(--cor-borda); }
+.tabela tr:last-child td { border-bottom: none; }
+.tabela th { color: var(--cor-texto-suave); font-size: var(--texto-sm); font-weight: var(--peso-forte); white-space: nowrap; }
+.tabela form { margin: 0; }
+.acoes-pessoa { flex-wrap: nowrap; }
+.acoes-pessoa .botao { white-space: nowrap; }
+
+/* --- Dados de acesso (usuário e senha provisória) ------------------------------ */
+.dados-de-acesso { display: grid; gap: var(--espaco-4); margin: 0; }
+.dados-de-acesso div { display: flex; flex-direction: column; gap: var(--espaco-1); }
+.dados-de-acesso dt { color: var(--cor-texto-suave); font-weight: var(--peso-forte); }
+.dados-de-acesso dd { margin: 0; }
+.dados-de-acesso code { font-size: var(--texto-2xl); padding: var(--espaco-2) var(--espaco-3); user-select: all; overflow-wrap: anywhere; }
+
+/* --- Tela de entrar ------------------------------------------------------------ */
+.entrar__marca { display: flex; flex-direction: column; align-items: flex-start; gap: var(--espaco-4); }

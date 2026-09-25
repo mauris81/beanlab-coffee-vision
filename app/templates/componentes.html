@@ -146,6 +146,13 @@
 {%- endmacro %}
 
 
+{#- "Mostrar senha": caixa que troca os campos de senha (ids separados por espaço) para
+    texto visível. Ajuda muito a digitar no celular. Funciona via static/js/app.js. -#}
+{% macro mostrar_senha(ids_dos_campos) -%}
+<label class="opcao"><input type="checkbox" data-mostrar-senha="{{ ids_dos_campos }}"> Mostrar senha</label>
+{%- endmacro %}
+
+
 {#- Título de página, com sobretítulo e descrição opcionais e ações via {% call %}. -#}
 {% macro cabecalho_pagina(titulo, sobretitulo=None, descricao=None) -%}
 <header class="cabecalho-pagina">

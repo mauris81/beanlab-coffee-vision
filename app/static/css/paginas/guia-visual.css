@@ -25,7 +25,6 @@
 }
 .amostra code { align-self: flex-start; font-size: var(--texto-xs); }
 
-.tabela-rolagem { overflow-x: auto; border: 1px solid var(--cor-borda); border-radius: var(--raio-lg); background: var(--cor-superficie); }
 .tabela-contraste { width: 100%; border-collapse: collapse; font-size: var(--texto-sm); }
 .tabela-contraste th, .tabela-contraste td { padding: var(--espaco-3) var(--espaco-4); text-align: left; border-bottom: 1px solid var(--cor-borda); white-space: nowrap; }
 .tabela-contraste tr:last-child td { border-bottom: none; }
@@ -74,4 +73,3 @@
 .atalhos dt { display: flex; align-items: center; gap: var(--espaco-1); min-width: 6rem; }
 .atalhos dd { margin: 0; }
 .exemplo-contraste--contorno { width: 5.5rem; height: 2rem; vertical-align: middle; border: 2px solid; box-shadow: none; }
-.tabela-rolagem:focus-visible { outline-offset: 2px; }

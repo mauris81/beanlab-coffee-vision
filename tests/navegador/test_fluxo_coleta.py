@@ -1,11 +1,11 @@
 """O caminho completo de quem coleta, no navegador, com a fila em segundo plano:
-entrar -> criar coleta -> enviar foto -> acompanhar a segmentação -> excluir."""
+entrar (login) -> criar coleta -> enviar foto -> acompanhar a segmentação -> excluir."""
 import re
 
 import pytest
 
 from tests.fabrica_imagens import foto_de_graos
-from tests.navegador.conftest import violacoes_wcag
+from tests.navegador.conftest import SENHA, violacoes_wcag
 
 pytestmark = pytest.mark.navegador
 
@@ -14,15 +14,19 @@ pytestmark = pytest.mark.navegador
 def test_coletar_enviar_e_acompanhar(abrir, tmp_path, tela):
     foto = tmp_path / 'bandeja.png'
     foto.write_bytes(foto_de_graos())
-    pagina = abrir('/coletas', tela)
+    pagina = abrir('/coletas/nova', tela, como=None)
 
-    # 1. Sem saber quem é a pessoa, "Nova coleta" leva para "Quem é você?"
-    pagina.get_by_role('link', name='Nova coleta').click()
+    # 1. Sem login, a página pede usuário e senha; senha errada explica o problema
     pagina.wait_for_url(re.compile(r'/entrar'))
-    assert 'Antes, diga quem é você' in pagina.inner_text('main')
     assert violacoes_wcag(pagina) == ''
-    pagina.get_by_role('textbox', name='Seu nome').fill(f'Ana {tela}')
-    pagina.get_by_role('button', name='Continuar').click()
+    pagina.get_by_label('Usuário').fill('membro')
+    pagina.get_by_label('Senha', exact=True).fill('senha-errada-123')
+    pagina.get_by_role('button', name='Entrar').click()
+    assert 'Usuário ou senha incorretos.' in pagina.inner_text('main')
+    pagina.get_by_label('Senha', exact=True).fill(SENHA)
+    pagina.get_by_label('Mostrar senha').check()  # ajuda a conferir no celular
+    assert pagina.get_attribute('#campo-senha', 'type') == 'text'
+    pagina.get_by_role('button', name='Entrar').click()
 
     # 2. Volta sozinha para o formulário da coleta
     pagina.wait_for_url(re.compile(r'/coletas/nova'))
@@ -65,10 +69,7 @@ def test_fim_da_segmentacao_nao_recarrega_com_dialogo_aberto(abrir, tmp_path):
     """Se a pessoa estiver no meio de algo, a página não recarrega sozinha."""
     foto = tmp_path / 'bandeja.png'
     foto.write_bytes(foto_de_graos(semente=21))
-    pagina = abrir('/entrar')
-    pagina.get_by_role('textbox', name='Seu nome').fill('Bia')
-    pagina.get_by_role('button', name='Continuar').click()
-    pagina.goto(pagina.url.rsplit('/', 1)[0] + '/coletas/nova')
+    pagina = abrir('/coletas/nova')
     pagina.get_by_label('Grãos').check()
     pagina.get_by_label('Nome da coleta').fill('Teste de recarga')
     pagina.get_by_role('button', name='Criar coleta').click()

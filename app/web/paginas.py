@@ -10,11 +10,14 @@ from app.dominio import StatusImagem, StatusJob, TipoAmostra
 from app.extensions import db
 from app.segmentacao import obter_motor
 from app.web import web_bp
-from app.web.apresentacao import apresentar_status, icone, icone_do_tipo, itens_de_navegacao, plural
+from app.web.apresentacao import (
+    apresentar_status, hora_local, icone, icone_do_tipo, itens_de_navegacao, plural,
+)
 
 # Funções disponíveis em todos os templates.
 for _funcao in (icone, icone_do_tipo, apresentar_status, itens_de_navegacao, plural):
     web_bp.add_app_template_global(_funcao)
+web_bp.add_app_template_filter(hora_local)
 
 
 @web_bp.app_template_global()
@@ -57,6 +60,12 @@ def pedido_invalido(erro):
     mensagem = erro.description if erro.description != BadRequest.description \
         else 'O pedido veio incompleto. Volte e tente de novo.'
     return _pagina_de_erro(400, 'Não foi possível concluir', mensagem)
+
+
+@web_bp.app_errorhandler(403)
+def sem_permissao(_erro):
+    return _pagina_de_erro(403, 'Esta página é só para a administração',
+                           'Se você precisa fazer isso, peça a quem administra a plataforma.')
 
 
 @web_bp.app_errorhandler(404)

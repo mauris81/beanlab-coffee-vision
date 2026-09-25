@@ -1,27 +1,13 @@
-"""Rotas de identidade, coletas e envio de fotos (sem navegador)."""
+"""Rotas de coletas e envio de fotos (sem navegador). Login: tests/test_web_login.py."""
 import html
 import io
 
-import pytest
 from sqlalchemy import select
 
-from app.dominio import Coleta, Imagem, Pessoa, StatusImagem
+from app.dominio import Coleta, Imagem, StatusImagem
 from app.extensions import db
+from tests.conftest import TOKEN
 from tests.fabrica_imagens import foto_de_graos, foto_jpeg
-
-TOKEN = 'token-de-teste'
-
-
-@pytest.fixture
-def logado(cliente):
-    """Cliente já identificado (como 'Ana') e com o código CSRF na sessão."""
-    ana = Pessoa(nome='Ana', nome_normalizado='ana')
-    db.session.add(ana)
-    db.session.commit()
-    with cliente.session_transaction() as sessao:
-        sessao['pessoa_id'] = ana.id
-        sessao['_csrf'] = TOKEN
-    return cliente
 
 
 def criar_coleta(cliente, tipo='graos', nome='Talhão 3'):
@@ -39,33 +25,10 @@ def enviar(cliente, coleta, arquivos, modo='fotos', **cabecalhos):
 
 # ----------------------------------------------------------------- segurança
 
-def test_formulario_sem_codigo_csrf_e_recusado(cliente):
-    resposta = cliente.post('/entrar', data={'nome': 'Ana'})
+def test_formulario_sem_codigo_csrf_e_recusado(logado):
+    resposta = logado.post('/coletas/nova', data={'tipo': 'graos', 'nome': 'X'})
     assert resposta.status_code == 400
     assert 'Formulário expirado' in resposta.get_data(as_text=True)
-
-
-def test_criar_coleta_exige_saber_quem_e(cliente):
-    resposta = cliente.get('/coletas/nova')
-    assert resposta.status_code == 302 and '/entrar?proximo=/coletas/nova' in resposta.location
-
-
-def test_entrar_guarda_a_pessoa_e_volta_para_onde_estava(cliente):
-    with cliente.session_transaction() as sessao:
-        sessao['_csrf'] = TOKEN
-    resposta = cliente.post('/entrar', data={'_csrf': TOKEN, 'nome': '  maria  silva ',
-                                             'proximo': '/coletas/nova'})
-    assert resposta.status_code == 302 and resposta.location == '/coletas/nova'
-    with cliente.session_transaction() as sessao:
-        assert db.session.get(Pessoa, sessao['pessoa_id']).nome == 'maria silva'
-
-
-@pytest.mark.parametrize('destino', ['https://site-malicioso.com', '//site-malicioso.com', 'javascript:alert(1)'])
-def test_entrar_nao_redireciona_para_outro_site(cliente, destino):
-    with cliente.session_transaction() as sessao:
-        sessao['_csrf'] = TOKEN
-    resposta = cliente.post('/entrar', data={'_csrf': TOKEN, 'nome': 'Ana', 'proximo': destino})
-    assert resposta.location == '/'
 
 
 # ------------------------------------------------------------------- coletas

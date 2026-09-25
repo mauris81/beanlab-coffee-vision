@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from app.dominio import Coleta, Pessoa, TipoAmostra
+from app.dominio import Coleta, TipoAmostra
 from app.extensions import db
 from app.servicos.ingestao import receber_foto
 from app.servicos.segmentacao import agendar_segmentacao, executar_job
@@ -17,28 +17,23 @@ _contador = iter(range(1000))
 
 @pytest.fixture
 def coleta_pronta(aplicacao):
-    """Coleta de grãos com uma foto já segmentada e uma pessoa cadastrada."""
+    """Coleta de grãos com uma foto já segmentada."""
     n = next(_contador)
     with aplicacao.app_context():
-        pessoa = Pessoa(nome=f'Anotadora {n}', nome_normalizado=f'anotadora {n}')
         graos = db.session.scalars(db.select(TipoAmostra).filter_by(codigo='graos')).one()
-        coleta = Coleta(nome=f'Coleta {n}', tipo_amostra=graos, coletor=pessoa)
-        db.session.add_all([pessoa, coleta])
+        coleta = Coleta(nome=f'Coleta {n}', tipo_amostra=graos)
+        db.session.add(coleta)
         db.session.flush()
         imagem = receber_foto(coleta, foto_de_graos(semente=100 + n), f'foto{n}.png').imagem
         job = agendar_segmentacao(imagem)
         db.session.commit()
         executar_job(job.id)
         total = len(imagem.regioes)
-        return {'id': coleta.id, 'pessoa': pessoa.nome, 'total': total}
+        return {'id': coleta.id, 'total': total}
 
 
 def entrar_e_abrir(abrir, coleta, caminho, tela='computador'):
-    pagina = abrir('/entrar', tela)
-    pagina.get_by_role('button', name=coleta['pessoa']).click()
-    pagina.wait_for_load_state('networkidle')
-    pagina.goto(pagina.url.split('/entrar')[0].rstrip('/') + caminho, wait_until='networkidle')
-    return pagina
+    return abrir(caminho, tela)  # já entra como "membro" (sessão guardada no conftest)
 
 
 def progresso(pagina) -> str:
@@ -100,9 +95,7 @@ def test_anotar_pelo_toque_no_celular(abrir, coleta_pronta):
 
 @pytest.mark.parametrize('tema', ['light', 'dark'])
 def test_tela_de_anotacao_acessivel(abrir, coleta_pronta, tema):
-    pagina = abrir('/entrar', 'computador', tema)
-    pagina.get_by_role('button', name=coleta_pronta['pessoa']).click()
-    pagina.goto(pagina.url.split('/entrar')[0] + f"/coletas/{coleta_pronta['id']}/anotar", wait_until='networkidle')
+    pagina = abrir(f"/coletas/{coleta_pronta['id']}/anotar", 'computador', tema)
     pagina.wait_for_selector('[data-area]:not([hidden])')
     assert violacoes_wcag(pagina) == ''
 

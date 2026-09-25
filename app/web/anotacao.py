@@ -10,7 +10,7 @@ from app.servicos.anotacoes import (
 from app.servicos.recortes import media_da_imagem, recorte_da_regiao
 from app.web import web_bp
 from app.web.apresentacao import plural
-from app.web.identidade import exige_pessoa, pessoa_atual
+from app.web.identidade import pessoa_atual
 
 POR_PAGINA_LOTE = 120
 
@@ -22,7 +22,6 @@ def _coleta_ou_404(coleta_id: int) -> Coleta:
 # ------------------------------------------------------------ uma por vez
 
 @web_bp.get('/coletas/<int:coleta_id>/anotar')
-@exige_pessoa
 def anotar(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     return render_template('anotar.html', coleta=coleta, classes=coleta.tipo_amostra.classes_ativas,
@@ -33,7 +32,6 @@ def anotar(coleta_id):
 # ---------------------------------------------------------------- em lote
 
 @web_bp.get('/coletas/<int:coleta_id>/lote')
-@exige_pessoa
 def anotar_lote(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     mostrar = request.args.get('mostrar', 'pendentes')
@@ -59,7 +57,6 @@ def anotar_lote(coleta_id):
 
 
 @web_bp.post('/coletas/<int:coleta_id>/lote')
-@exige_pessoa
 def aplicar_lote(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     voltar = url_for('web.anotar_lote', coleta_id=coleta.id,
@@ -83,7 +80,6 @@ def aplicar_lote(coleta_id):
 
 
 @web_bp.post('/coletas/<int:coleta_id>/lote/desfazer')
-@exige_pessoa
 def desfazer_lote(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     ids = [int(i) for i in request.form.getlist('anotacoes') if i.isdigit()]

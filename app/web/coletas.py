@@ -15,7 +15,7 @@ from app.servicos.ingestao import (
 from app.servicos.segmentacao import agendar_segmentacao, ultimo_erro
 from app.web import web_bp
 from app.web.apresentacao import plural
-from app.web.identidade import exige_pessoa, pessoa_atual
+from app.web.identidade import pessoa_atual
 from app.web.paginas import tipos_de_amostra
 
 MODOS_DE_ENVIO = ('fotos', 'recortes', 'coco')
@@ -51,7 +51,6 @@ def coletas():
 # ---------------------------------------------------------------------- criar
 
 @web_bp.route('/coletas/nova', methods=['GET', 'POST'])
-@exige_pessoa
 def nova_coleta():
     tipos = tipos_de_amostra()
     dados = request.form if request.method == 'POST' else {
@@ -104,7 +103,6 @@ def coleta(coleta_id):
 # --------------------------------------------------------------------- enviar
 
 @web_bp.post('/coletas/<int:coleta_id>/enviar')
-@exige_pessoa
 def enviar_fotos(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     modo = request.form.get('modo', 'fotos')
@@ -179,7 +177,6 @@ def _avisar_importacao_coco(resumo):
 # ------------------------------------------------------------- ações na foto
 
 @web_bp.post('/imagens/<int:imagem_id>/excluir')
-@exige_pessoa
 def excluir_foto(imagem_id):
     imagem = db.session.get(Imagem, imagem_id) or abort(404)
     coleta_id, nome = imagem.coleta_id, imagem.nome_original
@@ -191,7 +188,6 @@ def excluir_foto(imagem_id):
 
 
 @web_bp.post('/imagens/<int:imagem_id>/segmentar')
-@exige_pessoa
 def segmentar_de_novo(imagem_id):
     imagem = db.session.get(Imagem, imagem_id) or abort(404)
     job = agendar_segmentacao(imagem)

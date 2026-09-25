@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}Minha conta · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande estreito">
+    {{ c.cabecalho_pagina('Minha conta', descricao=pessoa.nome ~ ' · usuário ' ~ pessoa.usuario
+        ~ (' · administração' if pessoa.eh_administrador else '')) }}
+
+    {% if pessoa.precisa_trocar_senha %}
+        {% call c.alerta('aviso', 'Crie a sua senha') %}
+            <p>A senha que você recebeu é provisória. Troque por uma que só você saiba para continuar.</p>
+        {% endcall %}
+    {% endif %}
+
+    <form method="post" class="cartao pilha" novalidate aria-labelledby="titulo-senha">
+        <h2 id="titulo-senha">{{ 'Criar senha' if pessoa.precisa_trocar_senha else 'Trocar senha' }}</h2>
+        {{ campo_csrf() }}
+        {% if erro %}{% call c.alerta('perigo') %}<p>{{ erro }}</p>{% endcall %}{% endif %}
+        {{ c.campo('senha_atual', 'Senha provisória' if pessoa.precisa_trocar_senha else 'Senha atual', tipo='password',
+                   attrs={'autocomplete': 'current-password'}) }}
+        {{ c.campo('senha_nova', 'Senha nova', tipo='password',
+                   dica='Pelo menos 8 caracteres. Uma frase curta é fácil de lembrar e difícil de adivinhar.',
+                   attrs={'autocomplete': 'new-password'}) }}
+        {{ c.campo('confirmacao', 'Repita a senha nova', tipo='password', attrs={'autocomplete': 'new-password'}) }}
+        {{ c.mostrar_senha('campo-senha_atual campo-senha_nova campo-confirmacao') }}
+        {{ c.botao('Salvar senha', tipo='submit', icone_nome='check') }}
+    </form>
+
+    <form method="post" action="{{ url_for('web.sair') }}">
+        {{ campo_csrf() }}
+        {{ c.botao('Sair desta conta', 'secundario', tipo='submit', icone_nome='seta-esquerda') }}
+    </form>
+</div>
+{% endblock %}

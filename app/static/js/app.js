@@ -37,6 +37,16 @@ document.addEventListener('click', (evento) => {
     }
 });
 
+// "Mostrar senha": data-mostrar-senha="id1 id2" troca esses campos entre senha e texto.
+document.addEventListener('change', (evento) => {
+    const caixa = evento.target.closest?.('[data-mostrar-senha]');
+    if (!caixa) return;
+    caixa.dataset.mostrarSenha.split(/\s+/).forEach((id) => {
+        const campo = document.getElementById(id);
+        if (campo) campo.type = caixa.checked ? 'text' : 'password';
+    });
+});
+
 // Clique fora do diálogo (no fundo escurecido) também fecha.
 document.addEventListener('click', (evento) => {
     if (evento.target instanceof HTMLDialogElement && evento.target.classList.contains('dialogo')) {

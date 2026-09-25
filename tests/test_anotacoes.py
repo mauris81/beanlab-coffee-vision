@@ -5,8 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from app.dominio import Anotacao
 from app.extensions import db
 from app.servicos.anotacoes import AnotacaoInvalida, anotar_regiao, progresso_da_coleta
-from app.servicos.pessoas import obter_ou_criar_pessoa
-from tests.conftest import classe, criar_coleta
+from tests.conftest import classe, criar_coleta, criar_pessoa
 
 
 def test_regiao_nova_e_pendente(app):
@@ -37,7 +36,7 @@ def test_progresso_conta_so_o_que_foi_anotado(app):
 def test_mudar_de_ideia_guarda_historico_e_conta_so_a_ultima(app):
     coleta = criar_coleta(num_regioes=1)
     regiao = coleta.imagens[0].regioes[0]
-    maria = obter_ou_criar_pessoa('Maria')
+    maria = criar_pessoa('Maria')
     anotar_regiao(regiao, classe('graos', 'verde'), pessoa=maria)
     anotar_regiao(regiao, classe('graos', 'ardido'), pessoa=maria, observacao='revisado')
     db.session.commit()

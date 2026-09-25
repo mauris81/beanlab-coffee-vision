@@ -25,6 +25,7 @@ import webbrowser
 from app import create_app
 from app.cli import descrever_resumo
 from app.servicos.banco import preparar_banco
+from app.servicos.contas import codigo_de_primeiro_acesso
 from app.servicos.taxonomias import TaxonomiaInvalida
 
 app = create_app()
@@ -88,6 +89,14 @@ if __name__ == '__main__':
             print(f'  {"Nos celulares (mesmo Wi-Fi):":<28} http://{ip}:{port}')
         print('  Para desligar, feche esta janela (ou Ctrl+C).')
         print()
+        with app.app_context():
+            codigo = codigo_de_primeiro_acesso(app.config['PASTA_DADOS'])
+        if codigo:
+            print('  ============================================================')
+            print(f'  PRIMEIRO ACESSO: abra a plataforma e use o código  {codigo}')
+            print('  para criar a conta de administração.')
+            print('  ============================================================')
+            print()
         if os.environ.get('CAFE_ABRIR_NAVEGADOR') == '1':
             abrir_navegador_quando_pronto(port)
 

@@ -1,23 +1,8 @@
-"""Identificação de pessoas e gravação de fotos no disco."""
+"""Gravação de fotos no disco e configuração. (Contas: tests/test_contas.py)"""
 import pytest
 
 from app.armazenamento import ArmazenamentoImagens
 from app.config import ConfigTeste, carregar_chave_secreta
-from app.servicos.pessoas import obter_ou_criar_pessoa
-
-
-# ------------------------------------------------------------------ pessoas
-
-def test_mesmo_nome_com_maiusculas_e_espacos_e_a_mesma_pessoa(app):
-    maria = obter_ou_criar_pessoa('Maria Silva')
-    assert obter_ou_criar_pessoa('  maria   SILVA ') is maria
-    assert maria.nome == 'Maria Silva'
-
-
-@pytest.mark.parametrize('nome', ['', '   ', None])
-def test_nome_vazio_e_recusado(app, nome):
-    with pytest.raises(ValueError, match='Informe um nome'):
-        obter_ou_criar_pessoa(nome)
 
 
 # ------------------------------------------------------------- armazenamento

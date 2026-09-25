@@ -27,7 +27,7 @@ def _pessoa_ou_401():
 
 @api_bp.errorhandler(401)
 def _nao_identificado(_erro):
-    return {'erro': 'Diga quem é você antes de anotar (recarregue a página).'}, 401
+    return {'erro': 'Sua sessão terminou. Entre de novo (recarregue a página).'}, 401
 
 
 @api_bp.errorhandler(404)

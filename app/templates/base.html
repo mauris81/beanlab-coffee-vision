@@ -31,26 +31,30 @@
     <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
     <header class="topo">
+        {#- Nomes com prefixo: um "set" aqui sobrescreveria variáveis de mesmo nome das páginas. -#}
+        {%- set pessoa_logada = pessoa_atual() %}
+        {%- set itens_do_menu = itens_de_navegacao(pessoa_logada) %}
         <div class="conteudo topo__interno">
             <a class="marca" href="{{ url_for('web.inicio') }}">
                 <img class="marca__logo" src="{{ url_for('static', filename='logo.svg') }}" alt="" width="36" height="36">
                 <span class="marca__nome">BeanLab <small>Coffee Vision</small></span>
             </a>
 
+            {%- if itens_do_menu %}
             <nav class="navegacao" aria-label="Principal">
                 <ul class="navegacao__lista">
-                    {%- for item in itens_de_navegacao() %}
+                    {%- for item in itens_do_menu %}
                     <li><a class="navegacao__item" href="{{ item.url }}"{% if item.atual %} aria-current="page"{% endif %}>{{ icone(item.icone) }}{{ item.texto }}</a></li>
                     {%- endfor %}
                 </ul>
             </nav>
+            {%- endif %}
 
-            {%- set pessoa = pessoa_atual() %}
-            <a class="pessoa" href="{{ url_for('web.entrar', proximo=request.full_path.rstrip('?')) }}"
-               title="{{ 'Trocar de pessoa' if pessoa else 'Dizer quem é você' }}">
-                {{ icone('usuario') }}<span>{{ pessoa.nome.split()[0] if pessoa else 'Entrar' }}</span>
-                {%- if pessoa %}<span class="visualmente-oculto"> (trocar de pessoa)</span>{% endif %}
+            {%- if pessoa_logada %}
+            <a class="pessoa" href="{{ url_for('web.minha_conta') }}" title="Minha conta (senha, sair)">
+                {{ icone('usuario') }}<span>{{ pessoa_logada.nome.split()[0] }}</span><span class="visualmente-oculto"> — minha conta</span>
             </a>
+            {%- endif %}
 
             <button class="botao botao--fantasma botao--icone alternar-tema" id="alternar-tema" type="button"
                     aria-label="Alternar tema claro ou escuro" title="Alternar tema claro ou escuro">
@@ -83,13 +87,15 @@
     </footer>
 
     {#- No celular o menu fica na base da tela, ao alcance do polegar. -#}
+    {%- if itens_do_menu %}
     <nav class="navegacao-inferior" aria-label="Principal">
         <ul class="navegacao__lista">
-            {%- for item in itens_de_navegacao() %}
+            {%- for item in itens_do_menu %}
             <li><a class="navegacao__item" href="{{ item.url }}"{% if item.atual %} aria-current="page"{% endif %}>{{ icone(item.icone) }}<span>{{ item.texto }}</span></a></li>
             {%- endfor %}
         </ul>
     </nav>
+    {%- endif %}
 
     <div class="avisos" id="avisos" aria-live="polite"></div>
 

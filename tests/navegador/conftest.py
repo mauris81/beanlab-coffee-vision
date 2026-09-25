@@ -16,7 +16,13 @@ from werkzeug.serving import make_server
 from app import create_app
 from app.config import ConfigTeste
 from app.extensions import db
+from app.dominio import Papel
 from app.servicos.banco import preparar_banco
+from app.servicos.contas import criar_conta
+
+SENHA = 'senha-dos-testes-2026'
+# (nome, usuário, perfil) das contas do servidor de teste
+CONTAS = [('Maria Membro', 'membro', Papel.MEMBRO), ('Ana Admin', 'admin', Papel.ADMINISTRADOR)]
 
 try:
     from playwright.sync_api import sync_playwright
@@ -32,6 +38,9 @@ def aplicacao(tmp_path_factory):
     app = create_app(config)
     with app.app_context():
         preparar_banco()
+        for nome, usuario, papel in CONTAS:
+            criar_conta(nome, usuario, papel, senha=SENHA)
+        db.session.commit()
     yield app
     with app.app_context():
         db.engine.dispose()
@@ -82,14 +91,37 @@ def violacoes_wcag(pagina) -> str:
 TELAS = {'celular': {'width': 390, 'height': 844}, 'computador': {'width': 1366, 'height': 900}}
 
 
+@pytest.fixture(scope='session')
+def sessoes(navegador, endereco, tmp_path_factory):
+    """Entra uma vez com cada conta e guarda os cookies, para os testes não repetirem o login."""
+    pasta = tmp_path_factory.mktemp('sessoes')
+    caminhos = {}
+    for _, usuario, _ in CONTAS:
+        contexto = navegador.new_context()
+        pagina = contexto.new_page()
+        pagina.goto(endereco + '/entrar')
+        pagina.get_by_label('Usuário').fill(usuario)
+        pagina.get_by_label('Senha', exact=True).fill(SENHA)
+        pagina.get_by_role('button', name='Entrar').click()
+        pagina.wait_for_url(lambda url: '/entrar' not in url)
+        caminhos[usuario] = str(pasta / f'{usuario}.json')
+        contexto.storage_state(path=caminhos[usuario])
+        contexto.close()
+    return caminhos
+
+
 @pytest.fixture
-def abrir(navegador, endereco):
-    """abrir('/guia-visual', tela='celular', tema='dark') -> página já carregada."""
+def abrir(navegador, endereco, sessoes):
+    """abrir('/guia-visual', tela='celular', tema='dark', como='membro') -> página carregada.
+
+    como: 'membro', 'admin' ou None (sem login).
+    """
     contextos = []
 
-    def _abrir(caminho='/', tela='computador', tema='light'):
+    def _abrir(caminho='/', tela='computador', tema='light', como='membro'):
         contexto = navegador.new_context(viewport=TELAS[tela], color_scheme=tema,
-                                         has_touch=tela == 'celular', is_mobile=tela == 'celular')
+                                         has_touch=tela == 'celular', is_mobile=tela == 'celular',
+                                         storage_state=sessoes[como] if como else None)
         contextos.append(contexto)
         pagina = contexto.new_page()
         pagina.erros_js = []

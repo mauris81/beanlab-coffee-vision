@@ -12,13 +12,15 @@ from tests.navegador.conftest import violacoes_wcag
 
 pytestmark = pytest.mark.navegador
 
-PAGINAS = ['/', '/guia-visual', '/pagina-que-nao-existe', '/coletas', '/entrar']
+# (endereço, com que conta abrir)
+PAGINAS = [('/', 'membro'), ('/guia-visual', 'membro'), ('/pagina-que-nao-existe', 'membro'),
+           ('/coletas', 'membro'), ('/conta', 'membro'), ('/pessoas', 'admin'), ('/entrar', None)]
 
 
 @pytest.mark.parametrize('tema', ['light', 'dark'])
 @pytest.mark.parametrize('tela', ['celular', 'computador'])
-@pytest.mark.parametrize('caminho', PAGINAS)
-def test_pagina_sem_violacoes_wcag(abrir, caminho, tela, tema):
-    pagina = abrir(caminho, tela, tema)
+@pytest.mark.parametrize('caminho, como', PAGINAS)
+def test_pagina_sem_violacoes_wcag(abrir, caminho, como, tela, tema):
+    pagina = abrir(caminho, tela, tema, como=como)
     assert violacoes_wcag(pagina) == ''
     assert pagina.erros_js == []

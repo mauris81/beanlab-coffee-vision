@@ -14,7 +14,7 @@ Detalhes e justificativas em docs/MODELO_DE_DADOS.md.
 """
 from app.dominio.coleta import Coleta, Imagem
 from app.dominio.job import JobSegmentacao
-from app.dominio.pessoa import Pessoa
+from app.dominio.pessoa import Papel, Pessoa
 from app.dominio.regiao import Anotacao, Regiao
 from app.dominio.taxonomia import Classe, TipoAmostra
 from app.dominio.tipos import (
@@ -22,7 +22,7 @@ from app.dominio.tipos import (
 )
 
 __all__ = [
-    'Anotacao', 'Classe', 'Coleta', 'Imagem', 'JobSegmentacao', 'Pessoa', 'Regiao',
+    'Anotacao', 'Classe', 'Coleta', 'Imagem', 'JobSegmentacao', 'Papel', 'Pessoa', 'Regiao',
     'TipoAmostra', 'OrigemAnotacao', 'OrigemImagem', 'OrigemRegiao', 'StatusImagem',
     'StatusJob',
 ]

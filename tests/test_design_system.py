@@ -104,7 +104,7 @@ def _icones_usados() -> set[str]:
             usados |= set(re.findall(r"\(\s*'([a-z][a-z-]*)',\s*'[^']+',\s*'[^']+'\s*\)", texto))
     usados |= {a.icone for a in apresentacao._STATUS.values()}
     usados |= set(apresentacao._ICONE_POR_TIPO.values()) | {'imagem'}
-    usados |= {nome for _, _, nome in apresentacao.ITENS_DE_NAVEGACAO}
+    usados |= {nome for _, _, nome in apresentacao.ITENS_DE_NAVEGACAO + apresentacao.ITENS_DA_ADMINISTRACAO}
     return usados
 
 
@@ -137,9 +137,9 @@ class _ColetorDeRecursos(HTMLParser):
 
 
 @pytest.mark.parametrize('caminho', ['/', '/guia-visual', '/nao-existe'])
-def test_paginas_nao_dependem_de_internet(cliente, caminho):
+def test_paginas_nao_dependem_de_internet(logado, caminho):
     coletor = _ColetorDeRecursos()
-    coletor.feed(cliente.get(caminho).get_data(as_text=True))
+    coletor.feed(logado.get(caminho).get_data(as_text=True))
     externos = [r for r in coletor.recursos if r and re.match(r'^(https?:)?//', r)]
     assert coletor.recursos and not externos, f'Recursos externos em {caminho}: {externos}'
 
@@ -161,16 +161,16 @@ def test_fonte_guardada_no_projeto_tem_licenca():
     assert 'Atkinson Hyperlegible Next' in TOKENS
 
 
-def test_recursos_da_pagina_existem(cliente):
+def test_recursos_da_pagina_existem(logado):
     coletor = _ColetorDeRecursos()
-    coletor.feed(cliente.get('/').get_data(as_text=True))
+    coletor.feed(logado.get('/').get_data(as_text=True))
     for recurso in coletor.recursos:
         caminho = recurso.split('#')[0]
-        assert cliente.get(caminho).status_code == 200, caminho
+        assert logado.get(caminho).status_code == 200, caminho
 
 
-def test_estrutura_acessivel_da_pagina(cliente):
-    html = cliente.get('/').get_data(as_text=True)
+def test_estrutura_acessivel_da_pagina(logado):
+    html = logado.get('/').get_data(as_text=True)
     assert '<html lang="pt-BR">' in html
     assert html.index('class="pular-para-conteudo"') < html.index('<header'), \
         '"Pular para o conteúdo" deve ser o primeiro item focável'
@@ -178,15 +178,15 @@ def test_estrutura_acessivel_da_pagina(cliente):
     assert 'aria-current="page"' in html
 
 
-def test_pagina_404_e_amigavel(cliente):
-    resposta = cliente.get('/pagina-que-nao-existe')
+def test_pagina_404_e_amigavel(logado):
+    resposta = logado.get('/pagina-que-nao-existe')
     html = resposta.get_data(as_text=True)
     assert resposta.status_code == 404
     assert 'Página não encontrada' in html and 'Voltar ao início' in html
 
 
-def test_guia_visual_mostra_todos_os_icones(cliente):
-    html = cliente.get('/guia-visual').get_data(as_text=True)
+def test_guia_visual_mostra_todos_os_icones(logado):
+    html = logado.get('/guia-visual').get_data(as_text=True)
     for nome in ICONES_EXISTENTES:
         assert f'<code>{nome}</code>' in html
 

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{#- Só aparece enquanto não existe nenhuma conta de administração. -#}
+
+{% block titulo %}Primeiro acesso · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande estreito">
+    {{ c.cabecalho_pagina('Primeiro acesso', sobretitulo='Boas-vindas ao BeanLab',
+        descricao='Crie a conta de administração. Com ela você cria as contas da equipe depois.') }}
+
+    {% call c.alerta('info', 'Onde está o código?') %}
+        <p>Na <strong>janela preta</strong> onde a plataforma está rodando, neste computador
+           (aparece como "Código de primeiro acesso"). Ele garante que só quem tem acesso ao
+           computador cria a primeira conta.</p>
+    {% endcall %}
+
+    <form method="post" class="cartao pilha" novalidate>
+        {{ campo_csrf() }}
+        {% if erro %}{% call c.alerta('perigo') %}<p>{{ erro }}</p>{% endcall %}{% endif %}
+        {{ c.campo('codigo', 'Código de primeiro acesso', valor=dados.get('codigo', ''),
+                   dica='Ex.: 1234-5678', attrs={'autocomplete': 'off', 'inputmode': 'numeric', 'maxlength': 9}) }}
+        {{ c.campo('nome', 'Seu nome', valor=dados.get('nome', ''), attrs={'autocomplete': 'name', 'maxlength': 120}) }}
+        {{ c.campo('usuario', 'Usuário para entrar', valor=dados.get('usuario', ''),
+                   dica='Letras minúsculas, sem espaço. Ex.: maria.silva',
+                   attrs={'autocomplete': 'username', 'autocapitalize': 'none', 'spellcheck': 'false', 'maxlength': 60}) }}
+        {{ c.campo('senha', 'Senha', tipo='password',
+                   dica='Pelo menos 8 caracteres. Uma frase curta é fácil de lembrar e difícil de adivinhar.',
+                   attrs={'autocomplete': 'new-password'}) }}
+        {{ c.campo('confirmacao', 'Repita a senha', tipo='password', attrs={'autocomplete': 'new-password'}) }}
+        {{ c.mostrar_senha('campo-senha campo-confirmacao') }}
+        {{ c.botao('Criar conta de administração', tipo='submit', icone_nome='check', bloco=True, tamanho='grande') }}
+    </form>
+</div>
+{% endblock %}

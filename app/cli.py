@@ -11,6 +11,22 @@ def registrar_comandos(app):
         resumo = preparar_banco()
         click.echo(descrever_resumo(resumo))
 
+    @app.cli.command('redefinir-senha')
+    @click.argument('usuario')
+    def comando_redefinir_senha(usuario):
+        """Emergência: nova senha provisória para USUARIO (ex.: o único administrador
+        esqueceu a senha). Precisa de acesso ao computador onde a plataforma roda."""
+        from app.extensions import db
+        from app.servicos.contas import buscar_por_usuario, redefinir_senha, reativar
+        pessoa = buscar_por_usuario(usuario)
+        if pessoa is None:
+            raise click.ClickException(f'Usuário "{usuario}" não existe.')
+        reativar(pessoa)
+        senha = redefinir_senha(pessoa)
+        db.session.commit()
+        click.echo(f'Nova senha provisória de {pessoa.nome} ({pessoa.usuario}): {senha}')
+        click.echo('No primeiro acesso a pessoa vai criar a própria senha.')
+
 
 def descrever_resumo(resumo) -> str:
     """Frase curta sobre o que a sincronização de taxonomias mudou."""

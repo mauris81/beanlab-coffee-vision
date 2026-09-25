@@ -38,8 +38,8 @@ def test_desfazer_ultima_migracao_com_dados_no_banco(app):
         assert conexao.exec_driver_sql('PRAGMA foreign_key_check').fetchall() == []
 
 
-def test_pagina_inicial_mostra_tipos_e_classes(cliente):
-    resposta = cliente.get('/')
+def test_pagina_inicial_mostra_tipos_e_classes(logado):
+    resposta = logado.get('/')
     assert resposta.status_code == 200
     html = resposta.get_data(as_text=True)
     for texto in ['Grãos', 'Folhas', 'Flores', 'Frutos', 'Ferrugem', 'Verde-cana']:

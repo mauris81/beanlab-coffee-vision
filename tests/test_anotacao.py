@@ -12,15 +12,13 @@ from app.servicos.anotacoes import (
 )
 from app.servicos.recortes import LADO_RECORTE, caixa_com_margem, caminho_do_recorte, recorte_da_regiao
 from tests.conftest import classe, criar_coleta
-from tests.test_web_coletas import TOKEN, criar_coleta as criar_coleta_web, enviar, logado  # noqa: F401 (fixture)
+from tests.conftest import TOKEN, criar_pessoa
+from tests.test_web_coletas import criar_coleta as criar_coleta_web, enviar
 from tests.fabrica_imagens import foto_de_graos
 
 
 def pessoa(nome='Ana') -> Pessoa:
-    p = Pessoa(nome=nome, nome_normalizado=nome.casefold())
-    db.session.add(p)
-    db.session.flush()
-    return p
+    return criar_pessoa(nome)
 
 
 # ------------------------------------------------------------------ recortes
@@ -163,7 +161,7 @@ def test_api_exige_csrf_e_pessoa(cliente, logado, coleta_com_regioes):
     with logado.session_transaction() as sessao:
         sessao.pop('pessoa_id')
     resposta = _post(logado, f'/api/regioes/{regiao_id}/anotar', {'classe': 'ardido'})
-    assert resposta.status_code == 401 and 'Diga quem é você' in resposta.get_json()['erro']
+    assert resposta.status_code == 401 and 'Entre de novo' in resposta.get_json()['erro']
 
 
 # ------------------------------------------------------------------ páginas

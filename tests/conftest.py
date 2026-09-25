@@ -7,9 +7,10 @@ import pytest
 
 from app import create_app
 from app.config import ConfigTeste
-from app.dominio import Coleta, Imagem, OrigemImagem, OrigemRegiao, Regiao, TipoAmostra
+from app.dominio import Coleta, Imagem, OrigemImagem, OrigemRegiao, Papel, Pessoa, Regiao, TipoAmostra
 from app.extensions import db
 from app.servicos.banco import preparar_banco
+from app.servicos.contas import criar_conta
 
 
 @pytest.fixture
@@ -24,7 +25,46 @@ def app(tmp_path):
 
 @pytest.fixture
 def cliente(app):
+    """Navegador de teste SEM login."""
     return app.test_client()
+
+
+# ------------------------------------------------------------------ contas
+
+TOKEN = 'token-de-teste'      # código CSRF usado nos formulários dos testes
+SENHA = 'cafe-da-serra-2026'  # senha das contas criadas nos testes
+
+
+def criar_pessoa(nome: str, papel: Papel = Papel.MEMBRO, senha: str = SENHA) -> Pessoa:
+    pessoa, _ = criar_conta(nome, Pessoa.normalizar_usuario(nome), papel, senha=senha)
+    db.session.commit()
+    return pessoa
+
+
+def entrar_como(cliente, pessoa: Pessoa):
+    """Deixa o cliente de teste logado como `pessoa` (sem passar pela tela de login)."""
+    with cliente.session_transaction() as sessao:
+        sessao['pessoa_id'] = pessoa.id
+        sessao['versao'] = pessoa.versao_sessao
+        sessao['_csrf'] = TOKEN
+    return cliente
+
+
+@pytest.fixture
+def administracao(app) -> Pessoa:
+    """Conta de administração (sem ela, toda página leva ao "Primeiro acesso")."""
+    return criar_pessoa('Admin Teste', Papel.ADMINISTRADOR)
+
+
+@pytest.fixture
+def logado(cliente, administracao):
+    """Cliente logado como 'Ana', membro."""
+    return entrar_como(cliente, criar_pessoa('Ana'))
+
+
+@pytest.fixture
+def logado_admin(cliente, administracao):
+    return entrar_como(cliente, administracao)
 
 
 def tipo(codigo: str) -> TipoAmostra:
