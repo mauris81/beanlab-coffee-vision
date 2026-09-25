@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Projeto - BeanLab Coffee Vision{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <section class="form-card">
+        <span class="eyebrow">Nova análise</span>
+        <h1>Criar projeto</h1>
+        <p class="form-subtitle">Cadastre uma imagem para segmentação e posterior classificação dos grãos detectados.</p>
+
+        {% if error %}
+        <div class="form-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="new-project-form">
+            <div class="form-field">
+                <label for="nome">Nome do projeto</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex.: Amostra Bourbon - Lote 03" required>
+            </div>
+
+            <div class="form-field">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="4" placeholder="Descreva origem, lote, iluminação, objetivo da análise..."></textarea>
+            </div>
+
+            <div class="form-field upload-field">
+                <label for="file">Imagem do café</label>
+                <input type="file" id="file" name="file" accept=".jpg,.jpeg,.png,.bmp" required>
+                <small>Formatos aceitos: JPG, JPEG, PNG e BMP.</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Criar projeto</button>
+                <a href="/" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

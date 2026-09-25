@@ -1,0 +1,22 @@
+# Ambientes virtuais
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Dados locais: fotos, banco e backups nunca vão para o git
+instance/
+app/uploads/
+data/
+backups/
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Sistema operacional / OneDrive
+Thumbs.db
+desktop.ini

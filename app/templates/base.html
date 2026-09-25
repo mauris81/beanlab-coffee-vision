@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BeanLab Coffee Vision{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand" aria-label="Página inicial">
+                <span class="brand-icon">☕</span>
+                <span>
+                    <strong>BeanLab Coffee Vision</strong>
+                    <small>Classificação visual de grãos de café</small>
+                </span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="/">Projetos</a></li>
+                <li><a href="/project/new" class="btn btn-primary">+ Novo Projeto</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+        <p>Plataforma de apoio à segmentação, anotação e classificação de grãos de café.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
