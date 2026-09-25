@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#1E1A17" media="(prefers-color-scheme: dark)">
     <link rel="icon" href="{{ url_for('static', filename='logo.svg') }}" type="image/svg+xml">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    {#- Código anti-CSRF para os pedidos feitos pelo JavaScript (cabeçalho X-CSRF). -#}
+    <meta name="csrf" content="{{ token_csrf() }}">
 
     {#- Aplica o tema escolhido antes de desenhar a página (evita "piscar"). -#}
     <script>

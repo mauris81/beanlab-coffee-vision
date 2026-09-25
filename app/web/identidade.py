@@ -24,10 +24,13 @@ from app.web import web_bp
 
 
 def pessoa_atual() -> Pessoa | None:
-    if 'pessoa_atual' not in g:
-        pessoa_id = session.get('pessoa_id')
-        g.pessoa_atual = db.session.get(Pessoa, pessoa_id) if pessoa_id else None
-    return g.pessoa_atual
+    # Guarda o resultado durante o pedido, mas só enquanto a sessão apontar para a
+    # mesma pessoa (se ela sair ou trocar, busca de novo).
+    pessoa_id = session.get('pessoa_id')
+    guardada = g.get('_pessoa_atual')
+    if guardada is None or guardada[0] != pessoa_id:
+        g._pessoa_atual = (pessoa_id, db.session.get(Pessoa, pessoa_id) if pessoa_id else None)
+    return g._pessoa_atual[1]
 
 
 def exige_pessoa(rota):

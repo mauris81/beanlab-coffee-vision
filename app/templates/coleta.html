@@ -21,11 +21,28 @@
         {{ c.estatistica('Regiões', progresso.total, 'objetos encontrados nas fotos') }}
         {{ c.estatistica('Pendentes', progresso.pendentes, 'regiões sem anotação') }}
     </div>
-    {% if progresso.total %}{{ c.progresso(progresso.anotadas, progresso.total, 'Anotação') }}{% endif %}
+    {% if progresso.total %}
+    <section class="cartao pilha" aria-labelledby="titulo-anotar">
+        <h2 id="titulo-anotar">Anotação</h2>
+        {{ c.progresso(progresso.anotadas, progresso.total, 'Regiões anotadas', 'sucesso' if not progresso.pendentes else None) }}
+        <div class="linha">
+            {% if progresso.pendentes %}
+            {{ c.botao('Continuar anotando' if progresso.anotadas else 'Começar a anotar', href=url_for('web.anotar', coleta_id=coleta.id),
+                       icone_nome='seta-direita', icone_depois=True, tamanho='grande') }}
+            {% else %}
+            {{ c.botao('Rever anotações', 'secundario', href=url_for('web.anotar', coleta_id=coleta.id), icone_nome='check') }}
+            {% endif %}
+            {{ c.botao('Anotar em lote', 'secundario', href=url_for('web.anotar_lote', coleta_id=coleta.id), icone_nome='lista') }}
+        </div>
+    </section>
+    {% endif %}
 
     {# ---------------------------------------------------------------- envio #}
     <section class="cartao pilha" id="enviar" aria-labelledby="titulo-enviar">
         <h2 id="titulo-enviar">Enviar fotos</h2>
+        {% if tipo.motor_padrao %}
+            {% call c.alerta('info', 'Como fotografar') %}<p>{{ dica_do_motor(tipo.motor_padrao) }}</p>{% endcall %}
+        {% endif %}
         {% if not tipo.motor_padrao %}
             {% call c.alerta('info', tipo.nome ~ ' ainda não têm segmentação automática') %}
                 <p>Ela chega numa próxima etapa. Por enquanto, envie <strong>recortes prontos</strong>

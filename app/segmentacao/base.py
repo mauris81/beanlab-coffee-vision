@@ -21,5 +21,6 @@ class RegiaoEncontrada:
 class Segmentador(Protocol):
     nome: str     # gravado em Regiao.motor, ex.: 'classico'
     versao: str   # gravado em Regiao.versao_motor; mude quando o resultado mudar
+    dica_foto: str  # como fotografar para este motor funcionar bem (aparece na tela de envio)
 
     def segmentar(self, rgb: np.ndarray) -> list[RegiaoEncontrada]: ...

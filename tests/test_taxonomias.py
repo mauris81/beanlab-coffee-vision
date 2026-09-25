@@ -100,6 +100,7 @@ def test_trocar_teclas_entre_duas_classes(app, tmp_path):
     (('classes:', 'classes: []\nsobra:'), 'campo desconhecido "sobra"'),
     (('  - codigo: a', '  - codigo: a\n  x'), 'erro de formatação'),
     (('nome: Teste\n', 'nome: Teste\nmotor: magico\n'), 'motor "magico" não existe'),
+    (('tecla: "2"', 'tecla: "Z"'), 'a tecla "z" já serve para desfazer'),
 ])
 def test_erros_no_arquivo_geram_mensagem_clara(tmp_path, troca, trecho_da_mensagem):
     escrever(tmp_path, 'teste.yaml', VALIDO)

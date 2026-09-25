@@ -72,7 +72,8 @@ ITENS_DE_NAVEGACAO = [
 ]
 
 # Páginas "de dentro" de um item do menu: marcam o item como atual.
-_SECAO_DO_ENDPOINT = {'web.nova_coleta': 'web.coletas', 'web.coleta': 'web.coletas'}
+_SECAO_DO_ENDPOINT = {'web.nova_coleta': 'web.coletas', 'web.coleta': 'web.coletas',
+                      'web.anotar': 'web.coletas', 'web.anotar_lote': 'web.coletas'}
 
 
 def itens_de_navegacao():

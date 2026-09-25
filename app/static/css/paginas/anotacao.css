@@ -1,0 +1,127 @@
+/* Telas de anotação: uma por vez (/coletas/<id>/anotar) e em lote (/coletas/<id>/lote). */
+
+/* --- Topo comum ------------------------------------------------------------ */
+.anotar__topo {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--espaco-4);
+    margin-bottom: var(--espaco-5);
+}
+.anotar__titulo h1 { margin: 0; font-size: var(--texto-2xl); }
+.anotar__progresso { flex: 1 1 16rem; }
+.link-voltar {
+    display: inline-flex; align-items: center; gap: var(--espaco-1);
+    min-height: 32px; margin-bottom: var(--espaco-1);
+    color: var(--cor-texto-suave); font-size: var(--texto-sm); font-weight: var(--peso-medio);
+    text-decoration: none;
+}
+.link-voltar:hover { color: var(--cor-primaria-texto); text-decoration: underline; }
+
+/* --- Uma por vez ------------------------------------------------------------ */
+.anotar__area {
+    display: grid; gap: var(--espaco-5);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "regiao" "classes" "navegacao" "contexto";
+}
+@media (min-width: 1024px) {
+    .anotar__area {
+        grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+        grid-template-areas: "regiao classes" "navegacao classes" "contexto classes";
+        align-items: start;
+    }
+}
+.anotar__regiao { grid-area: regiao; display: flex; flex-direction: column; gap: var(--espaco-3); }
+.anotar__classes { grid-area: classes; display: flex; flex-direction: column; gap: var(--espaco-3); }
+.anotar__contexto { grid-area: contexto; }
+@media (min-width: 1024px) {
+    .anotar__classes { position: sticky; top: calc(var(--altura-topo) + var(--espaco-4)); }
+}
+.anotar__classes h2 { margin: 0; font-size: var(--texto-xl); }
+
+.recorte { margin: 0; display: flex; flex-direction: column; gap: var(--espaco-2); }
+.recorte img {
+    width: 100%; max-width: 32rem; height: auto; aspect-ratio: 1; object-fit: contain;
+    margin-inline: auto;
+    border-radius: var(--raio-lg);
+    background: repeating-conic-gradient(var(--cor-superficie-2) 0 25%, var(--cor-superficie) 0 50%) 0 0 / 16px 16px;
+    border: 1px solid var(--cor-borda);
+    image-rendering: auto;
+}
+/* No celular a região fica mais baixa, para as classes aparecerem sem rolar. */
+@media (max-width: 1023px) {
+    .recorte img { width: auto; max-width: 100%; max-height: 36vh; }
+    .anotar__area { gap: var(--espaco-3); }
+    .anotar__topo { margin-bottom: var(--espaco-3); gap: var(--espaco-2); }
+    .anotar__titulo h1 { font-size: var(--texto-xl); }
+}
+/* Atalhos de teclado não fazem sentido em telas só de toque. */
+@media (hover: none) and (pointer: coarse) {
+    [data-so-teclado] { display: none; }
+}
+.recorte figcaption { text-align: center; color: var(--cor-texto-suave); font-size: var(--texto-sm); }
+.anotar__situacao { margin: 0 auto; min-height: 32px; }
+.anotar__navegacao { grid-area: navegacao; display: flex; justify-content: space-between; gap: var(--espaco-3); }
+.anotar__navegacao .botao { flex: 1; max-width: 14rem; }
+
+.anotar__duvida { min-height: var(--alvo-toque); }
+.anotar__observacao summary { cursor: pointer; min-height: var(--alvo-toque); display: flex; align-items: center; font-weight: var(--peso-medio); }
+.anotar__ultima {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--espaco-2);
+    margin: 0; padding: var(--espaco-2) var(--espaco-3);
+    border-radius: var(--raio-md);
+    background: var(--cor-superficie-2);
+    font-size: var(--texto-sm);
+}
+
+/* Foto inteira com os contornos por cima. Branco e preto fixos (fora dos tokens) de
+   propósito: o contorno fica sobre a FOTO, que é igual nos dois temas. */
+.anotar__contexto summary { cursor: pointer; min-height: var(--alvo-toque); display: flex; align-items: center; font-weight: var(--peso-forte); }
+.contexto { position: relative; margin-top: var(--espaco-2); border-radius: var(--raio-md); overflow: hidden; background: var(--cor-superficie-2); }
+.contexto img { width: 100%; height: auto; }
+.contexto svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.contorno { fill: transparent; stroke: var(--cor); pointer-events: all; cursor: pointer; vector-effect: non-scaling-stroke; }
+.contorno--pendente { stroke: #FFFFFF; stroke-dasharray: 4 3; filter: drop-shadow(0 0 1px #000); }
+.contorno--anotada { stroke: var(--cor); fill: color-mix(in srgb, var(--cor) 25%, transparent); }
+.contorno--atual { stroke: var(--cor-foco); fill: color-mix(in srgb, var(--cor-foco) 20%, transparent); filter: drop-shadow(0 0 2px #000); }
+.contorno:hover { stroke: var(--cor-foco); }
+
+.anotar__carregando { justify-content: center; padding: var(--espaco-7) 0; }
+.anotar__fim:focus { outline: none; }
+
+/* --- Em lote ------------------------------------------------------------------ */
+.grade-lote {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(min(46%, 9.5rem), 1fr));
+    gap: var(--espaco-3); margin: 0; padding: 0; list-style: none;
+}
+.item-lote {
+    position: relative;
+    display: flex; flex-direction: column;
+    border: 2px solid var(--cor-borda);
+    border-radius: var(--raio-md);
+    background: var(--cor-superficie);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color var(--duracao-rapida) var(--curva);
+}
+.item-lote:hover { border-color: var(--cor-borda-controle); }
+.item-lote:has(input:checked) { border-color: var(--cor-primaria); background: var(--cor-primaria-suave); }
+.item-lote:has(input:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.item-lote input { position: absolute; top: var(--espaco-2); left: var(--espaco-2); width: 24px; height: 24px; margin: 0; accent-color: var(--cor-primaria); }
+.item-lote img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; background: var(--cor-superficie-2); }
+.item-lote__legenda { display: flex; align-items: center; gap: var(--espaco-2); padding: var(--espaco-2) var(--espaco-3); font-size: var(--texto-sm); font-weight: var(--peso-medio); }
+
+.paginacao { justify-content: center; }
+
+.barra-lote {
+    position: sticky;
+    bottom: calc(var(--altura-navegacao-inferior) + env(safe-area-inset-bottom));
+    z-index: 5;
+    display: flex; flex-direction: column; gap: var(--espaco-2);
+    padding: var(--espaco-3);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-lg);
+    background: var(--cor-superficie);
+    box-shadow: var(--sombra-3);
+}
+@media (min-width: 768px) { .barra-lote { bottom: var(--espaco-3); } }
+.barra-lote__selecao { gap: var(--espaco-2); }
+.barra-lote__classes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); gap: var(--espaco-2); }
+.barra-lote .botao-classe { min-height: 44px; }

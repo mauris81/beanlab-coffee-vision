@@ -4,7 +4,7 @@ import re
 
 import pytest
 
-from tests.fabrica_imagens import bandeja_de_graos
+from tests.fabrica_imagens import foto_de_graos
 from tests.navegador.conftest import violacoes_wcag
 
 pytestmark = pytest.mark.navegador
@@ -13,7 +13,7 @@ pytestmark = pytest.mark.navegador
 @pytest.mark.parametrize('tela', ['computador', 'celular'])
 def test_coletar_enviar_e_acompanhar(abrir, tmp_path, tela):
     foto = tmp_path / 'bandeja.png'
-    foto.write_bytes(bandeja_de_graos())
+    foto.write_bytes(foto_de_graos())
     pagina = abrir('/coletas', tela)
 
     # 1. Sem saber quem é a pessoa, "Nova coleta" leva para "Quem é você?"
@@ -64,7 +64,7 @@ def test_coletar_enviar_e_acompanhar(abrir, tmp_path, tela):
 def test_fim_da_segmentacao_nao_recarrega_com_dialogo_aberto(abrir, tmp_path):
     """Se a pessoa estiver no meio de algo, a página não recarrega sozinha."""
     foto = tmp_path / 'bandeja.png'
-    foto.write_bytes(bandeja_de_graos(semente=21))
+    foto.write_bytes(foto_de_graos(semente=21))
     pagina = abrir('/entrar')
     pagina.get_by_role('textbox', name='Seu nome').fill('Bia')
     pagina.get_by_role('button', name='Continuar').click()

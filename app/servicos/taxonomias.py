@@ -11,6 +11,7 @@ import yaml
 from sqlalchemy import select
 
 from app.dominio import Classe, TipoAmostra
+from app.dominio.taxonomia import TECLAS_RESERVADAS
 from app.extensions import db
 from app.segmentacao import MOTORES
 
@@ -131,6 +132,10 @@ def _ler_classe(dados, ordem: int, local: str) -> DefinicaoClasse:
         tecla = str(tecla).lower()  # o YAML lê `tecla: 1` como número
         if not _TECLA.match(tecla):
             raise TaxonomiaInvalida(f'{local}: tecla "{tecla}" inválida. Use um único número ou letra.')
+        if tecla in TECLAS_RESERVADAS:
+            raise TaxonomiaInvalida(
+                f'{local}: a tecla "{tecla}" já serve para {TECLAS_RESERVADAS[tecla]} na tela de '
+                f'anotação. Escolha outra.')
 
     return DefinicaoClasse(
         codigo=_codigo(dados['codigo'], local),

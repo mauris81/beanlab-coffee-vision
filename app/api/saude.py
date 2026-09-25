@@ -1,11 +1,9 @@
-"""Rotas que devolvem dados em JSON (usadas pelo JavaScript das páginas)."""
-from flask import Blueprint
+"""/api/saude: confirma que o servidor e o banco respondem."""
 from sqlalchemy import func, select
 
+from app.api import api_bp
 from app.dominio import Classe, TipoAmostra
 from app.extensions import db
-
-api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 @api_bp.get('/saude')

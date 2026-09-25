@@ -47,18 +47,40 @@ def png(largura=200, altura=150, cor=(10, 200, 30), transparente=False) -> bytes
     return saida.getvalue()
 
 
-def bandeja_de_graos(semente=7, quantidade=60) -> bytes:
-    """Foto sintética de grãos escuros numa bandeja bege sobre fundo azul (PNG)."""
+def foto_de_graos(semente=7, linhas=6, colunas=8, espacamento='separados', formato='png') -> bytes:
+    """Foto sintética no cenário do motor clássico: grãos marrons sobre FUNDO AZUL.
+
+    espacamento: 'separados' (há fundo entre os grãos) ou 'encostados' (camada contínua).
+    Os centros dos grãos ficam em centros_dos_graos(...) para os testes conferirem.
+    """
+    return _codificar(_desenhar_graos(semente, linhas, colunas, espacamento)[0], formato)
+
+
+def centros_dos_graos(semente=7, linhas=6, colunas=8, espacamento='separados') -> list[tuple[int, int]]:
+    return _desenhar_graos(semente, linhas, colunas, espacamento)[1]
+
+
+def _desenhar_graos(semente, linhas, colunas, espacamento):
     rng = np.random.default_rng(semente)
-    bgr = np.full((700, 900, 3), (200, 120, 40), np.uint8)
-    cv2.rectangle(bgr, (60, 60), (840, 640), (150, 195, 225), -1)
-    for _ in range(quantidade):
-        centro = (int(rng.integers(100, 800)), int(rng.integers(100, 600)))
-        eixos = (int(rng.integers(16, 24)), int(rng.integers(10, 15)))
-        cor = tuple(int(v) for v in rng.integers(25, 80, 3))
-        cv2.ellipse(bgr, centro, eixos, float(rng.integers(0, 180)), 0, 360, cor, -1)
-    bgr = np.clip(bgr + rng.normal(0, 5, bgr.shape), 0, 255).astype(np.uint8)
-    return cv2.imencode('.png', bgr)[1].tobytes()
+    passo = (80, 60) if espacamento == 'separados' else (56, 40)
+    eixos = (30, 21)
+    bgr = np.full((linhas * passo[1] + 120, colunas * passo[0] + 120, 3), (190, 110, 30), np.uint8)
+    centros = []
+    for i in range(linhas):
+        for j in range(colunas):
+            centro = (60 + j * passo[0] + passo[0] // 2 + int(rng.integers(-4, 5)),
+                      60 + i * passo[1] + passo[1] // 2 + int(rng.integers(-4, 5)))
+            cor = (int(rng.integers(50, 80)), int(rng.integers(95, 125)), int(rng.integers(140, 170)))
+            angulo = float(rng.integers(-15, 15))
+            cv2.ellipse(bgr, centro, eixos, angulo, 0, 360, cor, -1)
+            cv2.ellipse(bgr, centro, eixos, angulo, 0, 360, (30, 45, 60), 2)
+            centros.append(centro)
+    bgr = np.clip(bgr + rng.normal(0, 4, bgr.shape), 0, 255).astype(np.uint8)
+    return bgr, centros
+
+
+def _codificar(bgr, formato):
+    return cv2.imencode('.png' if formato == 'png' else '.jpg', bgr)[1].tobytes()
 
 
 def coco(imagens: list[tuple[int, str]], anotacoes: list[dict], categorias: dict[int, str]) -> bytes:

@@ -23,7 +23,7 @@ def create_app(config: Config | None = None) -> Flask:
     from app import dominio  # noqa: F401  (registra as tabelas no SQLAlchemy)
     from app.fila import FilaDeSegmentacao
     app.extensions['fila_segmentacao'] = FilaDeSegmentacao(app)
-    from app.api.rotas import api_bp
+    from app.api import api_bp
     from app.cli import registrar_comandos
     from app.web import web_bp
 

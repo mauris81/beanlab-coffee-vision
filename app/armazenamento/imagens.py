@@ -10,6 +10,7 @@ O nome original do arquivo fica guardado no banco (Imagem.nome_original).
 """
 import hashlib
 import os
+import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -44,10 +45,20 @@ class ArmazenamentoImagens:
         """Miniatura JPEG ao lado do original: 3fa2...e1.mini.jpg"""
         return self.pasta_base / hash_sha256[:2] / hash_sha256[2:4] / f'{hash_sha256}.mini.jpg'
 
+    def caminho_media(self, hash_sha256: str) -> Path:
+        """Versão média (visão geral na tela de anotação): 3fa2...e1.media.jpg"""
+        return self.pasta_base / hash_sha256[:2] / hash_sha256[2:4] / f'{hash_sha256}.media.jpg'
+
+    def pasta_recortes(self, hash_sha256: str) -> Path:
+        """Recortes das regiões desta foto (um arquivo por geometria de região)."""
+        return self.pasta_base / hash_sha256[:2] / hash_sha256[2:4] / f'{hash_sha256}.recortes'
+
     def remover(self, hash_sha256: str, extensao: str) -> None:
-        """Apaga o original e a miniatura. Só chame se nenhuma Imagem usar mais este hash."""
+        """Apaga o original e tudo que deriva dele. Só chame se nenhuma Imagem usar mais este hash."""
         self.caminho(hash_sha256, extensao).unlink(missing_ok=True)
         self.caminho_miniatura(hash_sha256).unlink(missing_ok=True)
+        self.caminho_media(hash_sha256).unlink(missing_ok=True)
+        shutil.rmtree(self.pasta_recortes(hash_sha256), ignore_errors=True)
 
     def salvar(self, conteudo: bytes, extensao: str) -> ArquivoSalvo:
         """Grava o conteúdo (se ainda não existir) e devolve onde ficou."""

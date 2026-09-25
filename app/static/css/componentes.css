@@ -432,3 +432,28 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 .cartao__titulo { margin: 0; font-size: var(--texto-xl); }
 .cartao__titulo a { color: inherit; text-decoration: none; }
 .cartao__titulo a:hover { text-decoration: underline; }
+
+/* --- Botão de classe (escolher a classe de uma região: anotar, lote) ---------- */
+.botoes-classe { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--espaco-2); }
+@media (min-width: 1024px) { .botoes-classe { grid-template-columns: 1fr; } }
+
+.botao-classe {
+    display: flex; align-items: center; gap: var(--espaco-3);
+    min-height: var(--alvo-toque);
+    padding: var(--espaco-2) var(--espaco-3);
+    border: 2px solid var(--cor-borda);
+    border-radius: var(--raio-md);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    font-weight: var(--peso-forte);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--duracao-rapida) var(--curva), background var(--duracao-rapida) var(--curva),
+                transform var(--duracao-rapida) var(--curva);
+}
+.botao-classe:hover { border-color: var(--cor-borda-controle); background: var(--cor-superficie-2); }
+.botao-classe:active { transform: scale(0.98); }
+.botao-classe[aria-pressed="true"] { border-color: var(--cor-primaria); background: var(--cor-primaria-suave); }
+.botao-classe__nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.botao-classe .chip-classe__cor { width: 16px; height: 16px; }
+

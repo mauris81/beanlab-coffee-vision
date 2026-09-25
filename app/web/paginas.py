@@ -8,12 +8,18 @@ from werkzeug.exceptions import BadRequest
 
 from app.dominio import StatusImagem, StatusJob, TipoAmostra
 from app.extensions import db
+from app.segmentacao import obter_motor
 from app.web import web_bp
 from app.web.apresentacao import apresentar_status, icone, icone_do_tipo, itens_de_navegacao, plural
 
 # Funções disponíveis em todos os templates.
 for _funcao in (icone, icone_do_tipo, apresentar_status, itens_de_navegacao, plural):
     web_bp.add_app_template_global(_funcao)
+
+
+@web_bp.app_template_global()
+def dica_do_motor(nome_motor: str) -> str:
+    return obter_motor(nome_motor).dica_foto
 
 
 def tipos_de_amostra():

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{#- Anotar uma região por vez. A página carrega as regiões pela API
+    (/api/coletas/<id>/regioes) e o JavaScript (static/js/anotar.js) cuida do resto:
+    atalhos, avanço automático, desfazer, contexto na foto. -#}
+
+{% block titulo %}Anotar · {{ coleta.nome }} · BeanLab{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paginas/anotacao.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+<div class="anotar" id="anotar"
+     data-api="{{ url_for('api.regioes_da_coleta', coleta_id=coleta.id) }}"
+     data-regiao-inicial="{{ regiao_inicial or '' }}">
+
+    <header class="anotar__topo">
+        <div class="anotar__titulo">
+            <a class="link-voltar" href="{{ url_for('web.coleta', coleta_id=coleta.id) }}">{{ icone('seta-esquerda') }}{{ coleta.nome }}</a>
+            <h1>Anotar {{ coleta.tipo_amostra.nome|lower }}</h1>
+        </div>
+        <div class="anotar__progresso" data-progresso>{{ c.progresso(progresso.anotadas, progresso.total, 'Anotadas') }}</div>
+        <div class="linha">
+            {{ c.botao('Em lote', 'secundario', href=url_for('web.anotar_lote', coleta_id=coleta.id), icone_nome='lista') }}
+            {{ c.botao_icone('teclado', 'Atalhos de teclado', 'secundario', attrs={'data-abrir-dialogo': 'dialogo-atalhos', 'data-so-teclado': ''}) }}
+        </div>
+    </header>
+
+    {% if not progresso.total %}
+        {% call c.vazio('Nenhuma região para anotar',
+                        'Envie fotos na página da coleta. Quando a segmentação terminar, as regiões aparecem aqui.', 'imagem') %}
+            {{ c.botao('Ir para a coleta', href=url_for('web.coleta', coleta_id=coleta.id), icone_nome='seta-esquerda') }}
+        {% endcall %}
+    {% else %}
+
+    <div class="anotar__carregando linha" data-carregando role="status">
+        <div class="girador"></div><span>Carregando regiões…</span>
+    </div>
+
+    <div class="anotar__area" data-area hidden>
+        <section class="anotar__regiao" aria-labelledby="legenda-regiao">
+            <figure class="recorte">
+                <img data-recorte alt="" width="320" height="320">
+                <figcaption id="legenda-regiao" data-legenda></figcaption>
+            </figure>
+            <p class="anotar__situacao" data-situacao></p>
+        </section>
+
+        <section class="anotar__classes" aria-labelledby="titulo-classes">
+            <h2 id="titulo-classes">O que é esta região?</h2>
+            <div class="botoes-classe" role="group" aria-labelledby="titulo-classes">
+                {% for classe in classes %}
+                <button type="button" class="botao-classe" data-classe="{{ classe.codigo }}" aria-pressed="false"
+                        {% if classe.tecla_atalho %}aria-keyshortcuts="{{ classe.tecla_atalho }}"{% endif %}
+                        {% if classe.descricao %}title="{{ classe.descricao }}"{% endif %}>
+                    <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>
+                    <span class="botao-classe__nome">{{ classe.nome }}</span>
+                    {% if classe.tecla_atalho %}<kbd class="tecla" aria-hidden="true">{{ classe.tecla_atalho }}</kbd>{% endif %}
+                </button>
+                {% endfor %}
+            </div>
+            <label class="opcao anotar__duvida">
+                <input type="checkbox" data-duvida aria-keyshortcuts="D"> Tenho dúvida {{ c.tecla('D') }}
+            </label>
+            <details class="anotar__observacao">
+                <summary>Observação</summary>
+                <label class="visualmente-oculto" for="observacao">Observação sobre esta região</label>
+                <textarea class="entrada" id="observacao" data-observacao rows="2"
+                          placeholder="Ex.: furo pequeno na ponta"></textarea>
+            </details>
+            <p class="anotar__ultima" data-ultima hidden>
+                <span data-ultima-texto></span>
+                {{ c.botao('Desfazer', 'fantasma', icone_nome='desfazer', attrs={'data-desfazer': '', 'aria-keyshortcuts': 'Z'}) }}
+            </p>
+        </section>
+
+        <div class="anotar__navegacao">
+            {{ c.botao('Anterior', 'secundario', icone_nome='seta-esquerda', attrs={'data-anterior': '', 'aria-keyshortcuts': 'ArrowLeft'}) }}
+            {{ c.botao('Próxima', 'secundario', icone_nome='seta-direita', icone_depois=True, attrs={'data-proxima': '', 'aria-keyshortcuts': 'ArrowRight'}) }}
+        </div>
+
+        <details class="anotar__contexto" data-contexto>
+            <summary>Ver na foto inteira</summary>
+            <div class="contexto">
+                <img data-foto alt="">
+                <svg data-sobreposicao aria-hidden="true" preserveAspectRatio="none"></svg>
+            </div>
+            <p class="texto-suave">Clique num contorno para ir até a região.</p>
+        </details>
+    </div>
+
+    <div class="anotar__fim" data-fim hidden tabindex="-1">
+        {% call c.vazio('Tudo anotado nesta coleta!', 'Obrigado. Você pode rever as anotações ou voltar para a coleta.', 'sucesso') %}
+            {{ c.botao('Rever do começo', 'secundario', icone_nome='desfazer', attrs={'data-rever': ''}) }}
+            {{ c.botao('Voltar à coleta', href=url_for('web.coleta', coleta_id=coleta.id), icone_nome='seta-esquerda') }}
+        {% endcall %}
+    </div>
+    {% endif %}
+
+    <p class="visualmente-oculto" aria-live="polite" data-anuncio></p>
+
+    <dialog class="dialogo" id="dialogo-atalhos" aria-labelledby="dialogo-atalhos-titulo">
+        <div class="dialogo__corpo">
+            <h2 id="dialogo-atalhos-titulo">Atalhos de teclado</h2>
+            <dl class="atalhos">
+                {% for classe in classes if classe.tecla_atalho %}
+                <div><dt>{{ c.tecla(classe.tecla_atalho) }}</dt><dd>{{ classe.nome }} (e vai para a próxima pendente)</dd></div>
+                {% endfor %}
+                <div><dt>{{ c.tecla('→', 'seta para a direita') }} {{ c.tecla('←', 'seta para a esquerda') }}</dt><dd>Próxima / anterior, sem anotar</dd></div>
+                <div><dt>{{ c.tecla('D') }}</dt><dd>Marca ou desmarca "Tenho dúvida"</dd></div>
+                <div><dt>{{ c.tecla('Z') }}</dt><dd>Desfaz a última anotação</dd></div>
+                <div><dt>{{ c.tecla('?') }}</dt><dd>Mostra esta lista</dd></div>
+            </dl>
+        </div>
+        <div class="dialogo__acoes">{{ c.botao('Fechar', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}</div>
+    </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/anotar.js') }}"></script>
+{% endblock %}

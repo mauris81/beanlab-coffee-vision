@@ -42,6 +42,7 @@ campo, as fotos precisam chegar já segmentadas (recortes ou COCO).
 - `codigo`: só letras minúsculas sem acento, números e `_`, começando por letra.
 - Cada `codigo` e cada `tecla` só pode aparecer uma vez no mesmo arquivo.
 - `cor` no formato `"#RRGGBB"`.
+- As teclas **Z** (desfazer) e **D** (dúvida) são da tela de anotação: não use em classes.
 
 ## Sobre as cores
 

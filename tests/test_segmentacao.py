@@ -1,7 +1,9 @@
 """Motor clássico, jobs de segmentação e fila."""
 import io
 
+import cv2
 import numpy as np
+import pytest
 from PIL import Image
 
 from app import segmentacao as pacote_segmentacao
@@ -9,16 +11,16 @@ from app.dominio import JobSegmentacao, OrigemRegiao, Regiao, StatusImagem, Stat
 from app.dominio.geometria import area_do_poligono
 from app.extensions import db
 from app.fila import fila
-from app.segmentacao.classico import MotorClassico
+from app.segmentacao.classico import MotorClassico, ParametrosClassico
 from app.servicos.imagens import abrir_orientada, matriz_rgb, recortar
 from app.servicos.ingestao import receber_foto
 from app.servicos.segmentacao import agendar_segmentacao, executar_job
-from tests.fabrica_imagens import bandeja_de_graos, foto_jpeg
+from tests.fabrica_imagens import centros_dos_graos, foto_de_graos, foto_jpeg
 from tests.test_ingestao import nova_coleta
 
 
 def enviar_e_segmentar(tipo_codigo='graos', conteudo=None):
-    imagem = receber_foto(nova_coleta(tipo_codigo), conteudo or bandeja_de_graos(), 'bandeja.png').imagem
+    imagem = receber_foto(nova_coleta(tipo_codigo), conteudo or foto_de_graos(), 'bandeja.png').imagem
     job = agendar_segmentacao(imagem)
     db.session.commit()
     if job:
@@ -29,16 +31,34 @@ def enviar_e_segmentar(tipo_codigo='graos', conteudo=None):
 
 # ------------------------------------------------------------- motor clássico
 
-def test_motor_classico_encontra_os_graos_da_bandeja():
-    rgb = matriz_rgb(bandeja_de_graos())
+def _grao_por_regiao(regioes, centros) -> list[int]:
+    """Para cada grão, em quantas regiões o seu centro cai (o certo é exatamente 1)."""
+    return [sum(cv2.pointPolygonTest(np.array(r.poligono, np.int32), centro, False) >= 0 for r in regioes)
+            for centro in centros]
+
+
+@pytest.mark.parametrize('espacamento', ['separados', 'encostados'])
+@pytest.mark.parametrize('semente', [1, 2, 3])
+def test_motor_classico_encontra_cada_grao_uma_vez(espacamento, semente):
+    rgb = matriz_rgb(foto_de_graos(semente, espacamento=espacamento))
     regioes = MotorClassico().segmentar(rgb)
+    centros = centros_dos_graos(semente, espacamento=espacamento)
+    assert _grao_por_regiao(regioes, centros) == [1] * len(centros)  # 48 grãos, 48 regiões
+    assert len(regioes) == len(centros)  # nenhuma região a mais (fundo)
     altura, largura = rgb.shape[:2]
-    assert 20 <= len(regioes) <= 45  # 60 elipses, algumas encostadas
     for regiao in regioes:
         xs, ys = zip(*regiao.poligono)
         assert 0 <= min(xs) and max(xs) <= largura and 0 <= min(ys) and max(ys) <= altura
         # a área real (pixels) e a do contorno simplificado devem ser parecidas
         assert abs(area_do_poligono(regiao.poligono) - regiao.area_px) / regiao.area_px < 0.25
+
+
+def test_modo_antigo_so_via_o_maior_grupo_de_graos():
+    """Documenta a limitação do algoritmo antigo (corrigida na versão 2.1): com grãos
+    separados, ele só enxergava um deles."""
+    rgb = matriz_rgb(foto_de_graos(1, espacamento='separados'))
+    antigo = MotorClassico(ParametrosClassico(somente_maior_grupo=True)).segmentar(rgb)
+    assert len(antigo) == 1
 
 
 def test_recorte_preserva_as_cores():
@@ -60,7 +80,7 @@ def test_foto_de_graos_e_segmentada_e_fica_pronta(app):
     assert job.status == StatusJob.CONCLUIDO and job.num_regioes == len(imagem.regioes) > 0
     assert imagem.status == StatusImagem.PRONTA
     regiao = imagem.regioes[0]
-    assert (regiao.origem, regiao.motor, regiao.versao_motor) == (OrigemRegiao.AUTOMATICA, 'classico', '2.0')
+    assert (regiao.origem, regiao.motor, regiao.versao_motor) == (OrigemRegiao.AUTOMATICA, 'classico', '2.1')
     assert job.duracao_s is not None
 
 
@@ -102,7 +122,7 @@ def test_segmentar_de_novo_troca_so_as_regioes_automaticas(app):
 
 
 def test_fila_retoma_o_que_ficou_pela_metade(app):
-    imagem = receber_foto(nova_coleta(), bandeja_de_graos(), 'b.png').imagem
+    imagem = receber_foto(nova_coleta(), foto_de_graos(), 'b.png').imagem
     job = agendar_segmentacao(imagem)
     job.status = StatusJob.PROCESSANDO  # como se a plataforma tivesse fechado no meio
     db.session.commit()

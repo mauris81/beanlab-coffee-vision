@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from app.dominio import Coleta, Imagem, Pessoa, StatusImagem
 from app.extensions import db
-from tests.fabrica_imagens import bandeja_de_graos, foto_jpeg
+from tests.fabrica_imagens import foto_de_graos, foto_jpeg
 
 TOKEN = 'token-de-teste'
 
@@ -96,7 +96,7 @@ def test_lista_de_coletas_filtra_por_tipo(logado):
 
 def test_enviar_fotos_segmenta_e_mostra_resumo(logado):
     coleta = criar_coleta(logado)
-    resposta = enviar(logado, coleta, [('bandeja.png', bandeja_de_graos()), ('texto.jpg', b'nao e foto')])
+    resposta = enviar(logado, coleta, [('bandeja.png', foto_de_graos()), ('texto.jpg', b'nao e foto')])
     assert resposta.status_code == 302 and resposta.location.endswith('#fotos')
     html = logado.get(resposta.location).get_data(as_text=True)
     assert '1 foto recebida.' in html
@@ -120,7 +120,7 @@ def test_envio_sem_arquivos(logado):
 
 def test_situacao_json_para_acompanhar_a_segmentacao(logado):
     coleta = criar_coleta(logado)
-    enviar(logado, coleta, [('bandeja.png', bandeja_de_graos())])
+    enviar(logado, coleta, [('bandeja.png', foto_de_graos())])
     situacao = logado.get(f'/coletas/{coleta.id}/situacao.json').get_json()
     assert situacao['pendentes'] == 0 and situacao['regioes'] > 0
     assert situacao['imagens'][0]['selo'] == {'texto': 'Pronta', 'variante': 'sucesso',

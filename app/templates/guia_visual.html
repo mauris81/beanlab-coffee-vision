@@ -237,6 +237,18 @@
             </div>
         </fieldset>
 
+        <h3>Botões de classe</h3>
+        <p class="texto-suave">Na anotação: cor, nome e tecla. O que já foi escolhido fica marcado (<code>aria-pressed</code>).</p>
+        <div class="botoes-classe" style="max-width: 24rem">
+            {% for classe in (tipos[0].classes_ativas if tipos else [])[:3] %}
+            <button type="button" class="botao-classe" aria-pressed="{{ 'true' if loop.index == 2 else 'false' }}">
+                <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>
+                <span class="botao-classe__nome">{{ classe.nome }}</span>
+                {% if classe.tecla_atalho %}<kbd class="tecla" aria-hidden="true">{{ classe.tecla_atalho }}</kbd>{% endif %}
+            </button>
+            {% endfor %}
+        </div>
+
         <h3>Filtros</h3>
         <ul class="filtros" aria-label="Exemplo de filtros">
             <li><a class="filtro" href="#escolhas" aria-current="page">Todas</a></li>

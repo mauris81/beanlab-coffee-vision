@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{#- Anotar em lote: marcar várias regiões e aplicar uma classe a todas de uma vez.
+    Funciona sem JavaScript (formulário comum); o JS (static/js/lote.js) acrescenta
+    contagem, "marcar todas", Shift+clique e atalhos de teclado. -#}
+
+{% block titulo %}Anotar em lote · {{ coleta.nome }} · BeanLab{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paginas/anotacao.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande" id="lote">
+    <header class="anotar__topo">
+        <div class="anotar__titulo">
+            <a class="link-voltar" href="{{ url_for('web.coleta', coleta_id=coleta.id) }}">{{ icone('seta-esquerda') }}{{ coleta.nome }}</a>
+            <h1>Anotar em lote</h1>
+        </div>
+        <div class="anotar__progresso">{{ c.progresso(progresso.anotadas, progresso.total, 'Anotadas') }}</div>
+        {{ c.botao('Uma por vez', 'secundario', href=url_for('web.anotar', coleta_id=coleta.id), icone_nome='imagem') }}
+    </header>
+
+    {% if ultimo_lote %}
+    {% call c.alerta('sucesso') %}
+        <div class="linha">
+            <p>{{ ultimo_lote.texto }}</p>
+            <form method="post" action="{{ url_for('web.desfazer_lote', coleta_id=coleta.id) }}">
+                {{ campo_csrf() }}
+                <input type="hidden" name="mostrar" value="{{ mostrar }}">
+                {% for anotacao_id in ultimo_lote.ids %}<input type="hidden" name="anotacoes" value="{{ anotacao_id }}">{% endfor %}
+                {{ c.botao('Desfazer', 'secundario', tipo='submit', icone_nome='desfazer') }}
+            </form>
+        </div>
+    {% endcall %}
+    {% endif %}
+
+    <nav aria-label="Quais regiões mostrar">
+        <ul class="filtros">
+            <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar='pendentes') }}"{% if mostrar == 'pendentes' %} aria-current="page"{% endif %}>Pendentes ({{ progresso.pendentes }})</a></li>
+            <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar='todas') }}"{% if mostrar == 'todas' %} aria-current="page"{% endif %}>Todas ({{ progresso.total }})</a></li>
+            {% for classe in classes %}
+            <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar=classe.codigo) }}"{% if mostrar == classe.codigo %} aria-current="page"{% endif %}>
+                <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>{{ classe.nome }} ({{ progresso.por_classe.get(classe.codigo, 0) }})</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    {% if regioes %}
+    <form method="post" action="{{ url_for('web.aplicar_lote', coleta_id=coleta.id) }}" class="pilha" data-form-lote>
+        {{ campo_csrf() }}
+        <input type="hidden" name="mostrar" value="{{ mostrar }}">
+        <input type="hidden" name="pagina" value="{{ pagina }}">
+
+        <fieldset>
+            <legend class="visualmente-oculto">Regiões ({{ plural(quantidade, 'região', 'regiões') }}). Marque as que são da mesma classe.</legend>
+            <ul class="grade-lote">
+                {% for regiao in regioes %}
+                {%- set classe = nomes_classes.get(regiao.classe) %}
+                <li>
+                    <label class="item-lote">
+                        <input type="checkbox" name="regioes" value="{{ regiao.id }}" data-item>
+                        <img src="{{ url_for('web.recorte_da_regiao', regiao_id=regiao.id, v=regiao.bbox|join('_')) }}"
+                             alt="" loading="lazy" width="160" height="160">
+                        <span class="item-lote__legenda">
+                            <span class="visualmente-oculto">Região {{ (pagina - 1) * por_pagina + loop.index }}:</span>
+                            {% if classe %}<span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>{{ classe.nome }}{% if regiao.duvida %} (dúvida){% endif %}
+                            {% else %}<span class="texto-suave">Pendente</span>{% endif %}
+                        </span>
+                    </label>
+                </li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+
+        {% if total_paginas > 1 %}
+        <nav class="linha paginacao" aria-label="Páginas">
+            {% if pagina > 1 %}{{ c.botao('Página anterior', 'secundario', href=url_for('web.anotar_lote', coleta_id=coleta.id, mostrar=mostrar, pagina=pagina - 1), icone_nome='seta-esquerda') }}{% endif %}
+            <span>Página {{ pagina }} de {{ total_paginas }}</span>
+            {% if pagina < total_paginas %}{{ c.botao('Próxima página', 'secundario', href=url_for('web.anotar_lote', coleta_id=coleta.id, mostrar=mostrar, pagina=pagina + 1), icone_nome='seta-direita', icone_depois=True) }}{% endif %}
+        </nav>
+        {% endif %}
+
+        <div class="barra-lote" role="region" aria-label="Aplicar classe às marcadas">
+            <div class="linha barra-lote__selecao">
+                <strong data-contagem aria-live="polite">Marque as regiões</strong>
+                {{ c.botao('Marcar todas desta página', 'fantasma', attrs={'data-marcar-todas': ''}) }}
+                {{ c.botao('Desmarcar', 'fantasma', attrs={'data-desmarcar': ''}) }}
+            </div>
+            <div class="barra-lote__classes">
+                {% for classe in classes %}
+                <button type="submit" name="classe" value="{{ classe.codigo }}" class="botao-classe"
+                        {% if classe.tecla_atalho %}aria-keyshortcuts="{{ classe.tecla_atalho }}"{% endif %}>
+                    <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>
+                    <span class="botao-classe__nome">{{ classe.nome }}</span>
+                    {% if classe.tecla_atalho %}<kbd class="tecla" aria-hidden="true">{{ classe.tecla_atalho }}</kbd>{% endif %}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </form>
+    {% else %}
+        {% call c.vazio('Nenhuma região ' ~ ('pendente' if mostrar == 'pendentes' else 'aqui'),
+                        'Tudo anotado nesta coleta.' if mostrar == 'pendentes' and progresso.total else 'Escolha outro filtro acima.', 'sucesso' if mostrar == 'pendentes' else 'imagem') %}
+            {{ c.botao('Voltar à coleta', 'secundario', href=url_for('web.coleta', coleta_id=coleta.id), icone_nome='seta-esquerda') }}
+        {% endcall %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/lote.js') }}"></script>
+{% endblock %}

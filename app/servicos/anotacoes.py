@@ -79,3 +79,72 @@ def progresso_da_coleta(coleta_id: int) -> Progresso:
     ).all())
 
     return Progresso(total=total, anotadas=anotadas, por_classe=por_classe)
+
+
+# ------------------------------------------------------------- tela de anotação
+
+CONFIANCA_DUVIDA = 0.5  # "Tenho dúvida" na tela vira esta confiança
+
+
+@dataclass(frozen=True)
+class SituacaoRegiao:
+    """Uma região e sua anotação vigente (se houver), para montar a tela de anotação."""
+    id: int
+    imagem_id: int
+    bbox: list[int]
+    poligono: list[list[int]]
+    anotacao_id: int | None
+    classe: str | None          # código da classe vigente
+    duvida: bool
+    observacao: str | None
+
+
+def situacao_das_regioes(coleta_id: int) -> list[SituacaoRegiao]:
+    """Todas as regiões da coleta, na ordem de anotação (foto, depois região), numa consulta só."""
+    vigentes = (
+        select(Anotacao.regiao_id, func.max(Anotacao.id).label('anotacao_id'))
+        .group_by(Anotacao.regiao_id).subquery()
+    )
+    linhas = db.session.execute(
+        select(Regiao, Anotacao, Classe.codigo)
+        .join(Regiao.imagem)
+        .outerjoin(vigentes, vigentes.c.regiao_id == Regiao.id)
+        .outerjoin(Anotacao, Anotacao.id == vigentes.c.anotacao_id)
+        .outerjoin(Classe, Classe.id == Anotacao.classe_id)
+        .where(Imagem.coleta_id == coleta_id)
+        .order_by(Imagem.id, Regiao.id)
+    ).all()
+    return [
+        SituacaoRegiao(
+            id=regiao.id, imagem_id=regiao.imagem_id, bbox=regiao.bbox, poligono=regiao.poligono,
+            anotacao_id=anotacao.id if anotacao else None, classe=codigo,
+            duvida=bool(anotacao and anotacao.confianca is not None
+                        and anotacao.confianca < 1),
+            observacao=anotacao.observacao if anotacao else None,
+        )
+        for regiao, anotacao, codigo in linhas
+    ]
+
+
+def anotar_em_lote(regioes: list[Regiao], classe: Classe, *, pessoa: Pessoa | None = None) -> list[Anotacao]:
+    """Aplica a mesma classe a várias regiões. Não confirma (commit)."""
+    return [anotar_regiao(regiao, classe, pessoa=pessoa) for regiao in regioes]
+
+
+def desfazer_anotacoes(ids: list[int], pessoa: Pessoa) -> int:
+    """Apaga anotações recém-feitas, para corrigir um engano. Não confirma (commit).
+
+    Só apaga as que forem da própria pessoa E ainda forem a vigente da região: ninguém
+    desfaz o trabalho de outra pessoa, nem uma anotação que já foi substituída.
+    Mudar de ideia depois não é "desfazer": é anotar de novo (fica no histórico).
+    Devolve quantas foram apagadas.
+    """
+    apagadas = 0
+    for anotacao in db.session.scalars(select(Anotacao).where(Anotacao.id.in_(ids))).all():
+        vigente = db.session.scalar(
+            select(func.max(Anotacao.id)).where(Anotacao.regiao_id == anotacao.regiao_id))
+        if anotacao.pessoa_id == pessoa.id and anotacao.id == vigente:
+            db.session.delete(anotacao)
+            apagadas += 1
+    db.session.flush()
+    return apagadas

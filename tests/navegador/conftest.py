@@ -25,19 +25,25 @@ except ImportError:  # só quem roda estes testes precisa do Playwright
 
 
 @pytest.fixture(scope='session')
-def endereco(tmp_path_factory):
-    """URL de um servidor da plataforma rodando só para os testes."""
+def aplicacao(tmp_path_factory):
+    """A aplicação por trás do servidor de teste (para preparar dados direto no banco)."""
     config = ConfigTeste(pasta_dados=tmp_path_factory.mktemp('dados'))
     config.SEGMENTACAO_SINCRONA = False  # fila em segundo plano, como no uso real
-    aplicacao = create_app(config)
-    with aplicacao.app_context():
+    app = create_app(config)
+    with app.app_context():
         preparar_banco()
+    yield app
+    with app.app_context():
+        db.engine.dispose()
+
+
+@pytest.fixture(scope='session')
+def endereco(aplicacao):
+    """URL de um servidor da plataforma rodando só para os testes."""
     servidor = make_server('127.0.0.1', 0, aplicacao, threaded=True)
     threading.Thread(target=servidor.serve_forever, daemon=True).start()
     yield f'http://127.0.0.1:{servidor.server_port}'
     servidor.shutdown()
-    with aplicacao.app_context():
-        db.engine.dispose()
 
 
 @pytest.fixture(scope='session')

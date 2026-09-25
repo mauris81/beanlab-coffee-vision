@@ -7,6 +7,10 @@ que é como o navegador e as pessoas a veem. Por isso tudo que lê pixels passa 
 abrir_orientada().
 """
 import io
+import os
+import tempfile
+import threading
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -100,17 +104,51 @@ def matriz_rgb(origem: Path | bytes) -> np.ndarray:
 
 def gerar_miniatura(origem: Path | bytes, destino: Path, lado: int = LADO_MINIATURA) -> Path:
     """JPEG leve (lado maior = `lado` px) para listas e para o celular."""
-    if destino.exists():
-        return destino
-    imagem = Image.open(io.BytesIO(origem) if isinstance(origem, bytes) else origem)
-    imagem.draft('RGB', (lado * 2, lado * 2))  # JPEG: decodifica já reduzido (bem mais rápido)
-    imagem = _sem_transparencia(ImageOps.exif_transpose(imagem))
-    imagem.thumbnail((lado, lado))
-    destino.parent.mkdir(parents=True, exist_ok=True)
-    temporario = destino.with_suffix('.parcial')
-    imagem.save(temporario, 'JPEG', quality=82, optimize=True)
-    temporario.replace(destino)
+    with trava(f'derivado:{destino}'):
+        if destino.exists():
+            return destino
+        imagem = Image.open(io.BytesIO(origem) if isinstance(origem, bytes) else origem)
+        imagem.draft('RGB', (lado * 2, lado * 2))  # JPEG: decodifica já reduzido (bem mais rápido)
+        imagem = _sem_transparencia(ImageOps.exif_transpose(imagem))
+        imagem.thumbnail((lado, lado))
+        salvar_jpeg(imagem, destino, quality=82, optimize=True)
     return destino
+
+
+# ------------------------------------------------ gravação segura com vários pedidos
+
+_travas: dict[str, threading.Lock] = {}
+_trava_das_travas = threading.Lock()
+
+
+@contextmanager
+def trava(chave: str):
+    """Garante que só um pedido por vez gere o mesmo arquivo derivado; os outros esperam
+    e depois encontram o arquivo pronto. (Vale dentro de um processo: ver decisão 0005.)"""
+    with _trava_das_travas:
+        trava_da_chave = _travas.setdefault(chave, threading.Lock())
+    with trava_da_chave:
+        yield
+
+
+def salvar_jpeg(imagem: Image.Image, destino: Path, **opcoes) -> None:
+    """Grava num temporário de nome único e renomeia: nunca deixa arquivo pela metade e
+    dois pedidos simultâneos não disputam o mesmo temporário."""
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    descritor, temporario = tempfile.mkstemp(dir=destino.parent, suffix='.parcial')
+    try:
+        with os.fdopen(descritor, 'wb') as arquivo:
+            imagem.save(arquivo, 'JPEG', **opcoes)
+        os.replace(temporario, destino)
+    except PermissionError:
+        # Windows: outro pedido acabou de gravar o mesmo destino e ele está aberto.
+        # O conteúdo é o mesmo; basta descartar o nosso.
+        Path(temporario).unlink(missing_ok=True)
+        if not destino.exists():
+            raise
+    except BaseException:
+        Path(temporario).unlink(missing_ok=True)
+        raise
 
 
 def recortar(imagem_orientada: Image.Image, bbox: list[int], margem: int = 0) -> Image.Image:

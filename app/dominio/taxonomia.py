@@ -8,6 +8,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
 
+# Teclas que a tela de anotação usa para outras funções: não podem ser atalho de classe.
+TECLAS_RESERVADAS = {'z': 'desfazer', 'd': 'marcar dúvida'}
+
 
 class TipoAmostra(db.Model):
     __tablename__ = 'tipo_amostra'
