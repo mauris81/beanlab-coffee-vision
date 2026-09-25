@@ -30,7 +30,9 @@ Extras já entregues fora das fases:
   identifica pelo nome (sem senha), e o modelo de dados já prevê login no futuro.
 - **Tecnologia:** continua Python (3.14) + Flask, sem etapa de build no front-end
   (ver [decisoes/0001](decisoes/0001-manter-flask-sem-build.md)).
-- **Código no GitHub, em repositório público.** Fotos e banco nunca sobem (`.gitignore`).
+- **Código no GitHub, em repositório público:**
+  https://github.com/mauris81/beanlab-coffee-vision. Fotos e banco nunca sobem
+  (`.gitignore`). Ainda sem licença, a decidir.
 - **Hospedagem online:** decidir depois da Fase 2.
 
 ## Pendências para o responsável

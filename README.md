@@ -22,8 +22,9 @@ usar nos **celulares conectados ao mesmo Wi-Fi**. Para desligar, feche a janela 
 
 ### Baixando o projeto em outro computador
 
-No GitHub, clique no botão verde **Code → Download ZIP**, extraia a pasta e dê dois
-cliques em `Iniciar BeanLab.bat`. (Quem usa git: `git clone` e o mesmo duplo clique.)
+Em **https://github.com/mauris81/beanlab-coffee-vision**, clique no botão verde
+**Code → Download ZIP**, extraia a pasta e dê dois cliques em `Iniciar BeanLab.bat`.
+(Quem usa git: `git clone` e o mesmo duplo clique.)
 
 <details>
 <summary>Para quem programa: rodar pelo terminal</summary>
