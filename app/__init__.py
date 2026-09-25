@@ -21,9 +21,11 @@ def create_app(config: Config | None = None) -> Flask:
     migrate.init_app(app, db, directory=str(app.config['PASTA_MIGRACOES']), render_as_batch=True)
 
     from app import dominio  # noqa: F401  (registra as tabelas no SQLAlchemy)
+    from app.fila import FilaDeSegmentacao
+    app.extensions['fila_segmentacao'] = FilaDeSegmentacao(app)
     from app.api.rotas import api_bp
     from app.cli import registrar_comandos
-    from app.web.rotas import web_bp
+    from app.web import web_bp
 
     app.register_blueprint(web_bp)
     app.register_blueprint(api_bp)

@@ -25,6 +25,19 @@ def test_migracoes_podem_ser_desfeitas_e_refeitas(app):
     assert 'anotacao' in inspect(db.engine).get_table_names()
 
 
+def test_desfazer_ultima_migracao_com_dados_no_banco(app):
+    """Alterar uma tabela que outras referenciam (com dados) não pode falhar nem quebrar
+    as referências; e as chaves estrangeiras precisam voltar ligadas depois."""
+    from tests.conftest import criar_coleta
+    criar_coleta(num_regioes=2)
+    db.session.remove()
+    downgrade(revision='-1')
+    upgrade()
+    with db.engine.connect() as conexao:
+        assert conexao.exec_driver_sql('PRAGMA foreign_keys').scalar() == 1
+        assert conexao.exec_driver_sql('PRAGMA foreign_key_check').fetchall() == []
+
+
 def test_pagina_inicial_mostra_tipos_e_classes(cliente):
     resposta = cliente.get('/')
     assert resposta.status_code == 200

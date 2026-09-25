@@ -8,6 +8,7 @@ Sobem um servidor próprio, numa porta livre, com banco numa pasta temporária.
 Nada toca em C:\\CafeData nem no servidor que estiver aberto.
 """
 import threading
+from pathlib import Path
 
 import pytest
 from werkzeug.serving import make_server
@@ -26,7 +27,9 @@ except ImportError:  # só quem roda estes testes precisa do Playwright
 @pytest.fixture(scope='session')
 def endereco(tmp_path_factory):
     """URL de um servidor da plataforma rodando só para os testes."""
-    aplicacao = create_app(ConfigTeste(pasta_dados=tmp_path_factory.mktemp('dados')))
+    config = ConfigTeste(pasta_dados=tmp_path_factory.mktemp('dados'))
+    config.SEGMENTACAO_SINCRONA = False  # fila em segundo plano, como no uso real
+    aplicacao = create_app(config)
     with aplicacao.app_context():
         preparar_banco()
     servidor = make_server('127.0.0.1', 0, aplicacao, threaded=True)
@@ -52,6 +55,22 @@ def navegador():
             pytest.skip('Nem Chrome nem Edge encontrados')
         yield instancia
         instancia.close()
+
+
+AXE = (Path(__file__).parent / 'axe.min.js').read_text(encoding='utf-8')
+REGRAS_WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
+
+
+def violacoes_wcag(pagina) -> str:
+    """Roda o axe-core na página aberta; devolve '' se não houver problemas."""
+    pagina.add_script_tag(content=AXE)
+    resultado = pagina.evaluate(
+        '(regras) => axe.run(document, {runOnly: {type: "tag", values: regras}})', REGRAS_WCAG)
+    linhas = []
+    for v in resultado['violations']:
+        linhas.append(f"[{v['impact']}] {v['id']}: {v['help']} ({v['helpUrl']})")
+        linhas += [f"    em {no['target']}" for no in v['nodes'][:5]]
+    return '\n'.join(linhas)
 
 
 TELAS = {'celular': {'width': 390, 'height': 844}, 'computador': {'width': 1366, 'height': 900}}

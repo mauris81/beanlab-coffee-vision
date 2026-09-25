@@ -4,24 +4,15 @@ axe-core: https://github.com/dequelabs/axe-core (licença MPL-2.0; o arquivo
 axe.min.js desta pasta é uma cópia sem alterações da versão 4.10.2).
 Não substitui teste com pessoas nem com leitor de tela, mas pega a maior parte
 dos erros comuns: contraste, rótulos, nomes de botões, estrutura, teclado.
+Páginas que precisam de dados (coleta com fotos) são auditadas em test_fluxo_coleta.py.
 """
-from pathlib import Path
-
 import pytest
+
+from tests.navegador.conftest import violacoes_wcag
 
 pytestmark = pytest.mark.navegador
 
-AXE = (Path(__file__).parent / 'axe.min.js').read_text(encoding='utf-8')
-REGRAS_WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
-PAGINAS = ['/', '/guia-visual', '/pagina-que-nao-existe']
-
-
-def _descrever(violacoes) -> str:
-    linhas = []
-    for v in violacoes:
-        linhas.append(f"[{v['impact']}] {v['id']}: {v['help']} ({v['helpUrl']})")
-        linhas += [f"    em {no['target']}" for no in v['nodes'][:5]]
-    return '\n'.join(linhas)
+PAGINAS = ['/', '/guia-visual', '/pagina-que-nao-existe', '/coletas', '/entrar']
 
 
 @pytest.mark.parametrize('tema', ['light', 'dark'])
@@ -29,8 +20,5 @@ def _descrever(violacoes) -> str:
 @pytest.mark.parametrize('caminho', PAGINAS)
 def test_pagina_sem_violacoes_wcag(abrir, caminho, tela, tema):
     pagina = abrir(caminho, tela, tema)
-    pagina.add_script_tag(content=AXE)
-    resultado = pagina.evaluate(
-        '(regras) => axe.run(document, {runOnly: {type: "tag", values: regras}})', REGRAS_WCAG)
-    assert resultado['violations'] == [], '\n' + _descrever(resultado['violations'])
+    assert violacoes_wcag(pagina) == ''
     assert pagina.erros_js == []

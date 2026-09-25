@@ -13,7 +13,7 @@
 {% set secoes = [
     ('principios', 'Princípios'), ('cores', 'Cores'), ('tipografia', 'Tipografia'),
     ('espacos', 'Espaços e formas'), ('icones', 'Ícones'), ('botoes', 'Botões'),
-    ('formularios', 'Formulários'), ('status', 'Status'), ('classes', 'Classes'),
+    ('formularios', 'Formulários'), ('escolhas', 'Escolhas e listas'), ('status', 'Status'), ('classes', 'Classes'),
     ('progresso', 'Progresso e números'), ('mensagens', 'Mensagens'),
     ('atalhos', 'Atalhos de teclado'), ('carregando', 'Carregando'),
 ] %}
@@ -181,7 +181,7 @@
                 {{ c.botao('Enviar fotos', icone_nome='enviar') }}
                 {{ c.botao('Tirar foto', 'secundario', icone_nome='camera') }}
                 {{ c.botao('Ver detalhes', 'fantasma', icone_nome='avancar', icone_depois=True) }}
-                {{ c.botao('Excluir coleta', 'perigo', icone_nome='erro') }}
+                {{ c.botao('Excluir coleta', 'perigo', icone_nome='lixeira') }}
             </div>
             <div class="linha">
                 {{ c.botao('Começar a anotar', tamanho='grande', icone_nome='seta-direita', icone_depois=True) }}
@@ -217,6 +217,45 @@
                 <input type="file" accept="image/*" capture="environment" multiple>
             </label>
         </form>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="escolhas" class="guia__secao" aria-labelledby="t-escolhas">
+        <h2 id="t-escolhas">Escolhas e listas</h2>
+        <h3>Opções em cartão</h3>
+        <p class="texto-suave">Para poucas opções importantes: o cartão inteiro é tocável e mostra uma explicação.</p>
+        <fieldset class="campo">
+            <legend class="campo__rotulo">O que você fotografou?</legend>
+            <div class="opcoes-cartao">
+                {% for tipo in tipos %}
+                <label class="opcao-cartao">
+                    <input type="radio" name="exemplo-tipo" value="{{ tipo.codigo }}"{% if loop.first %} checked{% endif %}>
+                    <span class="opcao-cartao__icone">{{ icone(icone_do_tipo(tipo.codigo)) }}</span>
+                    <span class="opcao-cartao__texto"><strong>{{ tipo.nome }}</strong><span>{{ plural(tipo.classes_ativas|length, 'classe') }}</span></span>
+                </label>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <h3>Filtros</h3>
+        <ul class="filtros" aria-label="Exemplo de filtros">
+            <li><a class="filtro" href="#escolhas" aria-current="page">Todas</a></li>
+            {% for tipo in tipos %}<li><a class="filtro" href="#escolhas">{{ icone(icone_do_tipo(tipo.codigo)) }}{{ tipo.nome }}</a></li>{% endfor %}
+        </ul>
+
+        <h3>Cartão de foto</h3>
+        <ul class="grade-fotos">
+            {% for status, regioes in [(status_imagem[2], 31), (status_imagem[1], 0), (status_imagem[3], 0)] %}
+            <li class="foto">
+                <span class="foto__imagem" aria-hidden="true"></span>
+                <div class="foto__info">
+                    <span class="foto__nome">IMG_20260312_09{{ loop.index }}1.jpg</span>
+                    <div class="linha linha--compacta">{{ c.selo_status(status) }}<span class="texto-suave">{{ plural(regioes, 'região', 'regiões') }}</span></div>
+                </div>
+                {{ c.botao_icone('lixeira', 'Excluir a foto de exemplo ' ~ loop.index) }}
+            </li>
+            {% endfor %}
+        </ul>
     </section>
 
     {# ------------------------------------------------------------------ #}

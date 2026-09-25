@@ -43,6 +43,13 @@
                 </ul>
             </nav>
 
+            {%- set pessoa = pessoa_atual() %}
+            <a class="pessoa" href="{{ url_for('web.entrar', proximo=request.full_path.rstrip('?')) }}"
+               title="{{ 'Trocar de pessoa' if pessoa else 'Dizer quem é você' }}">
+                {{ icone('usuario') }}<span>{{ pessoa.nome.split()[0] if pessoa else 'Entrar' }}</span>
+                {%- if pessoa %}<span class="visualmente-oculto"> (trocar de pessoa)</span>{% endif %}
+            </a>
+
             <button class="botao botao--fantasma botao--icone alternar-tema" id="alternar-tema" type="button"
                     aria-label="Alternar tema claro ou escuro" title="Alternar tema claro ou escuro">
                 {{ icone('lua', classe='alternar-tema__lua') }}{{ icone('sol', classe='alternar-tema__sol') }}
@@ -52,6 +59,16 @@
 
     <main class="principal" id="conteudo" tabindex="-1">
         <div class="conteudo">
+            {%- with mensagens = get_flashed_messages(with_categories=true) %}
+            {%- if mensagens %}
+            {% import 'componentes.html' as c_base %}
+            <div class="mensagens" role="status">
+                {%- for categoria, mensagem in mensagens %}
+                {% call c_base.alerta(categoria if categoria in ('info', 'sucesso', 'aviso', 'perigo') else 'info') %}<p>{{ mensagem }}</p>{% endcall %}
+                {%- endfor %}
+            </div>
+            {%- endif %}
+            {%- endwith %}
             {% block conteudo %}{% endblock %}
         </div>
     </main>

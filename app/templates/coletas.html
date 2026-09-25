@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}Coletas · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande">
+    {% call c.cabecalho_pagina('Coletas',
+        descricao='Cada coleta junta as fotos de um mesmo lugar e dia.') %}
+        {{ c.botao('Nova coleta', href=url_for('web.nova_coleta', tipo=filtro or ''), icone_nome='mais') }}
+    {% endcall %}
+
+    <nav aria-label="Filtrar por tipo de amostra">
+        <ul class="filtros">
+            <li><a class="filtro" href="{{ url_for('web.coletas') }}"{% if not filtro %} aria-current="page"{% endif %}>Todas</a></li>
+            {% for tipo in tipos %}
+            <li><a class="filtro" href="{{ url_for('web.coletas', tipo=tipo.codigo) }}"{% if filtro == tipo.codigo %} aria-current="page"{% endif %}>{{ icone(icone_do_tipo(tipo.codigo)) }}{{ tipo.nome }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    {% if coletas %}
+    <ul class="grade lista-sem-marcador">
+        {% for coleta in coletas %}
+        {%- set p = progresso[coleta.id] %}
+        <li class="cartao cartao--interativo">
+            <div class="cartao__cabecalho">
+                <span class="cartao__icone">{{ icone(icone_do_tipo(coleta.tipo_amostra.codigo)) }}</span>
+                <div>
+                    <h2 class="cartao__titulo"><a class="cartao__link" href="{{ url_for('web.coleta', coleta_id=coleta.id) }}">{{ coleta.nome }}</a></h2>
+                    <span class="texto-suave">{{ coleta.tipo_amostra.nome }}</span>
+                </div>
+            </div>
+            {%- set detalhes = [coleta.fazenda, coleta.talhao and 'Talhão ' ~ coleta.talhao, coleta.data_coleta and coleta.data_coleta.strftime('%d/%m/%Y')]|select|list %}
+            {% if detalhes %}<p class="texto-suave">{{ detalhes|join(' · ') }}</p>{% endif %}
+            <p>{{ plural(fotos.get(coleta.id, 0), 'foto') }} · {{ plural(p.total, 'região', 'regiões') }}</p>
+            {% if p.total %}{{ c.progresso(p.anotadas, p.total, 'Anotadas', 'sucesso' if p.pendentes == 0 else None) }}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        {% call c.vazio('Nenhuma coleta ' ~ ('deste tipo ' if filtro else '') ~ 'ainda',
+                        'Uma coleta junta as fotos de um mesmo lugar e dia. Crie a primeira para começar.', 'imagem') %}
+            {{ c.botao('Criar coleta', href=url_for('web.nova_coleta', tipo=filtro or ''), icone_nome='mais') }}
+        {% endcall %}
+    {% endif %}
+</div>
+{% endblock %}

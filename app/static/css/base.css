@@ -65,6 +65,14 @@ code {
 }
 
 img, svg { display: block; max-width: 100%; }
+
+/* O atributo hidden sempre esconde, mesmo em componentes com display próprio. */
+[hidden] { display: none !important; }
+
+/* Grupos de opções (fieldset) sem a moldura padrão do navegador. */
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+legend { padding: 0; }
+legend.campo__rotulo { margin-bottom: var(--espaco-2); }
 button, input, select, textarea { font: inherit; color: inherit; }
 
 ::selection { background: var(--cor-primaria); color: var(--cor-sobre-primaria); }
@@ -269,3 +277,17 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .alternar-tema__sol { display: none; }
 .alternar-tema[data-tema="dark"] .alternar-tema__sol { display: block; }
 .alternar-tema[data-tema="dark"] .alternar-tema__lua { display: none; }
+
+/* Pessoa atual no topo (link para trocar) */
+.pessoa {
+    display: inline-flex; align-items: center; gap: var(--espaco-2);
+    min-height: var(--alvo-toque); padding: 0 var(--espaco-3);
+    border-radius: var(--raio-pilula);
+    color: var(--cor-texto); text-decoration: none; font-weight: var(--peso-medio);
+}
+.pessoa:hover { background: var(--cor-superficie-2); }
+
+.estreito { max-width: 44rem; }
+.lista-sem-marcador { margin: 0; padding: 0; list-style: none; }
+.grade--estatisticas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+.grade--campos { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }

@@ -25,6 +25,12 @@ def icone(nome: str, rotulo: str | None = None, classe: str = '') -> Markup:
                   f'<use href="{href}"></use></svg>')
 
 
+def plural(quantidade: int, singular: str, forma_plural: str | None = None) -> str:
+    """"1 foto", "3 fotos", "1.250 regiões": número com separador brasileiro + palavra certa."""
+    palavra = singular if quantidade == 1 else (forma_plural or singular + 's')
+    return f'{quantidade:,}'.replace(',', '.') + f' {palavra}'
+
+
 _ICONE_POR_TIPO = {'graos': 'grao', 'folhas': 'folha', 'flores': 'flor', 'frutos': 'fruto'}
 
 
@@ -61,13 +67,17 @@ def apresentar_status(status) -> Apresentacao:
 # (endpoint, texto, ícone)
 ITENS_DE_NAVEGACAO = [
     ('web.inicio', 'Início', 'inicio'),
+    ('web.coletas', 'Coletas', 'imagem'),
     ('web.guia_visual', 'Guia visual', 'paleta'),
 ]
+
+# Páginas "de dentro" de um item do menu: marcam o item como atual.
+_SECAO_DO_ENDPOINT = {'web.nova_coleta': 'web.coletas', 'web.coleta': 'web.coletas'}
 
 
 def itens_de_navegacao():
     return [
         {'url': url_for(endpoint), 'texto': texto, 'icone': nome_icone,
-         'atual': request.endpoint == endpoint}
+         'atual': _SECAO_DO_ENDPOINT.get(request.endpoint, request.endpoint) == endpoint}
         for endpoint, texto, nome_icone in ITENS_DE_NAVEGACAO
     ]

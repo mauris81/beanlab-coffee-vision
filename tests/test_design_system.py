@@ -100,7 +100,8 @@ def _icones_usados() -> set[str]:
         texto = arquivo.read_text(encoding='utf-8')
         usados |= set(re.findall(r"icone\('([a-z-]+)'", texto))
         usados |= set(re.findall(r"icone_nome='([a-z-]+)'", texto))
-        usados |= set(re.findall(r"\(\s*'([a-z][a-z-]*)',\s*'[^']+',\s*'[^']+'\s*\)", texto))  # tuplas (ícone, título, texto)
+        if arquivo.name == 'guia_visual.html':  # princípios: tuplas (ícone, título, texto)
+            usados |= set(re.findall(r"\(\s*'([a-z][a-z-]*)',\s*'[^']+',\s*'[^']+'\s*\)", texto))
     usados |= {a.icone for a in apresentacao._STATUS.values()}
     usados |= set(apresentacao._ICONE_POR_TIPO.values()) | {'imagem'}
     usados |= {nome for _, _, nome in apresentacao.ITENS_DE_NAVEGACAO}

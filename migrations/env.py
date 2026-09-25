@@ -94,14 +94,37 @@ def run_migrations_online():
     connectable = get_engine()
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=get_metadata(),
-            **conf_args
-        )
+        # SQLite: para alterar uma tabela, o Alembic a recria (copia, apaga a antiga,
+        # renomeia). Com as chaves estrangeiras ligadas, apagar a tabela antiga falha
+        # se outras tabelas apontam para ela. Por isso elas ficam desligadas SÓ durante
+        # a migração, a integridade é conferida no fim e elas são religadas antes de a
+        # conexão voltar ao uso normal. (O PRAGMA só vale fora de transação.)
+        sqlite = connection.dialect.name == 'sqlite'
+        if sqlite:
+            connection.exec_driver_sql('PRAGMA foreign_keys = OFF')
+            # Fecha a transação que o SQLAlchemy abre sozinho; senão o Alembic acha que
+            # já existe uma em andamento e não confirma (commit) a migração.
+            connection.commit()
+        try:
+            context.configure(
+                connection=connection,
+                target_metadata=get_metadata(),
+                **conf_args
+            )
 
-        with context.begin_transaction():
-            context.run_migrations()
+            with context.begin_transaction():
+                context.run_migrations()
+                if sqlite:
+                    problemas = connection.exec_driver_sql('PRAGMA foreign_key_check').fetchall()
+                    if problemas:
+                        raise RuntimeError(
+                            'A migração deixaria referências quebradas no banco '
+                            f'(tabela, linha, tabela referida): {problemas[:10]}')
+        finally:
+            if sqlite:
+                connection.rollback()  # garante que não há transação aberta (senão o PRAGMA é ignorado)
+                connection.exec_driver_sql('PRAGMA foreign_keys = ON')
+                connection.commit()
 
 
 if context.is_offline_mode():

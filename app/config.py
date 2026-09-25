@@ -9,6 +9,7 @@ Variáveis reconhecidas:
 """
 import os
 import secrets
+from datetime import timedelta
 from pathlib import Path
 
 RAIZ_DO_PROJETO = Path(__file__).resolve().parent.parent
@@ -23,7 +24,10 @@ class Config:
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MB por envio
-    EXTENSOES_PERMITIDAS = {'jpg', 'jpeg', 'png', 'bmp', 'tif', 'tiff', 'webp'}
+    # Cookie da sessão (guarda quem é a pessoa): não vai em pedidos vindos de outros
+    # sites (proteção extra contra CSRF) e dura 90 dias.
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = timedelta(days=90)
 
     PASTA_TAXONOMIAS = RAIZ_DO_PROJETO / 'taxonomias'
     PASTA_MIGRACOES = RAIZ_DO_PROJETO / 'migrations'
@@ -40,6 +44,7 @@ class ConfigTeste(Config):
     """Configuração dos testes automáticos: cada teste usa uma pasta temporária."""
 
     TESTING = True
+    SEGMENTACAO_SINCRONA = True  # segmenta na hora, sem thread: testes previsíveis
 
 
 def carregar_chave_secreta(pasta_dados: Path) -> str:

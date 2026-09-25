@@ -6,6 +6,8 @@ codigo: folhas
 nome: Folhas
 descricao: Folhas sadias ou com sintomas de doenças, pragas ou deficiências.
 ordem: 2
+# Sem "motor:" ainda: segmentação automática chega na Fase 6.
+# Por enquanto envie as fotos já segmentadas (recortes ou COCO).
 
 classes:
   - codigo: saudavel

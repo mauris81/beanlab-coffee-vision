@@ -5,8 +5,10 @@ Jeito mais fácil: dois cliques em "Iniciar BeanLab.bat".
 Pelo terminal (celulares na mesma rede Wi-Fi conseguem acessar):
     python run.py
 
-Modo desenvolvimento (recarrega ao salvar e mostra erros detalhados,
-mas só aceita conexões deste computador):
+No modo normal usa o servidor waitress, feito para vários celulares ao mesmo tempo.
+
+Modo desenvolvimento (servidor do Flask: recarrega ao salvar e mostra erros
+detalhados, mas só aceita conexões deste computador):
     PowerShell:  $env:CAFE_DEBUG = "1"; python run.py
 
 Outras variáveis opcionais:
@@ -55,6 +57,7 @@ def abrir_navegador_quando_pronto(porta):
 
 
 if __name__ == '__main__':
+    sys.stdout.reconfigure(line_buffering=True)  # mensagens aparecem na hora, mesmo em arquivo de log
     debug = os.environ.get('CAFE_DEBUG') == '1'
     # O depurador do Werkzeug permite executar código Python pelo navegador.
     # Por isso, com debug ligado, o servidor fica restrito a este computador.
@@ -88,4 +91,14 @@ if __name__ == '__main__':
         if os.environ.get('CAFE_ABRIR_NAVEGADOR') == '1':
             abrir_navegador_quando_pronto(port)
 
-    app.run(debug=debug, host=host, port=port)
+    # O processo que atende as páginas retoma as segmentações que ficaram pela metade.
+    # (No modo desenvolvimento, é o processo filho criado pelo recarregador.)
+    atende_paginas = not debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
+    if atende_paginas and (retomadas := app.extensions['fila_segmentacao'].retomar_pendentes()):
+        print(f'  Retomando {retomadas} segmentação(ões) que ficaram pela metade.')
+
+    if debug:
+        app.run(debug=True, host=host, port=port)
+    else:
+        from waitress import serve
+        serve(app, host=host, port=port, threads=8)

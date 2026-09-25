@@ -6,6 +6,8 @@ codigo: frutos
 nome: Frutos
 descricao: Frutos no pé ou colhidos, por estágio de maturação.
 ordem: 4
+# Sem "motor:" ainda: segmentação automática chega na Fase 6.
+# Por enquanto envie as fotos já segmentadas (recortes ou COCO).
 
 classes:
   - codigo: chumbinho

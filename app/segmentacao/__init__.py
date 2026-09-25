@@ -1,6 +1,23 @@
 """Motores de segmentação: recebem uma foto e devolvem as regiões encontradas.
 
-Hoje só existe o motor clássico (watershed), ainda no formato antigo e sem uso
-pelas telas. A Fase 2 cria a interface comum a todos os motores e o corrige.
-Ver docs/decisoes/0002-segmentacao-plugavel.md.
+Todos seguem a interface de app/segmentacao/base.py. Para adicionar um motor:
+crie o arquivo, registre-o em MOTORES abaixo e indique-o no YAML do tipo de
+amostra (campo `motor`). Ver docs/decisoes/0002-segmentacao-plugavel.md.
 """
+from app.segmentacao.base import RegiaoEncontrada, Segmentador
+from app.segmentacao.classico import MotorClassico
+
+MOTORES: dict[str, Segmentador] = {
+    MotorClassico.nome: MotorClassico(),
+}
+
+
+def obter_motor(nome: str) -> Segmentador:
+    try:
+        return MOTORES[nome]
+    except KeyError:
+        raise ValueError(f'Motor de segmentação desconhecido: "{nome}". '
+                         f'Disponíveis: {", ".join(MOTORES)}') from None
+
+
+__all__ = ['MOTORES', 'RegiaoEncontrada', 'Segmentador', 'obter_motor']

@@ -3,6 +3,9 @@
 // Comportamentos ativados só com atributos no HTML, sem escrever JS na página:
 //   data-aviso="sucesso" data-aviso-texto="..."   mostra um aviso ao clicar
 //   data-abrir-dialogo="id-do-dialogo"            abre um <dialog class="dialogo">
+//     + data-acao="/url" data-nome="texto"         (opcional) aponta o formulário do diálogo
+//                                                  ([data-form-acao]) para a url e escreve o
+//                                                  texto em [data-nome-alvo]: um diálogo serve a vários itens
 //   data-fechar-dialogo                           fecha o diálogo em que está
 
 import { avisar } from './avisos.js';
@@ -20,7 +23,12 @@ document.addEventListener('click', (evento) => {
 
     const abrir = alvo.closest('[data-abrir-dialogo]');
     if (abrir) {
-        document.getElementById(abrir.dataset.abrirDialogo)?.showModal();
+        const dialogo = document.getElementById(abrir.dataset.abrirDialogo);
+        if (dialogo && abrir.dataset.acao) {
+            dialogo.querySelector('[data-form-acao]')?.setAttribute('action', abrir.dataset.acao);
+            dialogo.querySelectorAll('[data-nome-alvo]').forEach((el) => { el.textContent = abrir.dataset.nome ?? ''; });
+        }
+        dialogo?.showModal();
     }
 
     const fechar = alvo.closest('[data-fechar-dialogo]');

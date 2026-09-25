@@ -9,6 +9,8 @@ SQLAlchemy==2.1.1
 Werkzeug==3.1.8
 Flask-Migrate==4.1.0
 alembic==1.20.0
+# Servidor de produção (vários celulares ao mesmo tempo); funciona no Windows
+waitress==3.0.2
 
 # Configuração (listas de classes em taxonomias/*.yaml)
 PyYAML==6.0.3

@@ -6,6 +6,8 @@ codigo: graos
 nome: Grãos
 descricao: Grãos crus ou beneficiados, para classificação de defeitos.
 ordem: 1
+# Segmentação automática: motor clássico (watershed), para grãos sobre fundo uniforme.
+motor: classico
 
 classes:
   - codigo: sem_defeito

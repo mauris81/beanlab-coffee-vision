@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}{{ coleta.nome }} · BeanLab{% endblock %}
+
+{% block conteudo %}
+{%- set tipo = coleta.tipo_amostra %}
+{%- set detalhes = [coleta.fazenda, coleta.talhao and 'Talhão ' ~ coleta.talhao, coleta.variedade,
+                    coleta.data_coleta and coleta.data_coleta.strftime('%d/%m/%Y'),
+                    coleta.coletor and 'por ' ~ coleta.coletor.nome]|select|list %}
+<div class="pilha pilha--grande" id="pagina-coleta"
+     data-situacao="{{ url_for('web.situacao_da_coleta', coleta_id=coleta.id) }}"
+     data-pendentes="{{ coleta.imagens|selectattr('status', 'in', ['aguardando', 'segmentando'])|list|length }}">
+
+    {% call c.cabecalho_pagina(coleta.nome, sobretitulo=tipo.nome, descricao=detalhes|join(' · ') or None) %}
+        {{ c.botao('Enviar fotos', href='#enviar', icone_nome='enviar') }}
+    {% endcall %}
+
+    <div class="grade grade--estatisticas">
+        {{ c.estatistica('Fotos', coleta.imagens|length) }}
+        {{ c.estatistica('Regiões', progresso.total, 'objetos encontrados nas fotos') }}
+        {{ c.estatistica('Pendentes', progresso.pendentes, 'regiões sem anotação') }}
+    </div>
+    {% if progresso.total %}{{ c.progresso(progresso.anotadas, progresso.total, 'Anotação') }}{% endif %}
+
+    {# ---------------------------------------------------------------- envio #}
+    <section class="cartao pilha" id="enviar" aria-labelledby="titulo-enviar">
+        <h2 id="titulo-enviar">Enviar fotos</h2>
+        {% if not tipo.motor_padrao %}
+            {% call c.alerta('info', tipo.nome ~ ' ainda não têm segmentação automática') %}
+                <p>Ela chega numa próxima etapa. Por enquanto, envie <strong>recortes prontos</strong>
+                   (um objeto por arquivo) ou um <strong>conjunto COCO</strong>. Fotos inteiras também
+                   são aceitas, mas ficam sem regiões.</p>
+            {% endcall %}
+        {% endif %}
+
+        <form method="post" action="{{ url_for('web.enviar_fotos', coleta_id=coleta.id) }}"
+              enctype="multipart/form-data" class="pilha" data-envio>
+            {{ campo_csrf() }}
+            <fieldset class="campo">
+                <legend class="campo__rotulo">O que você vai enviar?</legend>
+                <div class="opcoes-cartao opcoes-cartao--lista">
+                    {% for valor, titulo, texto in [
+                        ('fotos', 'Fotos para segmentar', 'Fotos inteiras. A plataforma encontra cada objeto sozinha.' if tipo.motor_padrao else 'Fotos inteiras (ficam sem regiões por enquanto).'),
+                        ('recortes', 'Recortes prontos', 'Um objeto por arquivo. PNG com fundo transparente dá o contorno exato.'),
+                        ('coco', 'Conjunto COCO', 'As fotos e um arquivo .json com os contornos (formato COCO).'),
+                    ] %}
+                    <label class="opcao-cartao">
+                        <input type="radio" name="modo" value="{{ valor }}"{% if valor == ('fotos' if tipo.motor_padrao else 'recortes') %} checked{% endif %}>
+                        <span class="opcao-cartao__texto"><strong>{{ titulo }}</strong><span>{{ texto }}</span></span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <div class="escolha-arquivos">
+                <label class="envio">
+                    {{ icone('camera') }}
+                    <span class="envio__titulo">Tirar foto</span>
+                    <span class="texto-suave">Abre a câmera do celular</span>
+                    <input type="file" name="arquivos" accept="image/*" capture="environment" multiple data-arquivos>
+                </label>
+                <label class="envio">
+                    {{ icone('imagem') }}
+                    <span class="envio__titulo">Escolher arquivos</span>
+                    <span class="texto-suave">Da galeria ou do computador · vários de uma vez</span>
+                    <input type="file" name="arquivos" accept="image/*,.json,application/json" multiple data-arquivos>
+                </label>
+            </div>
+            <p class="texto-suave" data-resumo-arquivos aria-live="polite">Nenhum arquivo escolhido. JPG, PNG ou WEBP, até 100 MB por envio.</p>
+
+            <div class="progresso" data-progresso-envio hidden>
+                <div class="progresso__legenda"><span>Enviando…</span><strong data-progresso-texto>0%</strong></div>
+                <div class="progresso__trilho" role="progressbar" aria-label="Enviando fotos" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="progresso__barra" style="--valor: 0%"></div>
+                </div>
+            </div>
+
+            <div>{{ c.botao('Enviar', tipo='submit', icone_nome='enviar', tamanho='grande') }}</div>
+        </form>
+    </section>
+
+    {# ---------------------------------------------------------------- fotos #}
+    <section class="pilha" id="fotos" aria-labelledby="titulo-fotos">
+        <h2 id="titulo-fotos">Fotos</h2>
+        <p class="visualmente-oculto" aria-live="polite" data-anuncio></p>
+        {% if coleta.imagens %}
+        <ul class="grade-fotos">
+            {% for imagem in coleta.imagens|reverse %}
+            {%- set n_regioes = regioes_por_imagem.get(imagem.id, 0) %}
+            <li class="foto" data-imagem="{{ imagem.id }}">
+                <a class="foto__imagem" href="{{ url_for('web.arquivo_da_foto', imagem_id=imagem.id) }}" target="_blank" rel="noopener">
+                    <img src="{{ url_for('web.miniatura_da_foto', imagem_id=imagem.id) }}" alt="Foto {{ imagem.nome_original }}"
+                         loading="lazy" width="{{ imagem.largura }}" height="{{ imagem.altura }}">
+                </a>
+                <div class="foto__info">
+                    <span class="foto__nome" title="{{ imagem.nome_original }}">{{ imagem.nome_original }}</span>
+                    <div class="linha linha--compacta">
+                        <span data-selo>{{ c.selo_status(imagem.status) }}</span>
+                        <span class="texto-suave" data-regioes>{{ plural(n_regioes, 'região', 'regiões') }}</span>
+                    </div>
+                    {% if erros.get(imagem.id) %}
+                    <details class="foto__erro">
+                        <summary>O que deu errado?</summary>
+                        <code>{{ erros[imagem.id] }}</code>
+                    </details>
+                    <form method="post" action="{{ url_for('web.segmentar_de_novo', imagem_id=imagem.id) }}">
+                        {{ campo_csrf() }}
+                        {{ c.botao('Tentar de novo', 'secundario', tipo='submit', icone_nome='processando') }}
+                    </form>
+                    {% endif %}
+                </div>
+                {{ c.botao_icone('lixeira', 'Excluir a foto ' ~ imagem.nome_original, 'fantasma',
+                                 attrs={'data-abrir-dialogo': 'dialogo-excluir',
+                                        'data-acao': url_for('web.excluir_foto', imagem_id=imagem.id),
+                                        'data-nome': imagem.nome_original}) }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            {{ c.vazio('Nenhuma foto ainda', 'Use "Enviar fotos" acima. Você pode tirar as fotos pelo próprio celular.', 'camera') }}
+        {% endif %}
+    </section>
+
+    <dialog class="dialogo" id="dialogo-excluir" aria-labelledby="dialogo-excluir-titulo">
+        <form method="post" data-form-acao>
+            {{ campo_csrf() }}
+            <div class="dialogo__corpo">
+                <h2 id="dialogo-excluir-titulo">Excluir a foto "<span data-nome-alvo></span>"?</h2>
+                <p class="texto-suave">As regiões e anotações desta foto também serão apagadas. Isso não pode ser desfeito.</p>
+            </div>
+            <div class="dialogo__acoes">
+                {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+                {{ c.botao('Excluir foto', 'perigo', tipo='submit') }}
+            </div>
+        </form>
+    </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/coleta.js') }}"></script>
+{% endblock %}

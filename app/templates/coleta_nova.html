@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}Nova coleta · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande estreito">
+    {{ c.cabecalho_pagina('Nova coleta', sobretitulo='Coletas',
+        descricao='Diga o que foi fotografado e onde. Depois você envia as fotos.') }}
+
+    {% if erros %}
+        {% call c.alerta('perigo', 'Falta pouco') %}<p>Corrija {{ 'o campo marcado' if erros|length == 1 else 'os campos marcados' }} abaixo.</p>{% endcall %}
+    {% endif %}
+
+    <form method="post" class="pilha pilha--grande" novalidate>
+        {{ campo_csrf() }}
+
+        <fieldset class="campo{% if erros.tipo %} campo--erro{% endif %}"{% if erros.tipo %} aria-describedby="erro-tipo"{% endif %}>
+            <legend class="campo__rotulo">O que você fotografou?</legend>
+            <div class="opcoes-cartao">
+                {% for tipo in tipos %}
+                <label class="opcao-cartao">
+                    <input type="radio" name="tipo" value="{{ tipo.codigo }}"{% if dados.get('tipo') == tipo.codigo %} checked{% endif %} required>
+                    <span class="opcao-cartao__icone">{{ icone(icone_do_tipo(tipo.codigo)) }}</span>
+                    <span class="opcao-cartao__texto">
+                        <strong>{{ tipo.nome }}</strong>
+                        <span>{{ 'Segmentação automática' if tipo.motor_padrao else 'Envie já segmentadas' }}</span>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+            {% if erros.tipo %}<span class="campo__erro" id="erro-tipo">{{ icone('erro') }}{{ erros.tipo }}</span>{% endif %}
+        </fieldset>
+
+        {{ c.campo('nome', 'Nome da coleta', valor=dados.get('nome', ''), erro=erros.nome,
+                   dica='Algo que ajude a encontrar depois. Ex.: "Talhão 3, março".',
+                   attrs={'maxlength': 200}) }}
+        {{ c.campo('data_coleta', 'Data da coleta', tipo='date', valor=dados.get('data_coleta', ''),
+                   erro=erros.data_coleta, opcional=True) }}
+
+        <div class="grade grade--campos">
+            {{ c.campo('fazenda', 'Fazenda', valor=dados.get('fazenda', ''), opcional=True, attrs={'maxlength': 120}) }}
+            {{ c.campo('talhao', 'Talhão', valor=dados.get('talhao', ''), opcional=True, attrs={'maxlength': 80}) }}
+            {{ c.campo('variedade', 'Variedade', valor=dados.get('variedade', ''), opcional=True,
+                       dica='Ex.: Catuaí, Bourbon, Mundo Novo', attrs={'maxlength': 80}) }}
+        </div>
+        {{ c.campo('descricao', 'Observações', tipo='textarea', valor=dados.get('descricao', ''), opcional=True,
+                   dica='Iluminação, condições do dia, objetivo da coleta…') }}
+
+        <div class="linha">
+            {{ c.botao('Criar coleta', tipo='submit', icone_nome='check', tamanho='grande') }}
+            {{ c.botao('Cancelar', 'fantasma', href=url_for('web.coletas')) }}
+        </div>
+    </form>
+</div>
+{% endblock %}

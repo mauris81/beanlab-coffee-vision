@@ -6,6 +6,8 @@ codigo: flores
 nome: Flores
 descricao: Estágios da florada.
 ordem: 3
+# Sem "motor:" ainda: segmentação automática chega na Fase 6.
+# Por enquanto envie as fotos já segmentadas (recortes ou COCO).
 
 classes:
   - codigo: botao_floral

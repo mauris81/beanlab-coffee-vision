@@ -20,6 +20,12 @@ classe e o que corrigir.
 
 A **ordem** das classes no arquivo é a ordem em que aparecem na tela.
 
+## Segmentação automática (campo `motor`)
+
+Logo abaixo de `ordem:`, o campo opcional `motor:` diz qual motor encontra os objetos
+nas fotos deste tipo. Hoje existe só `classico` (grãos sobre fundo uniforme). Sem esse
+campo, as fotos precisam chegar já segmentadas (recortes ou COCO).
+
 ## O que pode e o que não pode
 
 | Quero... | Como fazer | Seguro? |

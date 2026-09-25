@@ -17,6 +17,9 @@ class TipoAmostra(db.Model):
     nome: Mapped[str] = mapped_column(String(80))                 # exibido, ex.: 'Folhas'
     descricao: Mapped[str | None] = mapped_column(Text)
     ordem: Mapped[int] = mapped_column(default=0)
+    # Motor de segmentação automática (app/segmentacao). Vazio = ainda não há motor
+    # para este tipo: as fotos precisam chegar já segmentadas.
+    motor_padrao: Mapped[str | None] = mapped_column(String(40))
 
     classes: Mapped[list['Classe']] = relationship(
         back_populates='tipo_amostra', order_by='Classe.ordem'
