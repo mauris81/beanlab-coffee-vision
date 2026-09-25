@@ -13,6 +13,11 @@ ser revisado ou desfeito.
 | 5. Anotação | — | Atalhos de teclado, avanço automático, anotação em lote, desfazer, edição de contorno |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
+| H. Hospedagem online | ⏸️ Decidir após a Fase 2 | Acesso pelos celulares na fazenda sem este PC ligado. Comparar opções (Render, Railway, PythonAnywhere, servidor próprio), custo, internet na fazenda e troca de SQLite por PostgreSQL |
+
+Extras já entregues fora das fases:
+- **Atalho de duplo clique** `Iniciar BeanLab.bat`: instala e inicia sozinho.
+- **Python atualizado de 3.11 para 3.14**, com as bibliotecas nas versões mais recentes.
 
 ## Decisões já tomadas com o responsável pelo projeto
 
@@ -23,8 +28,10 @@ ser revisado ou desfeito.
 - **Usuários:** ainda não definido. A expectativa é uso como aplicativo no celular,
   na fazenda. Por isso: interface pensada primeiro para celular, cada pessoa se
   identifica pelo nome (sem senha), e o modelo de dados já prevê login no futuro.
-- **Tecnologia:** continua Python + Flask, sem etapa de build no front-end
+- **Tecnologia:** continua Python (3.14) + Flask, sem etapa de build no front-end
   (ver [decisoes/0001](decisoes/0001-manter-flask-sem-build.md)).
+- **Código no GitHub, em repositório público.** Fotos e banco nunca sobem (`.gitignore`).
+- **Hospedagem online:** decidir depois da Fase 2.
 
 ## Pendências para o responsável
 
