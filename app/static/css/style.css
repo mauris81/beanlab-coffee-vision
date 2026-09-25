@@ -308,3 +308,16 @@ td { color: #e9edf2; }
     .stats-grid { grid-template-columns: 1fr; }
     .project-actions .btn { flex: 1; }
 }
+
+/* Classes de cada tipo de amostra (página provisória; será refeito na Fase 3). */
+.lista-classes { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-classe {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 10px; border-radius: 999px; font-size: .9rem;
+    border: 1px solid var(--border); background: rgba(255,255,255,.04);
+}
+.chip-classe .cor { width: 12px; height: 12px; border-radius: 50%; background: var(--cor); box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+.chip-classe kbd {
+    font: inherit; font-size: .75rem; color: var(--muted);
+    border: 1px solid var(--border-strong); border-radius: 6px; padding: 0 6px;
+}

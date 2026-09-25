@@ -1,0 +1,57 @@
+# Classes para fotos de FRUTOS (cerejas) de café.
+# Como editar este arquivo: veja taxonomias/LEIAME.md
+# ⚠️ Lista proposta, a validar com agrônomos.
+
+codigo: frutos
+nome: Frutos
+descricao: Frutos no pé ou colhidos, por estágio de maturação.
+ordem: 4
+
+classes:
+  - codigo: chumbinho
+    nome: Chumbinho
+    tecla: "1"
+    cor: "#56B4E9"
+    descricao: Fruto recém-formado, pequeno e verde-escuro.
+
+  - codigo: verde
+    nome: Verde
+    tecla: "2"
+    cor: "#009E73"
+    descricao: Fruto desenvolvido, ainda imaturo.
+
+  - codigo: verde_cana
+    nome: Verde-cana
+    tecla: "3"
+    cor: "#F0E442"
+    descricao: Início da maturação, verde-amarelado.
+
+  - codigo: cereja
+    nome: Cereja
+    tecla: "4"
+    cor: "#D55E00"
+    descricao: Maduro, vermelho ou amarelo conforme a variedade.
+
+  - codigo: passa
+    nome: Passa
+    tecla: "5"
+    cor: "#CC79A7"
+    descricao: Sobremaduro, murcho, de cor escura arroxeada.
+
+  - codigo: seco
+    nome: Seco
+    tecla: "6"
+    cor: "#3D3D3D"
+    descricao: Fruto seco, marrom-escuro ou preto.
+
+  - codigo: brocado
+    nome: Brocado
+    tecla: "7"
+    cor: "#0072B2"
+    descricao: Fruto com o furo da broca-do-café.
+
+  - codigo: outro
+    nome: Outro
+    tecla: "8"
+    cor: "#999999"
+    descricao: Não se encaixa nas outras classes. Explique na observação.

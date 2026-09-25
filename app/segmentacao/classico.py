@@ -1,3 +1,9 @@
+"""Motor clássico (watershed) para grãos sobre fundo uniforme.
+
+Código herdado, movido de app/segmentation.py sem alterações. Problemas conhecidos
+(área calculada pela caixa, filtro de fundo específico para grãos) serão
+corrigidos na Fase 2: ver docs/PROBLEMAS_CONHECIDOS.md.
+"""
 import numpy as np
 import cv2
 from scipy import ndimage as ndi

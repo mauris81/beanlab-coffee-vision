@@ -1,0 +1,5 @@
+# Configuração das ferramentas de desenvolvimento. (A plataforma não é instalada
+# como pacote; as dependências estão em requirements.txt.)
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

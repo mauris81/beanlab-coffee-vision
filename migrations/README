@@ -1,0 +1,11 @@
+Migrações do banco de dados (Alembic, via Flask-Migrate).
+
+Cada arquivo em versions/ é uma mudança no banco, aplicada em ordem.
+Elas são aplicadas automaticamente ao iniciar a plataforma.
+
+Mudou um modelo em app/dominio/? Gere uma migração nova:
+    .\.venv\Scripts\flask.exe --app app db migrate -m "descreva a mudança"
+Depois LEIA o arquivo gerado antes de fazer o commit: o Alembic não percebe tudo
+(ex.: renomear coluna vira "apagar e criar", o que perde dados).
+
+Guia completo: docs/DESENVOLVIMENTO.md

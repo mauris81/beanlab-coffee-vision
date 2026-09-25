@@ -5,6 +5,7 @@ venv/
 # Python
 __pycache__/
 *.py[cod]
+.pytest_cache/
 
 # Dados locais: fotos, banco e backups nunca vão para o git
 instance/

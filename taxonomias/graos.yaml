@@ -1,0 +1,63 @@
+# Classes para fotos de GRÃOS de café.
+# Como editar este arquivo: veja taxonomias/LEIAME.md
+# ⚠️ Lista proposta, a validar com agrônomos.
+
+codigo: graos
+nome: Grãos
+descricao: Grãos crus ou beneficiados, para classificação de defeitos.
+ordem: 1
+
+classes:
+  - codigo: sem_defeito
+    nome: Sem defeito
+    tecla: "1"
+    cor: "#009E73"
+    descricao: Grão íntegro, sem defeitos visíveis.
+
+  - codigo: preto
+    nome: Preto
+    tecla: "2"
+    cor: "#3D3D3D"
+    descricao: Grão de coloração preta.
+
+  - codigo: ardido
+    nome: Ardido
+    tecla: "3"
+    cor: "#D55E00"
+    descricao: Grão de coloração parda ou marrom, sinal de fermentação.
+
+  - codigo: verde
+    nome: Verde
+    tecla: "4"
+    cor: "#F0E442"
+    descricao: Grão colhido imaturo, de cor esverdeada.
+
+  - codigo: brocado
+    nome: Brocado
+    tecla: "5"
+    cor: "#CC79A7"
+    descricao: Grão com furos causados pela broca-do-café.
+
+  - codigo: quebrado
+    nome: Quebrado
+    tecla: "6"
+    cor: "#56B4E9"
+    descricao: Fragmento de grão.
+
+  - codigo: concha
+    nome: Concha
+    tecla: "7"
+    cor: "#0072B2"
+    descricao: Grão com má formação em forma de concha.
+
+  - codigo: chocho
+    nome: Chocho / mal granado
+    tecla: "8"
+    cor: "#E69F00"
+    descricao: Grão mal formado, leve ou enrugado.
+
+  - codigo: outro
+    nome: Outro
+    tecla: "9"
+    cor: "#999999"
+    descricao: Não se encaixa nas outras classes. Explique na observação.

@@ -1,0 +1,4 @@
+# Tudo da plataforma + ferramentas para quem programa.
+-r requirements.txt
+
+pytest==9.1.1

@@ -1,28 +1,31 @@
-from flask import Flask
-from app.models import db
-import os
+"""BeanLab Coffee Vision: criação da aplicação Flask.
 
-def create_app(config=None):
+Estrutura das pastas e responsabilidades: docs/ARQUITETURA.md
+"""
+from flask import Flask
+
+from app.config import Config, carregar_chave_secreta
+from app.extensions import db, migrate
+
+
+def create_app(config: Config | None = None) -> Flask:
+    config = config or Config()
     app = Flask(__name__)
-    
-    # Configurações
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafe_annotations.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
-    app.config['UPLOAD_FOLDER'] = 'app/uploads'
-    app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'bmp'}
-    
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
-    
+    app.config.from_object(config)
+
+    app.config['PASTA_IMAGENS'].mkdir(parents=True, exist_ok=True)
+    app.config['SECRET_KEY'] = carregar_chave_secreta(app.config['PASTA_DADOS'])
+
     db.init_app(app)
-    
-    with app.app_context():
-        db.create_all()
-    
-    # Registrar blueprints
-    from app.routes import main_bp, api_bp
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp, url_prefix='/api')
-    
+    # render_as_batch: o SQLite não altera colunas diretamente; o Alembic recria a tabela.
+    migrate.init_app(app, db, directory=str(app.config['PASTA_MIGRACOES']), render_as_batch=True)
+
+    from app import dominio  # noqa: F401  (registra as tabelas no SQLAlchemy)
+    from app.api.rotas import api_bp
+    from app.cli import registrar_comandos
+    from app.web.rotas import web_bp
+
+    app.register_blueprint(web_bp)
+    app.register_blueprint(api_bp)
+    registrar_comandos(app)
     return app

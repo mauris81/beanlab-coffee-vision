@@ -1,0 +1,57 @@
+# Classes para fotos de FOLHAS de café.
+# Como editar este arquivo: veja taxonomias/LEIAME.md
+# ⚠️ Lista proposta, a validar com agrônomos.
+
+codigo: folhas
+nome: Folhas
+descricao: Folhas sadias ou com sintomas de doenças, pragas ou deficiências.
+ordem: 2
+
+classes:
+  - codigo: saudavel
+    nome: Saudável
+    tecla: "1"
+    cor: "#009E73"
+    descricao: Sem sintomas visíveis.
+
+  - codigo: ferrugem
+    nome: Ferrugem
+    tecla: "2"
+    cor: "#E69F00"
+    descricao: Pústulas alaranjadas, principalmente na face de baixo (Hemileia vastatrix).
+
+  - codigo: cercosporiose
+    nome: Cercosporiose
+    tecla: "3"
+    cor: "#8C564B"
+    descricao: Manchas circulares pardas com centro claro e halo amarelo, o "olho-pardo" (Cercospora coffeicola).
+
+  - codigo: bicho_mineiro
+    nome: Bicho-mineiro
+    tecla: "4"
+    cor: "#D55E00"
+    descricao: Lesões marrons irregulares (minas) feitas pela larva (Leucoptera coffeella).
+
+  - codigo: phoma
+    nome: Mancha de Phoma
+    tecla: "5"
+    cor: "#3D3D3D"
+    descricao: Manchas escuras nas bordas e pontas de folhas novas (Phoma spp.).
+
+  - codigo: mancha_aureolada
+    nome: Mancha-aureolada
+    tecla: "6"
+    cor: "#F0E442"
+    descricao: Lesões escuras cercadas por halo amarelado (Pseudomonas syringae pv. garcae).
+
+  - codigo: deficiencia_nutricional
+    nome: Deficiência nutricional
+    tecla: "7"
+    cor: "#56B4E9"
+    descricao: Amarelecimento ou descoloração sem lesões de doença.
+
+  - codigo: outro
+    nome: Outro
+    tecla: "8"
+    cor: "#999999"
+    descricao: Não se encaixa nas outras classes. Explique na observação.

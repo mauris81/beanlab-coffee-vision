@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{#- Página provisória enquanto as telas novas são construídas (Fases 2 a 5).
+    Mostra os tipos de amostra e classes lidos de taxonomias/*.yaml. -#}
+
+{% block content %}
+<section class="hero-card">
+    <div>
+        <span class="eyebrow">Em reconstrução</span>
+        <h1>A plataforma está sendo refeita</h1>
+        <p>O novo banco de dados já está funcionando. As telas de envio de fotos e de
+           anotação voltam nas próximas etapas. Abaixo estão as classes que estarão
+           disponíveis para cada tipo de amostra.</p>
+    </div>
+</section>
+
+<section class="section-header">
+    <div>
+        <h2>Tipos de amostra</h2>
+        <p>{{ tipos|length }} tipo(s), definidos nos arquivos da pasta <code>taxonomias/</code></p>
+    </div>
+</section>
+
+<div class="projects-grid">
+    {% for tipo in tipos %}
+    <article class="project-card">
+        <h3>{{ tipo.nome }}</h3>
+        <p class="description">{{ tipo.descricao or '' }}</p>
+        <ul class="lista-classes" aria-label="Classes de {{ tipo.nome }}">
+            {% for classe in tipo.classes_ativas %}
+            <li class="chip-classe" title="{{ classe.descricao or '' }}">
+                <span class="cor" style="--cor: {{ classe.cor }}" aria-hidden="true"></span>
+                {{ classe.nome }}
+                {% if classe.tecla_atalho %}<kbd aria-label="tecla de atalho {{ classe.tecla_atalho }}">{{ classe.tecla_atalho }}</kbd>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </article>
+    {% else %}
+    <div class="empty-state">
+        <h3>Nenhum tipo de amostra encontrado</h3>
+        <p>Confira os arquivos da pasta <code>taxonomias/</code> e reinicie a plataforma.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

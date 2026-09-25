@@ -1,0 +1,33 @@
+# Classes para fotos de FLORES de café.
+# Como editar este arquivo: veja taxonomias/LEIAME.md
+# ⚠️ Lista proposta, a validar com agrônomos.
+
+codigo: flores
+nome: Flores
+descricao: Estágios da florada.
+ordem: 3
+
+classes:
+  - codigo: botao_floral
+    nome: Botão floral
+    tecla: "1"
+    cor: "#0072B2"
+    descricao: Flor ainda fechada.
+
+  - codigo: flor_aberta
+    nome: Flor aberta
+    tecla: "2"
+    cor: "#E69F00"
+    descricao: Pétalas abertas (antese).
+
+  - codigo: flor_murcha
+    nome: Flor murcha
+    tecla: "3"
+    cor: "#8C564B"
+    descricao: Pétalas secas ou escurecidas depois da abertura.
+
+  - codigo: outro
+    nome: Outro
+    tecla: "4"
+    cor: "#999999"
+    descricao: Não se encaixa nas outras classes. Explique na observação.

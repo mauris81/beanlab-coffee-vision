@@ -15,11 +15,15 @@ Outras variáveis opcionais:
 """
 import os
 import socket
+import sys
 import threading
 import time
 import webbrowser
 
 from app import create_app
+from app.cli import descrever_resumo
+from app.servicos.banco import preparar_banco
+from app.servicos.taxonomias import TaxonomiaInvalida
 
 app = create_app()
 
@@ -61,7 +65,19 @@ if __name__ == '__main__':
     # navegador só devem aparecer uma vez.
     primeira_execucao = os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
     if primeira_execucao:
+        # Aplica migrações pendentes e lê taxonomias/*.yaml antes de abrir as portas.
+        try:
+            with app.app_context():
+                resumo = preparar_banco()
+        except TaxonomiaInvalida as erro:
+            print(f'\n  ERRO num arquivo de classes (pasta taxonomias/):\n  {erro}\n'
+                  '  Corrija o arquivo e abra a plataforma de novo.\n')
+            sys.exit(1)
+
         ip = endereco_na_rede()
+        print()
+        print(f'  Dados em: {app.config["PASTA_DADOS"]}')
+        print(f'  {descrever_resumo(resumo)}')
         print()
         print('  BeanLab Coffee Vision está no ar')
         print(f'  {"Neste computador:":<28} http://127.0.0.1:{port}')
