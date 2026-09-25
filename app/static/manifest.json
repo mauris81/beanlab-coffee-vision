@@ -1,0 +1,13 @@
+{
+    "name": "BeanLab Coffee Vision",
+    "short_name": "BeanLab",
+    "description": "Segmentação e anotação de amostras de café.",
+    "lang": "pt-BR",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#F6F3EF",
+    "theme_color": "#6B4226",
+    "icons": [
+        { "src": "/static/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    ]
+}

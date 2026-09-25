@@ -1,0 +1,159 @@
+{#- ===========================================================================
+    COMPONENTES DO DESIGN SYSTEM (macros Jinja)
+    Uso numa página:  {% import 'componentes.html' as c %}
+                      {{ c.botao('Enviar fotos', icone_nome='enviar') }}
+    Estilos em static/css/componentes.css. Exemplos vivos em /guia-visual.
+    =========================================================================== -#}
+
+
+{#- Botão ou link com cara de botão.
+    variante: primario | secundario | fantasma | perigo
+    tamanho: None | 'grande';  bloco=True ocupa a largura toda.
+    href: se informado, vira <a> (navegação); senão, <button> (ação).
+    icone_depois=True: ícone à direita do texto (use para setas de "avançar"). -#}
+{% macro botao(texto, variante='primario', icone_nome=None, href=None, tipo='button',
+               tamanho=None, bloco=False, icone_depois=False, attrs={}) -%}
+{%- set classes = ['botao', 'botao--' ~ variante]
+      + (['botao--' ~ tamanho] if tamanho else [])
+      + (['botao--bloco'] if bloco else []) -%}
+{%- set svg = icone(icone_nome) if icone_nome else '' -%}
+{%- set miolo = ('<span>'|safe ~ texto ~ '</span>'|safe ~ svg) if icone_depois
+                else (svg ~ '<span>'|safe ~ texto ~ '</span>'|safe) -%}
+{%- if href -%}
+<a class="{{ classes|join(' ') }}" href="{{ href }}"{{ attrs|xmlattr }}>{{ miolo }}</a>
+{%- else -%}
+<button class="{{ classes|join(' ') }}" type="{{ tipo }}"{{ attrs|xmlattr }}>{{ miolo }}</button>
+{%- endif -%}
+{%- endmacro %}
+
+
+{#- Botão só com ícone: o rótulo é obrigatório (lido pelo leitor de tela e
+    mostrado como dica ao passar o mouse). -#}
+{% macro botao_icone(icone_nome, rotulo, variante='fantasma', attrs={}) -%}
+<button class="botao botao--{{ variante }} botao--icone" type="button" aria-label="{{ rotulo }}" title="{{ rotulo }}"{{ attrs|xmlattr }}>{{ icone(icone_nome) }}</button>
+{%- endmacro %}
+
+
+{#- Selo de status: ícone + texto (a cor nunca é a única informação).
+    variante: neutro | sucesso | aviso | perigo | info -#}
+{% macro selo(texto, variante='neutro', icone_nome=None, animado=False) -%}
+<span class="selo selo--{{ variante }}{% if animado %} selo--animado{% endif %}">{% if icone_nome %}{{ icone(icone_nome) }}{% endif %}{{ texto }}</span>
+{%- endmacro %}
+
+
+{#- Selo a partir de um StatusImagem ou StatusJob. -#}
+{% macro selo_status(status) -%}
+{%- set a = apresentar_status(status) -%}
+{{ selo(a.texto, a.variante, a.icone, a.animado) }}
+{%- endmacro %}
+
+
+{#- Tecla do teclado, ex.: {{ c.tecla('1') }} -#}
+{% macro tecla(texto, rotulo=None) -%}
+<kbd class="tecla"{% if rotulo %} aria-label="{{ rotulo }}"{% endif %}>{{ texto }}</kbd>
+{%- endmacro %}
+
+
+{#- Chip de uma Classe: cor + nome + tecla de atalho. -#}
+{% macro chip_classe(classe) -%}
+<li class="chip-classe"{% if classe.descricao %} title="{{ classe.descricao }}"{% endif %}>
+    <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>
+    <span>{{ classe.nome }}</span>
+    {%- if classe.tecla_atalho %} {{ tecla(classe.tecla_atalho, 'tecla de atalho ' ~ classe.tecla_atalho) }}{% endif %}
+</li>
+{%- endmacro %}
+
+
+{#- Barra de progresso com texto (o número está sempre escrito, não só desenhado). -#}
+{% macro progresso(valor, total, rotulo, variante=None) -%}
+{%- set pct = (100 * valor / total) if total else 0 -%}
+<div class="progresso{% if variante %} progresso--{{ variante }}{% endif %}">
+    <div class="progresso__legenda">
+        <span>{{ rotulo }}</span>
+        <strong>{{ valor }} de {{ total }} · {{ '%.0f'|format(pct) }}%</strong>
+    </div>
+    <div class="progresso__trilho" role="progressbar" aria-label="{{ rotulo }}"
+         aria-valuemin="0" aria-valuemax="{{ total }}" aria-valuenow="{{ valor }}"
+         aria-valuetext="{{ valor }} de {{ total }}">
+        <div class="progresso__barra" style="--valor: {{ '%.1f'|format(pct) }}%"></div>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{#- Número em destaque (painéis). -#}
+{% macro estatistica(rotulo, valor, detalhe=None) -%}
+<div class="estatistica">
+    <span class="estatistica__rotulo">{{ rotulo }}</span>
+    <span class="estatistica__valor">{{ valor }}</span>
+    {%- if detalhe %}<span class="estatistica__detalhe">{{ detalhe }}</span>{% endif %}
+</div>
+{%- endmacro %}
+
+
+{#- Alerta fixo na página. Conteúdo vai entre {% call %} e {% endcall %}.
+    variante: info | sucesso | aviso | perigo -#}
+{% macro alerta(variante='info', titulo=None) -%}
+{%- set icones = {'info': 'info', 'sucesso': 'sucesso', 'aviso': 'alerta', 'perigo': 'erro'} -%}
+<div class="alerta alerta--{{ variante }}"{% if variante == 'perigo' %} role="alert"{% endif %}>
+    {{ icone(icones[variante]) }}
+    <div>
+        {%- if titulo %}<h2 class="alerta__titulo">{{ titulo }}</h2>{% endif %}
+        {{ caller() }}
+    </div>
+</div>
+{%- endmacro %}
+
+
+{#- Estado vazio: explica o que falta e o que fazer. Ações opcionais via {% call %}. -#}
+{% macro vazio(titulo, texto=None, icone_nome='imagem') -%}
+<div class="vazio">
+    {{ icone(icone_nome) }}
+    <h2>{{ titulo }}</h2>
+    {%- if texto %}<p>{{ texto }}</p>{% endif %}
+    {%- if caller is defined %}<div class="linha">{{ caller() }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+
+{#- Campo de formulário com rótulo, dica e erro ligados ao campo
+    (aria-describedby), para o leitor de tela ler tudo junto.
+    tipo: text | email | number | date | textarea | select (opcoes=[(valor, texto)]) -#}
+{% macro campo(nome, rotulo, tipo='text', valor='', dica=None, erro=None, opcional=False,
+               opcoes=[], attrs={}) -%}
+{%- set id_campo = 'campo-' ~ nome -%}
+{%- set descricoes = ([id_campo ~ '-dica'] if dica else []) + ([id_campo ~ '-erro'] if erro else []) -%}
+{%- set comuns = {'id': id_campo, 'name': nome, 'class': 'entrada',
+                  'aria-describedby': descricoes|join(' ') or none,
+                  'aria-invalid': 'true' if erro else none,
+                  'required': none if opcional else true} -%}
+<div class="campo{% if erro %} campo--erro{% endif %}">
+    <label class="campo__rotulo" for="{{ id_campo }}">{{ rotulo }}{% if opcional %} <span class="campo__opcional">(opcional)</span>{% endif %}</label>
+    {%- if dica %}<span class="campo__dica" id="{{ id_campo }}-dica">{{ dica }}</span>{% endif %}
+    {%- if tipo == 'textarea' %}
+    <textarea{{ comuns|xmlattr }}{{ attrs|xmlattr }}>{{ valor }}</textarea>
+    {%- elif tipo == 'select' %}
+    <select{{ comuns|xmlattr }}{{ attrs|xmlattr }}>
+        {%- for valor_opcao, texto_opcao in opcoes %}
+        <option value="{{ valor_opcao }}"{% if valor_opcao == valor %} selected{% endif %}>{{ texto_opcao }}</option>
+        {%- endfor %}
+    </select>
+    {%- else %}
+    <input type="{{ tipo }}" value="{{ valor }}"{{ comuns|xmlattr }}{{ attrs|xmlattr }}>
+    {%- endif %}
+    {%- if erro %}<span class="campo__erro" id="{{ id_campo }}-erro">{{ icone('erro') }}{{ erro }}</span>{% endif %}
+</div>
+{%- endmacro %}
+
+
+{#- Título de página, com sobretítulo e descrição opcionais e ações via {% call %}. -#}
+{% macro cabecalho_pagina(titulo, sobretitulo=None, descricao=None) -%}
+<header class="cabecalho-pagina">
+    <div class="cabecalho-pagina__texto">
+        {%- if sobretitulo %}<span class="sobretitulo">{{ sobretitulo }}</span>{% endif %}
+        <h1>{{ titulo }}</h1>
+        {%- if descricao %}<p>{{ descricao }}</p>{% endif %}
+    </div>
+    {%- if caller is defined %}<div class="linha">{{ caller() }}</div>{% endif %}
+</header>
+{%- endmacro %}

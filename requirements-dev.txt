@@ -2,3 +2,7 @@
 -r requirements.txt
 
 pytest==9.1.1
+
+# Testes de navegador (tests/navegador): usa o Chrome ou Edge já instalados,
+# sem baixar outro navegador.
+playwright==1.63.0

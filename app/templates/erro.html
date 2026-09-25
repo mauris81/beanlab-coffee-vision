@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}{{ titulo }} · BeanLab{% endblock %}
+
+{% block conteudo %}
+{% call c.vazio(titulo, mensagem, 'alerta' if codigo == 500 else 'imagem') %}
+    {{ c.botao('Voltar ao início', href=url_for('web.inicio'), icone_nome='inicio') }}
+{% endcall %}
+<p class="texto-suave texto-centro">Código do erro: {{ codigo }}</p>
+{% endblock %}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="BeanLab">
+  <!-- Logotipo: grão de café dentro de um quadro de "leitura" (visão computacional). -->
+  <rect width="64" height="64" rx="16" fill="#6B4226"/>
+  <path d="M14 22v-6a2 2 0 0 1 2-2h6M42 14h6a2 2 0 0 1 2 2v6M50 42v6a2 2 0 0 1-2 2h-6M22 50h-6a2 2 0 0 1-2-2v-6"
+        fill="none" stroke="#F3E9E0" stroke-width="3.5" stroke-linecap="round"/>
+  <g transform="rotate(30 32 32)">
+    <ellipse cx="32" cy="32" rx="10.5" ry="15" fill="#F3E9E0"/>
+    <path d="M32 17.5c-5 4.7-5 10.1 0 14.5s5 9.8 0 14.5" fill="none" stroke="#6B4226"
+          stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

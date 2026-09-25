@@ -1,0 +1,149 @@
+/* ==========================================================================
+   TOKENS DO DESIGN SYSTEM
+   A única fonte de cores, tamanhos e espaçamentos. Os componentes nunca usam
+   valores soltos (ex.: #6B4226 ou 13px); usam estes nomes.
+
+   Contraste: cada par de cor usado para texto ou controle é conferido pelo
+   teste tests/test_design_system.py (WCAG 2.2 AA). Mudou uma cor? Rode os testes.
+   Documentação: docs/DESIGN_SYSTEM.md
+   ========================================================================== */
+
+:root {
+    color-scheme: light;
+
+    /* --- Cores: tema claro (padrão; melhor sob sol forte, no campo) --------- */
+    --cor-fundo: #F6F3EF;           /* fundo da página */
+    --cor-superficie: #FFFFFF;      /* cartões, campos, cabeçalho */
+    --cor-superficie-2: #EFEAE3;    /* áreas de destaque sutil, trilhos */
+    --cor-borda: #E2DBD2;           /* divisórias decorativas */
+    --cor-borda-controle: #8C8177;  /* contorno de campos (≥ 3:1) */
+    --cor-texto: #1E1915;
+    --cor-texto-suave: #5C534B;     /* textos secundários (≥ 4.5:1) */
+
+    --cor-primaria: #6B4226;        /* café torrado: ações principais */
+    --cor-primaria-hover: #55331C;
+    --cor-sobre-primaria: #FFFFFF;
+    --cor-primaria-suave: #F3E9E0;
+    --cor-primaria-texto: #6B4226;  /* links e texto em destaque */
+
+    --cor-foco: #0B6BCB;            /* anel de foco: azul, contrasta com tudo */
+
+    --cor-sucesso: #1B7340;  --cor-sucesso-suave: #E2F2E8;
+    --cor-aviso: #8A5300;    --cor-aviso-suave: #FDF0D5;
+    --cor-perigo: #B3261E;   --cor-perigo-suave: #FBE4E2;
+    --cor-info: #0B5CAD;     --cor-info-suave: #E1EDFA;
+
+    --sombra-cor: 30 20 10;         /* RGB usado nas sombras */
+
+    /* --- Tipografia --------------------------------------------------------- */
+    /* Fonte do sistema: não depende de internet (uso no campo) e é a mais
+       legível em cada aparelho (Segoe UI no Windows, Roboto no Android...). */
+    --fonte: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+             "Noto Sans", sans-serif;
+    --fonte-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+
+    --texto-xs: 0.8125rem;   /* 13px: só rótulos curtos, nunca parágrafos */
+    --texto-sm: 0.875rem;    /* 14px */
+    --texto-md: 1rem;        /* 16px: base. Abaixo disso o iPhone dá zoom nos campos */
+    --texto-lg: 1.125rem;    /* 18px */
+    --texto-xl: 1.25rem;     /* 20px */
+    --texto-2xl: 1.5rem;     /* 24px */
+    --texto-3xl: 1.875rem;   /* 30px */
+    --texto-4xl: 2.25rem;    /* 36px */
+
+    --peso-normal: 400;
+    --peso-medio: 500;
+    --peso-forte: 600;
+    --peso-titulo: 700;
+
+    --altura-linha: 1.5;
+    --altura-linha-titulo: 1.2;
+
+    /* --- Espaçamento (múltiplos de 4px) -------------------------------------- */
+    --espaco-1: 0.25rem;   /* 4 */
+    --espaco-2: 0.5rem;    /* 8 */
+    --espaco-3: 0.75rem;   /* 12 */
+    --espaco-4: 1rem;      /* 16 */
+    --espaco-5: 1.5rem;    /* 24 */
+    --espaco-6: 2rem;      /* 32 */
+    --espaco-7: 3rem;      /* 48 */
+    --espaco-8: 4rem;      /* 64 */
+
+    /* --- Tamanhos ------------------------------------------------------------ */
+    --alvo-toque: 48px;           /* altura mínima de tudo que se toca */
+    --alvo-toque-compacto: 40px;  /* só em listas densas no computador */
+    --largura-conteudo: 72rem;    /* 1152px */
+    --largura-texto: 42rem;       /* linhas longas cansam a leitura */
+    --altura-topo: 64px;
+    --altura-navegacao-inferior: 64px;
+
+    /* --- Formas -------------------------------------------------------------- */
+    --raio-sm: 6px;
+    --raio-md: 10px;
+    --raio-lg: 16px;
+    --raio-pilula: 999px;
+
+    --sombra-1: 0 1px 2px rgb(var(--sombra-cor) / 0.06), 0 1px 3px rgb(var(--sombra-cor) / 0.08);
+    --sombra-2: 0 4px 12px rgb(var(--sombra-cor) / 0.08), 0 2px 4px rgb(var(--sombra-cor) / 0.06);
+    --sombra-3: 0 16px 40px rgb(var(--sombra-cor) / 0.16);
+
+    /* --- Movimento (desligado para quem pede menos movimento; ver base.css) - */
+    --duracao-rapida: 120ms;
+    --duracao-media: 200ms;
+    --curva: cubic-bezier(0.2, 0, 0, 1);
+
+    /* --- Camadas ------------------------------------------------------------- */
+    --camada-topo: 20;
+    --camada-navegacao: 30;
+    --camada-avisos: 50;
+}
+
+/* --- Tema escuro -------------------------------------------------------------
+   Aplicado quando o aparelho está em modo escuro, a menos que a pessoa tenha
+   escolhido o claro no botão de tema. Os dois blocos abaixo PRECISAM ser
+   iguais; o teste tests/test_design_system.py confere. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --cor-fundo: #14110F;
+        --cor-superficie: #1E1A17;
+        --cor-superficie-2: #29231F;
+        --cor-borda: #342D28;
+        --cor-borda-controle: #857A70;
+        --cor-texto: #F3EEE8;
+        --cor-texto-suave: #B9AEA3;
+        --cor-primaria: #D9A273;
+        --cor-primaria-hover: #E6B88F;
+        --cor-sobre-primaria: #1E140C;
+        --cor-primaria-suave: #3A2B20;
+        --cor-primaria-texto: #E6B88F;
+        --cor-foco: #7CC4FF;
+        --cor-sucesso: #5FCB8C;  --cor-sucesso-suave: #1B2E23;
+        --cor-aviso: #F0B653;    --cor-aviso-suave: #33281A;
+        --cor-perigo: #FF8A80;   --cor-perigo-suave: #3A1F1D;
+        --cor-info: #7CC4FF;     --cor-info-suave: #1B2A3A;
+        --sombra-cor: 0 0 0;
+    }
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --cor-fundo: #14110F;
+    --cor-superficie: #1E1A17;
+    --cor-superficie-2: #29231F;
+    --cor-borda: #342D28;
+    --cor-borda-controle: #857A70;
+    --cor-texto: #F3EEE8;
+    --cor-texto-suave: #B9AEA3;
+    --cor-primaria: #D9A273;
+    --cor-primaria-hover: #E6B88F;
+    --cor-sobre-primaria: #1E140C;
+    --cor-primaria-suave: #3A2B20;
+    --cor-primaria-texto: #E6B88F;
+    --cor-foco: #7CC4FF;
+    --cor-sucesso: #5FCB8C;  --cor-sucesso-suave: #1B2E23;
+    --cor-aviso: #F0B653;    --cor-aviso-suave: #33281A;
+    --cor-perigo: #FF8A80;   --cor-perigo-suave: #3A1F1D;
+    --cor-info: #7CC4FF;     --cor-info-suave: #1B2A3A;
+    --sombra-cor: 0 0 0;
+}

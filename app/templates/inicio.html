@@ -1,46 +1,50 @@
 {% extends "base.html" %}
+{% import 'componentes.html' as c %}
 
-{#- Página provisória enquanto as telas novas são construídas (Fases 2 a 5).
-    Mostra os tipos de amostra e classes lidos de taxonomias/*.yaml. -#}
+{#- Página inicial provisória: vira o painel (dashboard) na Fase 4. -#}
 
-{% block content %}
-<section class="hero-card">
-    <div>
-        <span class="eyebrow">Em reconstrução</span>
-        <h1>A plataforma está sendo refeita</h1>
-        <p>O novo banco de dados já está funcionando. As telas de envio de fotos e de
-           anotação voltam nas próximas etapas. Abaixo estão as classes que estarão
-           disponíveis para cada tipo de amostra.</p>
-    </div>
-</section>
+{% block conteudo %}
+<div class="pilha pilha--grande">
+    {{ c.cabecalho_pagina(
+        'Anotação de amostras de café',
+        sobretitulo='BeanLab Coffee Vision',
+        descricao='Fotografe, separe cada objeto da foto e diga o que ele é. '
+                  'As anotações viram dados para pesquisa e para treinar modelos.') }}
 
-<section class="section-header">
-    <div>
-        <h2>Tipos de amostra</h2>
-        <p>{{ tipos|length }} tipo(s), definidos nos arquivos da pasta <code>taxonomias/</code></p>
-    </div>
-</section>
+    {% call c.alerta('info', 'A plataforma está sendo refeita') %}
+        <p>O banco de dados e o novo visual já estão prontos. O envio de fotos e a tela
+           de anotação chegam nas próximas etapas.</p>
+    {% endcall %}
 
-<div class="projects-grid">
-    {% for tipo in tipos %}
-    <article class="project-card">
-        <h3>{{ tipo.nome }}</h3>
-        <p class="description">{{ tipo.descricao or '' }}</p>
-        <ul class="lista-classes" aria-label="Classes de {{ tipo.nome }}">
-            {% for classe in tipo.classes_ativas %}
-            <li class="chip-classe" title="{{ classe.descricao or '' }}">
-                <span class="cor" style="--cor: {{ classe.cor }}" aria-hidden="true"></span>
-                {{ classe.nome }}
-                {% if classe.tecla_atalho %}<kbd aria-label="tecla de atalho {{ classe.tecla_atalho }}">{{ classe.tecla_atalho }}</kbd>{% endif %}
-            </li>
+    <section class="pilha" aria-labelledby="titulo-tipos">
+        <div>
+            <h2 id="titulo-tipos">Tipos de amostra</h2>
+            <p class="texto-suave">As classes de cada tipo vêm da pasta <code>taxonomias/</code>.
+               As teclas indicam o atalho que será usado na hora de anotar.</p>
+        </div>
+
+        {% if tipos %}
+        <div class="grade grade--larga">
+            {% for tipo in tipos %}
+            <article class="cartao" aria-labelledby="tipo-{{ tipo.codigo }}">
+                <div class="cartao__cabecalho">
+                    <span class="cartao__icone">{{ icone(icone_do_tipo(tipo.codigo)) }}</span>
+                    <div>
+                        <h3 id="tipo-{{ tipo.codigo }}">{{ tipo.nome }}</h3>
+                        <span class="texto-suave">{{ tipo.classes_ativas|length }} classes</span>
+                    </div>
+                </div>
+                {% if tipo.descricao %}<p class="texto-suave">{{ tipo.descricao }}</p>{% endif %}
+                <ul class="lista-chips" aria-label="Classes de {{ tipo.nome }}">
+                    {% for classe in tipo.classes_ativas %}{{ c.chip_classe(classe) }}{% endfor %}
+                </ul>
+            </article>
             {% endfor %}
-        </ul>
-    </article>
-    {% else %}
-    <div class="empty-state">
-        <h3>Nenhum tipo de amostra encontrado</h3>
-        <p>Confira os arquivos da pasta <code>taxonomias/</code> e reinicie a plataforma.</p>
-    </div>
-    {% endfor %}
+        </div>
+        {% else %}
+            {{ c.vazio('Nenhum tipo de amostra encontrado',
+                       'Confira os arquivos da pasta taxonomias/ e reinicie a plataforma.') }}
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

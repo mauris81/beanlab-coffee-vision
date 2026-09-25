@@ -2,35 +2,77 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}BeanLab Coffee Vision{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{{ url_for('web.inicio') }}" class="brand" aria-label="Página inicial">
-                <span class="brand-icon" aria-hidden="true">☕</span>
-                <span>
-                    <strong>BeanLab Coffee Vision</strong>
-                    <small>Segmentação e anotação de amostras de café</small>
-                </span>
-            </a>
-        </div>
-    </nav>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{% block titulo %}BeanLab Coffee Vision{% endblock %}</title>
+    <meta name="description" content="Segmentação e anotação de amostras de café: grãos, folhas, flores e frutos.">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1E1A17" media="(prefers-color-scheme: dark)">
+    <link rel="icon" href="{{ url_for('static', filename='logo.svg') }}" type="image/svg+xml">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
-    <main class="page-shell">
-        {% block content %}{% endblock %}
+    {#- Aplica o tema escolhido antes de desenhar a página (evita "piscar"). -#}
+    <script>
+        try {
+            var tema = localStorage.getItem('tema');
+            if (tema === 'light' || tema === 'dark') document.documentElement.dataset.theme = tema;
+        } catch (e) {}
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/componentes.css') }}">
+    {% block estilos %}{% endblock %}
+    <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body data-icones="{{ url_for('static', filename='icones.svg') }}">
+    <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="topo">
+        <div class="conteudo topo__interno">
+            <a class="marca" href="{{ url_for('web.inicio') }}">
+                <img class="marca__logo" src="{{ url_for('static', filename='logo.svg') }}" alt="" width="36" height="36">
+                <span class="marca__nome">BeanLab <small>Coffee Vision</small></span>
+            </a>
+
+            <nav class="navegacao" aria-label="Principal">
+                <ul class="navegacao__lista">
+                    {%- for item in itens_de_navegacao() %}
+                    <li><a class="navegacao__item" href="{{ item.url }}"{% if item.atual %} aria-current="page"{% endif %}>{{ icone(item.icone) }}{{ item.texto }}</a></li>
+                    {%- endfor %}
+                </ul>
+            </nav>
+
+            <button class="botao botao--fantasma botao--icone alternar-tema" id="alternar-tema" type="button"
+                    aria-label="Alternar tema claro ou escuro" title="Alternar tema claro ou escuro">
+                {{ icone('lua', classe='alternar-tema__lua') }}{{ icone('sol', classe='alternar-tema__sol') }}
+            </button>
+        </div>
+    </header>
+
+    <main class="principal" id="conteudo" tabindex="-1">
+        <div class="conteudo">
+            {% block conteudo %}{% endblock %}
+        </div>
     </main>
 
-    <footer class="app-footer">
-        <p>Plataforma de apoio à segmentação, anotação e classificação de amostras de café.</p>
+    <footer class="rodape">
+        <div class="conteudo">
+            <span>BeanLab Coffee Vision · anotação de amostras de café</span>
+            <a href="https://github.com/mauris81/beanlab-coffee-vision">Código no GitHub</a>
+        </div>
     </footer>
 
-    {% block extra_js %}{% endblock %}
+    {#- No celular o menu fica na base da tela, ao alcance do polegar. -#}
+    <nav class="navegacao-inferior" aria-label="Principal">
+        <ul class="navegacao__lista">
+            {%- for item in itens_de_navegacao() %}
+            <li><a class="navegacao__item" href="{{ item.url }}"{% if item.atual %} aria-current="page"{% endif %}>{{ icone(item.icone) }}<span>{{ item.texto }}</span></a></li>
+            {%- endfor %}
+        </ul>
+    </nav>
+
+    <div class="avisos" id="avisos" aria-live="polite"></div>
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,37 @@
+// Ponto de entrada do JavaScript comum a todas as páginas (carregado em base.html).
+//
+// Comportamentos ativados só com atributos no HTML, sem escrever JS na página:
+//   data-aviso="sucesso" data-aviso-texto="..."   mostra um aviso ao clicar
+//   data-abrir-dialogo="id-do-dialogo"            abre um <dialog class="dialogo">
+//   data-fechar-dialogo                           fecha o diálogo em que está
+
+import { avisar } from './avisos.js';
+import { iniciarAlternadorDeTema } from './tema.js';
+
+iniciarAlternadorDeTema(document.getElementById('alternar-tema'));
+
+document.addEventListener('click', (evento) => {
+    const alvo = evento.target;
+
+    const botaoAviso = alvo.closest('[data-aviso]');
+    if (botaoAviso) {
+        avisar(botaoAviso.dataset.avisoTexto ?? '', { tipo: botaoAviso.dataset.aviso });
+    }
+
+    const abrir = alvo.closest('[data-abrir-dialogo]');
+    if (abrir) {
+        document.getElementById(abrir.dataset.abrirDialogo)?.showModal();
+    }
+
+    const fechar = alvo.closest('[data-fechar-dialogo]');
+    if (fechar) {
+        fechar.closest('dialog')?.close(fechar.value || '');
+    }
+});
+
+// Clique fora do diálogo (no fundo escurecido) também fecha.
+document.addEventListener('click', (evento) => {
+    if (evento.target instanceof HTMLDialogElement && evento.target.classList.contains('dialogo')) {
+        evento.target.close();
+    }
+});

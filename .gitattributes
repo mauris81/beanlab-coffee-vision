@@ -5,3 +5,5 @@
 *.jpeg binary
 *.db binary
 *.bat text eol=crlf
+# Arquivos de terceiros ficam exatamente como vieram
+*.min.js -text

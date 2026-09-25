@@ -3,3 +3,9 @@
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Testes de navegador (tests/navegador) são mais lentos e precisam do Chrome ou Edge:
+# rodam só com  pytest -m navegador
+addopts = "-m 'not navegador'"
+markers = [
+    "navegador: abre as páginas num navegador de verdade (Playwright + Chrome/Edge)",
+]

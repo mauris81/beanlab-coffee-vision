@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+<!--
+  Ícones da plataforma (grade 24×24, traço de 2px, pontas arredondadas).
+  Uso nos templates: {{ icone('camera') }}  (macro em templates/componentes.html)
+  Para adicionar: crie um <symbol id="i-NOME" viewBox="0 0 24 24"> com traços
+  (sem preenchimento). O teste tests/test_design_system.py confere se todo ícone
+  usado existe aqui.
+-->
+
+<!-- Navegação e ações -->
+<symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="i-enviar" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+<symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+<symbol id="i-imagem" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-9 9"/></symbol>
+<symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-fechar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-seta-esquerda" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-seta-direita" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-avancar" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="i-desfazer" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+<symbol id="i-teclado" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></symbol>
+<symbol id="i-usuario" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-paleta" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.6 0-.9-.7-1.4-.7-2.3 0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4C21 6.8 17 3 12 3z"/><path d="M7.5 11h.01M10 7.5h.01M14.5 7.5h.01"/></symbol>
+<symbol id="i-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-lua" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/></symbol>
+<symbol id="i-grafico" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="i-lista" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+
+<!-- Estados -->
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+<symbol id="i-sucesso" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></symbol>
+<symbol id="i-alerta" viewBox="0 0 24 24"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 10v4M12 17h.01"/></symbol>
+<symbol id="i-erro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+<symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-processando" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></symbol>
+
+<!-- Tipos de amostra -->
+<symbol id="i-grao" viewBox="0 0 24 24"><g transform="rotate(30 12 12)"><ellipse cx="12" cy="12" rx="6.5" ry="9.5"/><path d="M12 2.5c-3.2 3-3.2 6.5 0 9.5s3.2 6.5 0 9.5"/></g></symbol>
+<symbol id="i-folha" viewBox="0 0 24 24"><path d="M5 20c0-9 5.5-15 15-16-.6 10-6.6 16-15 16z"/><path d="M5 20 14.5 10.5"/></symbol>
+<symbol id="i-flor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="6.3" r="3"/><circle cx="17.4" cy="10.2" r="3"/><circle cx="15.4" cy="16.6" r="3"/><circle cx="8.6" cy="16.6" r="3"/><circle cx="6.6" cy="10.2" r="3"/></symbol>
+<symbol id="i-fruto" viewBox="0 0 24 24"><circle cx="8" cy="16" r="4.5"/><circle cx="16.5" cy="15" r="4.5"/><path d="M8 11.5C8 7.5 10 4.5 14 3M16.5 10.5c0-3-1-5.5-2.5-7.5"/></symbol>
+</svg>

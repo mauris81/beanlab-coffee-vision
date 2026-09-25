@@ -1,0 +1,77 @@
+/* Estilos só da página /guia-visual (vitrine do design system). */
+
+.guia { display: flex; flex-direction: column; gap: var(--espaco-7); }
+.guia__secao { display: flex; flex-direction: column; gap: var(--espaco-4); scroll-margin-top: calc(var(--altura-topo) + var(--espaco-4)); }
+.guia__secao h3:not(:first-child) { margin-top: var(--espaco-4); }
+.guia__secao > h2 { padding-bottom: var(--espaco-2); border-bottom: 1px solid var(--cor-borda); }
+
+.guia__sumario ul { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin: 0; padding: 0; list-style: none; }
+.guia__sumario a {
+    display: inline-flex; align-items: center;
+    min-height: 40px; padding: 0 var(--espaco-3);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-pilula);
+    background: var(--cor-superficie);
+    color: var(--cor-texto); text-decoration: none; font-size: var(--texto-sm); font-weight: var(--peso-medio);
+}
+.guia__sumario a:hover { border-color: var(--cor-primaria); color: var(--cor-primaria-texto); }
+
+/* Cores */
+.amostras { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: var(--espaco-4); }
+.amostra { display: flex; flex-direction: column; gap: 2px; font-size: var(--texto-sm); }
+.amostra__cor {
+    height: 64px; margin-bottom: var(--espaco-2);
+    border-radius: var(--raio-md);
+    box-shadow: inset 0 0 0 1px rgb(128 128 128 / 0.35);
+}
+.amostra code { align-self: flex-start; font-size: var(--texto-xs); }
+
+.tabela-rolagem { overflow-x: auto; border: 1px solid var(--cor-borda); border-radius: var(--raio-lg); background: var(--cor-superficie); }
+.tabela-contraste { width: 100%; border-collapse: collapse; font-size: var(--texto-sm); }
+.tabela-contraste th, .tabela-contraste td { padding: var(--espaco-3) var(--espaco-4); text-align: left; border-bottom: 1px solid var(--cor-borda); white-space: nowrap; }
+.tabela-contraste tr:last-child td { border-bottom: none; }
+.tabela-contraste th { color: var(--cor-texto-suave); font-weight: var(--peso-forte); }
+.exemplo-contraste { display: inline-block; padding: var(--espaco-1) var(--espaco-3); border-radius: var(--raio-sm); font-weight: var(--peso-forte); box-shadow: inset 0 0 0 1px var(--cor-borda); }
+
+/* Tipografia */
+.escala-tipografica { display: flex; flex-direction: column; }
+.escala-tipografica__linha { display: flex; flex-direction: column; gap: var(--espaco-1); padding: var(--espaco-3) 0; border-bottom: 1px solid var(--cor-borda); }
+.escala-tipografica__exemplo { font-weight: var(--peso-forte); line-height: var(--altura-linha-titulo); }
+
+/* Espaços e formas */
+.regua { display: grid; grid-template-columns: 4.5rem 7rem auto; align-items: center; gap: var(--espaco-3); font-size: var(--texto-sm); }
+.regua__barra { height: 12px; border-radius: 2px; background: var(--cor-primaria); }
+.formas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--espaco-4); }
+.forma {
+    display: grid; place-items: center;
+    height: 72px; padding: var(--espaco-2);
+    border: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+    font-size: var(--texto-xs);
+}
+
+/* Ícones */
+.grade-icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: var(--espaco-2); margin: 0; padding: 0; list-style: none; }
+.grade-icones li {
+    display: flex; flex-direction: column; align-items: center; gap: var(--espaco-2);
+    padding: var(--espaco-3) var(--espaco-2);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-md);
+    background: var(--cor-superficie);
+}
+.grade-icones .icone { width: 28px; height: 28px; }
+.grade-icones code { background: none; font-size: var(--texto-xs); white-space: nowrap; }
+
+/* Formulários */
+.formulario-exemplo { display: flex; flex-direction: column; gap: var(--espaco-5); max-width: 32rem; }
+.formulario-exemplo fieldset { margin: 0; padding: 0; border: 0; }
+.formulario-exemplo legend { padding: 0; }
+
+/* Status */
+.rotulo-linha { min-width: 8rem; }
+
+/* Atalhos */
+.atalhos { display: grid; gap: var(--espaco-3); margin: 0; }
+.atalhos > div { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-3); }
+.atalhos dt { display: flex; align-items: center; gap: var(--espaco-1); min-width: 6rem; }
+.atalhos dd { margin: 0; }
+.exemplo-contraste--contorno { width: 5.5rem; height: 2rem; vertical-align: middle; border: 2px solid; box-shadow: none; }
+.tabela-rolagem:focus-visible { outline-offset: 2px; }
