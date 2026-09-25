@@ -7,9 +7,9 @@ ser revisado ou desfeito.
 |------|--------|---------|
 | 0. Fundação | ✅ Concluída (25/09/2026) | Git, backup, limpeza de duplicatas, depurador fechado, esta documentação |
 | 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
-| 2. Ingestão | ⏳ Próxima (depois da 3, por decisão) | Envio por câmera/arquivo/lote, imagens já segmentadas, segmentação em segundo plano com progresso |
+| 2. Ingestão | ✅ Concluída (25/09/2026) | Coletas, "Quem é você?", envio pela câmera ou em lote (rotação, GPS, repetidas, miniaturas), recortes prontos e COCO, segmentação em segundo plano com status ao vivo, motor clássico corrigido, servidor waitress |
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
-| 4. Dashboard | — | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
+| 4. Dashboard | ⏳ Próxima | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
 | 5. Anotação | — | Atalhos de teclado, avanço automático, anotação em lote, desfazer, edição de contorno |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |

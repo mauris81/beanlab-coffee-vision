@@ -6,12 +6,11 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 
 | Problema | Situação | Resolve em |
 |----------|----------|------------|
-| **Telas de envio de fotos e de anotação fora do ar** | Intencional: as telas antigas usavam o modelo de dados antigo e foram retiradas. A página inicial mostra as classes disponíveis. | Fases 2 (envio) e 5 (anotação) |
-| **Cores invertidas nos recortes** (vermelho ↔ azul) | O código com o bug (`routes.py`) foi removido. Na Fase 2 os recortes passam a ser gerados a partir do polígono, com um teste específico de cores. | Fase 2 |
-| **Motor clássico calcula a área pela caixa** | O modelo novo já guarda a área real e aceita a área exata do motor, mas `app/segmentacao/classico.py` ainda devolve largura × altura. | Fase 2 |
-| **Filtro de fundo só serve para grãos** (matiz ≤ 60) | Limitação do motor clássico. | Fases 2 e 6 |
-| **Segmentação dentro da requisição** (tela congela) | Ainda não há envio de fotos; será feito em segundo plano, com `JobSegmentacao`. | Fase 2 |
-| **Servidor de desenvolvimento do Flask** (aviso "development server" no terminal) | Funciona na rede local, mas não é feito para vários celulares ao mesmo tempo. Trocar por um servidor de produção (ex.: waitress). | Fase 2 |
+| **Tela de anotação ainda não existe** | As regiões são criadas e contadas, mas ainda não dá para dizer a classe de cada uma pela tela. | Fase 5 |
+| **Filtro de fundo do motor clássico só serve para grãos** (matiz ≤ 60) | Folhas, flores e frutos ainda não têm motor: as fotos precisam chegar já segmentadas (recortes ou COCO). | Fase 6 |
+| **COCO no formato RLE não é importado** | Só contornos em polígono. Regiões em RLE são contadas e avisadas como ignoradas. | Quando alguém precisar |
+| **Fotos HEIC (iPhone) não são aceitas** | O navegador do iPhone costuma converter para JPEG ao enviar; se não converter, a foto é recusada com mensagem. | Quando alguém precisar |
+| **Sem excluir ou editar coletas pela tela** | Dá para excluir fotos; a coleta em si, ainda não. | Fase 4 |
 | **`C:\CafeData` sem backup automático** | Fica fora do OneDrive de propósito ([decisão 0003](decisoes/0003-dados-fora-do-onedrive.md)). | Pendência do responsável |
 
 ## Requisitos de usabilidade para as telas novas
@@ -22,7 +21,7 @@ Problemas das telas antigas que as novas precisam evitar:
 - Sem atalhos de teclado e sem anotação em lote. → Fase 5
 - Lista não funcionava pelo teclado. → Fase 5 (foco visível e avisos acessíveis já existem: Fase 3)
 - Observações sumiam ao trocar de item. → Fase 5 (o dado já é guardado por anotação)
-- Imagens trafegavam em base64 dentro de JSON. → Fase 5: arquivos servidos direto, com cache
+- Imagens trafegavam em base64 dentro de JSON. → resolvido na Fase 2: fotos e miniaturas servidas direto, com cache de 1 ano
 
 ## Resolvidos
 
@@ -42,3 +41,8 @@ Problemas das telas antigas que as novas precisam evitar:
 | Sem modo claro e sem layout para celular | Tema claro/escuro; menu na base da tela no celular; alvos de 48 px | 3 | `tests/navegador/test_interacao.py` |
 | Foco invisível ao usar teclado; avisos com `alert()` | Foco sempre visível; avisos acessíveis (`aria-live`, erros não somem sozinhos) | 3 | `tests/navegador/` |
 | Fonte do Google: página dependia de internet | Fonte do sistema e ícones próprios | 3 | `test_paginas_nao_dependem_de_internet` |
+| **Cores invertidas nos recortes** (vermelho ↔ azul) | Recortes gerados a partir da foto original, sem conversões | 2 | `test_recorte_preserva_as_cores` |
+| **Motor clássico media a área pela caixa** | Motor v2.0 devolve o contorno e a contagem real de pixels | 2 | `test_motor_classico_encontra_os_graos_da_bandeja` |
+| **Segmentação dentro do envio** (a tela congelava) | Fila em segundo plano, com status ao vivo e retomada após reinício | 2 | `test_fila_retoma_o_que_ficou_pela_metade`, `tests/navegador/test_fluxo_coleta.py` |
+| **Servidor de desenvolvimento em uso normal** | waitress no modo normal (vários celulares) | 2 | — |
+| **Formulários sem proteção CSRF** | Código secreto por sessão em todo formulário | 2 | `test_formulario_sem_codigo_csrf_e_recusado` |

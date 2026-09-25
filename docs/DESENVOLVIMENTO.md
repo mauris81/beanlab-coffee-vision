@@ -29,6 +29,11 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_pessoas_e_armazenamento.py` | Identificação por nome, fotos por hash, configuração |
 | `tests/test_migracoes_e_paginas.py` | Modelos e migrações em sincronia; páginas respondem |
 | `tests/test_design_system.py` | Contraste de todas as cores (dois temas), ícones existentes, páginas sem internet, macros acessíveis |
+| `tests/test_ingestao.py` | Fotos válidas/inválidas, rotação de celular, data e GPS, repetidas, recortes, COCO, exclusão segura |
+| `tests/test_segmentacao.py` | Motor clássico, cores preservadas (regressão), jobs, erros do motor, retomada da fila |
+| `tests/test_web_coletas.py` | "Quem é você?", CSRF, redirecionamento seguro, coletas, envio, status, miniaturas |
+
+As fotos dos testes são geradas na hora (`tests/fabrica_imagens.py`): nenhum binário no git.
 
 ### Testes no navegador (opcionais, mais lentos)
 
@@ -39,7 +44,9 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 Abrem as páginas no Chrome ou Edge já instalados (via Playwright), num servidor
 próprio com banco temporário. Rodam a auditoria de acessibilidade **axe-core** (WCAG 2.2
 AA) e testam teclado, tema, diálogo, avisos e layout no celular
-(`tests/navegador/`). Rode antes de mexer em telas, CSS ou JavaScript.
+(`tests/navegador/`), além do **fluxo completo** de quem coleta (entrar, criar coleta,
+enviar foto, acompanhar a segmentação, excluir) no celular e no computador, com a fila
+em segundo plano como no uso real. Rode antes de mexer em telas, CSS ou JavaScript.
 
 ## Mudar o banco de dados (migrações)
 
@@ -80,6 +87,7 @@ $env:CAFE_DATA_DIR = "C:\CafeData-teste"; .\.venv\Scripts\python.exe run.py
 | Um componente visual | macro em `templates/componentes.html` + CSS em `static/css/componentes.css` + exemplo em `/guia-visual` |
 | Um ícone | `<symbol>` em `static/icones.svg` |
 | Um endpoint JSON | `app/api/rotas.py` |
+| Um motor de segmentação | arquivo em `app/segmentacao/` seguindo `base.py` + registro em `MOTORES` + `motor:` no YAML |
 | Uma classe ou tipo de amostra | `taxonomias/*.yaml` (sem código) |
 
 Convenções e o porquê da estrutura: [ARQUITETURA.md](ARQUITETURA.md).

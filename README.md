@@ -20,6 +20,19 @@ usar nos **celulares conectados ao mesmo Wi-Fi**. Para desligar, feche a janela 
 
 **Único pré-requisito:** [Python 3.14](https://www.python.org/downloads/) instalado.
 
+### Como usar
+
+1. Toque em **Entrar** (topo) e diga seu nome. Não precisa de senha.
+2. Em **Coletas → Nova coleta**, escolha o que foi fotografado (grãos, folhas, flores
+   ou frutos) e dê um nome.
+3. Na página da coleta, **Tirar foto** (abre a câmera do celular) ou **Escolher
+   arquivos** (várias de uma vez) e **Enviar**.
+4. Fotos de grãos são segmentadas sozinhas: o status muda de "Na fila" para "Pronta"
+   sem precisar recarregar. Folhas, flores e frutos, por enquanto, precisam chegar já
+   segmentados (recortes em PNG transparente ou um conjunto COCO).
+
+A tela de anotação (dizer a classe de cada região) chega na Fase 5.
+
 ### Baixando o projeto em outro computador
 
 Em **https://github.com/mauris81/beanlab-coffee-vision**, clique no botão verde

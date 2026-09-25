@@ -21,7 +21,7 @@ TipoAmostra ──1:N── Classe
 
 | Entidade | Tabela | O que é | Campos principais |
 |----------|--------|---------|-------------------|
-| **TipoAmostra** | `tipo_amostra` | Grãos, folhas, flores, frutos. Vem de `taxonomias/*.yaml`. | `codigo`, `nome`, `descricao`, `ordem` |
+| **TipoAmostra** | `tipo_amostra` | Grãos, folhas, flores, frutos. Vem de `taxonomias/*.yaml`. | `codigo`, `nome`, `descricao`, `ordem`, `motor_padrao` (vazio = sem segmentação automática) |
 | **Classe** | `classe` | Um rótulo possível para aquele tipo (ex.: "Ferrugem"). Vem do YAML. | `codigo` (fixo), `nome`, `cor`, `tecla_atalho`, `descricao`, `ordem`, `ativa` |
 | **Pessoa** | `pessoa` | Quem coleta e anota. Por enquanto só o nome, sem senha. | `nome`, `nome_normalizado` (único), `ativa` |
 | **Coleta** | `coleta` | Um conjunto de fotos tiradas juntas (o antigo "Projeto"). | tipo de amostra, `nome`, `fazenda`, `talhao`, `variedade`, `data_coleta`, coletor |
@@ -96,7 +96,17 @@ Valem mesmo que o código tenha um erro. Cada uma tem um teste em `tests/test_in
 | Chocho / mal granado | Outro | | Outro |
 | Outro | | | |
 
+## Detalhes que confundem
+
+- **Coordenadas valem para a foto já girada.** Fotos de celular vêm "deitadas" com uma
+  marca EXIF dizendo como girar. O arquivo original é guardado sem alteração, mas
+  `largura`, `altura` e todos os polígonos se referem à foto como ela aparece na tela
+  (`app/servicos/imagens.py:abrir_orientada`).
+- **`Imagem.capturada_em` é a hora local da câmera**, não UTC: o EXIF não informa o fuso.
+  As demais datas do banco são UTC.
+- **Segmentar de novo** substitui só as regiões `automatica` daquela foto; as `manual`
+  e `importada` ficam.
+
 ## Previsto para as próximas fases
 
-- `TipoAmostra.motor_padrao`: qual motor de segmentação usar para cada tipo (Fase 2).
 - Campos de login em `Pessoa`, se for decidido usar senha.

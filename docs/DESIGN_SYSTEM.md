@@ -83,9 +83,18 @@ Use a macro em vez de escrever o HTML: a acessibilidade vem junto.
 {{ c.estatistica('Pendentes', 305, 'faltam ~25 min') }}
 {% call c.alerta('aviso', 'Foto muito escura') %}<p>…</p>{% endcall %}
 {% call c.vazio('Nenhuma coleta ainda', 'Crie a primeira.') %}{{ c.botao('Criar coleta') }}{% endcall %}
+{{ plural(3, 'região', 'regiões') }}   {# "3 regiões"; nunca "região(ões)" #}
 {{ icone('camera') }}            {# decorativo, ao lado de texto #}
 {{ icone('camera', 'Tirar foto') }}  {# sozinho: precisa de rótulo #}
 ```
+
+Componentes só em CSS (sem macro), com exemplo no guia: **opções em cartão**
+(`.opcoes-cartao` + `.opcao-cartao`, rádios grandes), **filtros** (`.filtros` + `.filtro`
+com `aria-current`), **cartão de foto** (`.grade-fotos` + `.foto`) e **área de envio**
+(`.envio`, com botão de câmera e botão de arquivos separados).
+
+Mensagens depois de uma ação: `flash('…', 'sucesso' | 'info' | 'aviso' | 'perigo')` na
+rota; o `base.html` mostra como alerta no topo da página seguinte.
 
 Pelo JavaScript: `avisar('Anotação salva', { tipo: 'sucesso' })` (`static/js/avisos.js`).
 Comportamentos sem JS na página: `data-abrir-dialogo="id"`, `data-fechar-dialogo`,
@@ -99,6 +108,8 @@ Comportamentos sem JS na página: `data-abrir-dialogo="id"`, `data-fechar-dialog
 | Erro diz o que houve e o que fazer: "Informe o talhão ou marque 'Não sei'." | "Campo inválido", "Erro 422" |
 | Frases curtas, voz ativa, "você" | Jargão técnico: "job", "segmentation", "payload" |
 | Números escritos junto das barras: "4 de 309 · 1%" | Só a barra colorida |
+| Plural certo: "1 foto", "3 fotos" (`plural()`) | "3 foto(s)", "região(ões)" |
+| Não interromper: atualizações automáticas esperam a pessoa terminar o que está fazendo | Recarregar a página com um diálogo aberto |
 | Termos do café e da fazenda: coleta, talhão, ardido, florada | Traduções literais do inglês |
 | Estado vazio explica e oferece o próximo passo | Página em branco |
 
