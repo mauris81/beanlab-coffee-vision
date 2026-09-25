@@ -2,6 +2,16 @@
    BASE: reset, tipografia, foco, estrutura da página (app shell)
    ========================================================================== */
 
+/* Fonte guardada no projeto (licença SIL OFL em static/fontes/). Um único arquivo
+   "variável" traz todos os pesos. Só o alfabeto latino, que inclui ã, ç, é... */
+@font-face {
+    font-family: "Atkinson Hyperlegible Next";
+    src: url("../fontes/atkinson-hyperlegible-next-latin.woff2") format("woff2");
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html {

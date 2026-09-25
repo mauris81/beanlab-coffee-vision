@@ -25,7 +25,8 @@ e fácil de usar. **Veja tudo funcionando em `/guia-visual`**
 | **Reconhecer em vez de lembrar** | Classes sempre visíveis com cor, nome e tecla; atalhos lembrados na tela | Reconhecimento em vez de memorização |
 | **Consistência** | Um componente para cada coisa (macros em `componentes.html`); mesmos nomes e ícones em todas as telas | Consistência e padrões |
 | **Cor nunca sozinha** | Todo status tem ícone e texto; toda classe tem nome; paleta segura para daltonismo | WCAG 1.4.1 |
-| **Funciona sem internet** | Fonte do sistema, ícones próprios, nenhum arquivo de fora ([decisão 0004](decisoes/0004-visual-offline.md)) | — |
+| **Funciona sem internet** | Fonte e ícones guardados no projeto, nenhum arquivo de fora ([decisão 0004](decisoes/0004-visual-offline.md)) | — |
+| **Letras que não se confundem** | Atkinson Hyperlegible Next: I, l e 1 e também 0 e O são diferentes; texto base de 17 px | WCAG 1.4.4 / 1.4.12 |
 
 ## Acessibilidade (WCAG 2.2, nível AA)
 
@@ -56,7 +57,7 @@ Arquivo: `app/static/css/tokens.css`. **Componentes nunca usam valores soltos**,
 | Grupo | Exemplos | Regra |
 |-------|----------|-------|
 | Cores | `--cor-texto`, `--cor-primaria`, `--cor-sucesso-suave` | Cada cor existe nos dois temas. Mudou uma cor? Rode os testes. |
-| Texto | `--texto-sm` (14) … `--texto-4xl` (36) | Base 16 px. Nunca abaixo de 13 px, e 13 só para rótulos curtos. |
+| Texto | `--texto-xs` (14) … `--texto-4xl` (36) | Base 17 px. Nunca abaixo de 14 px, e 14 só para rótulos curtos. Fonte: Atkinson Hyperlegible Next (`--fonte`). |
 | Espaço | `--espaco-1` (4) … `--espaco-8` (64) | Múltiplos de 4 px. |
 | Formas | `--raio-md`, `--sombra-2` | Cantos moderados; sombras discretas. |
 | Tamanhos | `--alvo-toque` (48 px) | Altura mínima de tudo que se toca. |

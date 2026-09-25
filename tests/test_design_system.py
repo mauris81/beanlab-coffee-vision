@@ -127,7 +127,7 @@ class _ColetorDeRecursos(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
-        if tag == 'link' and attrs.get('rel') in ('stylesheet', 'icon', 'manifest', 'preconnect'):
+        if tag == 'link' and attrs.get('rel') in ('stylesheet', 'icon', 'manifest', 'preconnect', 'preload'):
             self.recursos.append(attrs.get('href'))
         elif tag in ('script', 'img', 'source', 'iframe') and attrs.get('src'):
             self.recursos.append(attrs['src'])
@@ -141,6 +141,31 @@ def test_paginas_nao_dependem_de_internet(cliente, caminho):
     coletor.feed(cliente.get(caminho).get_data(as_text=True))
     externos = [r for r in coletor.recursos if r and re.match(r'^(https?:)?//', r)]
     assert coletor.recursos and not externos, f'Recursos externos em {caminho}: {externos}'
+
+
+def test_todo_arquivo_citado_no_css_existe():
+    """Fontes e imagens referenciadas com url(...) nos CSS precisam existir no projeto."""
+    faltando = []
+    for css in (APP / 'static/css').rglob('*.css'):
+        for alvo in re.findall(r'url\(\s*["\']?([^"\')]+)', css.read_text(encoding='utf-8')):
+            if not alvo.startswith('data:') and not (css.parent / alvo).resolve().is_file():
+                faltando.append(f'{css.name}: {alvo}')
+    assert not faltando, faltando
+
+
+def test_fonte_guardada_no_projeto_tem_licenca():
+    fontes = list((APP / 'static/fontes').glob('*.woff2'))
+    assert fontes, 'nenhuma fonte em static/fontes/'
+    assert list((APP / 'static/fontes').glob('LICENCA-*')), 'a licença OFL precisa acompanhar a fonte'
+    assert 'Atkinson Hyperlegible Next' in TOKENS
+
+
+def test_recursos_da_pagina_existem(cliente):
+    coletor = _ColetorDeRecursos()
+    coletor.feed(cliente.get('/').get_data(as_text=True))
+    for recurso in coletor.recursos:
+        caminho = recurso.split('#')[0]
+        assert cliente.get(caminho).status_code == 200, caminho
 
 
 def test_estrutura_acessivel_da_pagina(cliente):

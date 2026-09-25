@@ -7,3 +7,4 @@
 *.bat text eol=crlf
 # Arquivos de terceiros ficam exatamente como vieram
 *.min.js -text
+*.woff2 binary

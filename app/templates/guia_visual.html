@@ -39,7 +39,7 @@
                 ('processando', 'Sempre dizer o que está acontecendo', 'Enviando, processando, pronto, erro: o status aparece com texto, não só com cor.'),
                 ('desfazer', 'Errar sem medo', 'Anotações guardam histórico. Desfazer é melhor que pedir "tem certeza?".'),
                 ('paleta', 'Cor nunca sozinha', 'Toda cor vem acompanhada de texto ou ícone. Paleta segura para daltonismo.'),
-                ('baixar', 'Funciona sem internet', 'Fontes e ícones são do próprio sistema; nada depende de serviços externos.'),
+                ('baixar', 'Funciona sem internet', 'Fonte e ícones ficam guardados no projeto; nada depende de serviços externos.'),
             ] %}
             <div class="cartao">
                 <div class="cartao__cabecalho"><span class="cartao__icone">{{ icone(nome_icone) }}</span><h3>{{ titulo }}</h3></div>
@@ -116,17 +116,18 @@
     {# ------------------------------------------------------------------ #}
     <section id="tipografia" class="guia__secao" aria-labelledby="t-tipografia">
         <h2 id="t-tipografia">Tipografia</h2>
-        <p class="texto-suave">Fonte do sistema (Segoe UI no Windows, Roboto no Android, SF no iPhone).
-           Base de 16 px: menor que isso o iPhone amplia a tela ao tocar num campo.</p>
+        <p class="texto-suave">Atkinson Hyperlegible Next, criada pelo Braille Institute para leitura com
+           baixa visão: não confunde <strong>I l 1</strong> nem <strong>0 O</strong>. Fica guardada no projeto
+           (funciona sem internet). Base de 17 px, o mesmo tamanho do texto do iPhone.</p>
         <div class="escala-tipografica">
             {% for token, px, uso in [
                 ('--texto-4xl', 36, 'Título de página (computador)'), ('--texto-3xl', 30, 'Título de página (celular), números grandes'),
-                ('--texto-2xl', 24, 'Título de seção'), ('--texto-xl', 20, 'Título de cartão'),
-                ('--texto-lg', 18, 'Destaques, subtítulos'), ('--texto-md', 16, 'Texto normal, campos, botões'),
-                ('--texto-sm', 14, 'Dicas, legendas, selos'), ('--texto-xs', 13, 'Só rótulos curtos'),
+                ('--texto-2xl', 24, 'Título de seção'), ('--texto-xl', 21, 'Título de cartão'),
+                ('--texto-lg', 19, 'Destaques, subtítulos'), ('--texto-md', 17, 'Texto normal, campos, botões'),
+                ('--texto-sm', 15, 'Dicas, legendas, selos'), ('--texto-xs', 14, 'Só rótulos curtos'),
             ] %}
             <div class="escala-tipografica__linha">
-                <span class="escala-tipografica__exemplo" style="font-size: var({{ token }})">Grão ardido, folha com ferrugem</span>
+                <span class="escala-tipografica__exemplo" style="font-size: var({{ token }})">Grão ardido, folha com ferrugem · Il1 0O</span>
                 <span class="texto-suave"><code>{{ token }}</code> · {{ px }} px · {{ uso }}</span>
             </div>
             {% endfor %}

@@ -36,17 +36,19 @@
     --sombra-cor: 30 20 10;         /* RGB usado nas sombras */
 
     /* --- Tipografia --------------------------------------------------------- */
-    /* Fonte do sistema: não depende de internet (uso no campo) e é a mais
-       legível em cada aparelho (Segoe UI no Windows, Roboto no Android...). */
-    --fonte: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-             "Noto Sans", sans-serif;
+    /* Atkinson Hyperlegible Next: criada pelo Braille Institute para leitura com
+       baixa visão; não confunde I/l/1 nem 0/O. O arquivo fica no projeto
+       (static/fontes/), então funciona sem internet. Ver decisão 0004.
+       Se não carregar, cai na fonte do sistema. */
+    --fonte: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto,
+             "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     --fonte-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
 
-    --texto-xs: 0.8125rem;   /* 13px: só rótulos curtos, nunca parágrafos */
-    --texto-sm: 0.875rem;    /* 14px */
-    --texto-md: 1rem;        /* 16px: base. Abaixo disso o iPhone dá zoom nos campos */
-    --texto-lg: 1.125rem;    /* 18px */
-    --texto-xl: 1.25rem;     /* 20px */
+    --texto-xs: 0.875rem;    /* 14px: só rótulos curtos, nunca parágrafos */
+    --texto-sm: 0.9375rem;   /* 15px: dicas, legendas, selos */
+    --texto-md: 1.0625rem;   /* 17px: base (o mesmo do texto do iPhone). Nunca menos de 16px em campos */
+    --texto-lg: 1.1875rem;   /* 19px */
+    --texto-xl: 1.3125rem;   /* 21px */
     --texto-2xl: 1.5rem;     /* 24px */
     --texto-3xl: 1.875rem;   /* 30px */
     --texto-4xl: 2.25rem;    /* 36px */
