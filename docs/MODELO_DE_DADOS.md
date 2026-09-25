@@ -23,7 +23,7 @@ TipoAmostra ──1:N── Classe
 |----------|--------|---------|-------------------|
 | **TipoAmostra** | `tipo_amostra` | Grãos, folhas, flores, frutos. Vem de `taxonomias/*.yaml`. | `codigo`, `nome`, `descricao`, `ordem`, `motor_padrao` (vazio = sem segmentação automática) |
 | **Classe** | `classe` | Um rótulo possível para aquele tipo (ex.: "Ferrugem"). Vem do YAML. | `codigo` (fixo), `nome`, `cor`, `tecla_atalho`, `descricao`, `ordem`, `ativa` |
-| **Pessoa** | `pessoa` | Quem coleta e anota. Por enquanto só o nome, sem senha. | `nome`, `nome_normalizado` (único), `ativa` |
+| **Pessoa** | `pessoa` | Conta de quem coleta e anota. Criada pela administração. | `nome`, `usuario` (único, ex. `maria.silva`), `senha_hash`, `papel` (membro/administrador), `ativa`, `precisa_trocar_senha`, `ultimo_acesso`, `tentativas_falhas`, `bloqueada_ate`, `versao_sessao` |
 | **Coleta** | `coleta` | Um conjunto de fotos tiradas juntas (o antigo "Projeto"). | tipo de amostra, `nome`, `fazenda`, `talhao`, `variedade`, `data_coleta`, coletor |
 | **Imagem** | `imagem` | Uma foto. O arquivo fica no disco, com o nome igual ao hash. | `hash_sha256`, `extensao`, `nome_original`, `largura`, `altura`, EXIF (`capturada_em`, `latitude`, `longitude`), `origem`, `status`, `ja_segmentada` |
 | **Regiao** | `regiao` | Um objeto dentro da foto (um grão, uma folha...). | `poligono`, `bbox_*`, `area_px`, `origem`, `motor`, `versao_motor`, `pontuacao` |
@@ -39,6 +39,7 @@ TipoAmostra ──1:N── Classe
 | `Regiao.origem` | `automatica`, `manual`, `importada` |
 | `Anotacao.origem` | `manual`, `importada`, `modelo` |
 | `JobSegmentacao.status` | `na_fila`, `processando`, `concluido`, `erro` |
+| `Pessoa.papel` | `membro`, `administrador` |
 
 ## Duas regras centrais
 
@@ -112,6 +113,7 @@ Valem mesmo que o código tenha um erro. Cada uma tem um teste em `tests/test_in
   recém-feita, e só se ela for da própria pessoa e ainda for a vigente da região
   (`desfazer_anotacoes`). Corrige um engano; mudar de ideia depois é anotar de novo.
 
-## Previsto para as próximas fases
-
-- Campos de login em `Pessoa`, se for decidido usar senha.
+- **Senha nunca é guardada**, só o hash (scrypt). `senha_hash` vazio = a conta existe (tem
+  anotações) mas ainda não pode entrar: veio do sistema antigo, que era só por nome.
+- **`versao_sessao`** muda quando a senha é trocada ou a conta desativada; a sessão guarda
+  a versão com que entrou, e se não bater, a pessoa sai (em todos os aparelhos).

@@ -42,3 +42,5 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | Anotar exigia 3 cliques por item (classe, salvar, próximo) | 1 tecla ou 1 toque; avanço automático para a próxima pendente | 5 | `tests/navegador/test_anotacao_navegador.py` |
 | Sem atalhos de teclado e sem anotação em lote | Atalhos 1–9, ←/→, D, Z, ?; tela em lote com "marcar todas", Shift+clique e desfazer | 5 | `tests/navegador/test_anotacao_navegador.py` |
 | Observações sumiam ao trocar de item | Observação e dúvida guardadas por anotação e mostradas ao voltar à região | 5 | `test_situacao_das_regioes_mostra_a_anotacao_vigente` |
+| **Sem login**: qualquer pessoa na rede podia usar e mudar dados | Login obrigatório, contas criadas pela administração, bloqueio após tentativas | L1 | `tests/test_web_login.py`, `tests/test_contas.py` |
+| **Página de senha provisória mostrava o usuário de quem criou a conta** (achado durante a fase, antes de publicar) | Variáveis do topo da página com nomes próprios (`pessoa_logada`) | L1 | `test_administracao_cria_conta_e_a_senha_aparece_uma_vez` |

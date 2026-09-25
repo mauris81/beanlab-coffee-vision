@@ -20,9 +20,20 @@ usar nos **celulares conectados ao mesmo Wi-Fi**. Para desligar, feche a janela 
 
 **Único pré-requisito:** [Python 3.14](https://www.python.org/downloads/) instalado.
 
+### Primeira vez (criar a conta de administração)
+
+Na primeira vez, a plataforma pede um **código de primeiro acesso**: ele aparece na
+**janela preta**, logo abaixo dos endereços. Com ele você cria a sua conta de
+administração. Depois, em **Pessoas**, crie as contas da equipe: cada pessoa recebe um
+usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
+
+> Esqueceu a senha de administração? Com a plataforma fechada, abra o PowerShell na
+> pasta do projeto e rode:
+> `.\.venv\Scripts\flask.exe --app app redefinir-senha SEU_USUARIO`
+
 ### Como usar
 
-1. Toque em **Entrar** (topo) e diga seu nome. Não precisa de senha.
+1. **Entre** com usuário e senha (a administração passa para você).
 2. Em **Coletas → Nova coleta**, escolha o que foi fotografado (grãos, folhas, flores
    ou frutos) e dê um nome.
 3. Na página da coleta, **Tirar foto** (abre a câmera do celular) ou **Escolher

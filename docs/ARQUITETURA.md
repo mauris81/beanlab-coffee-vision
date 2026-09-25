@@ -32,9 +32,16 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
 
 ## Segurança ✅
 
+- **Login obrigatório** em tudo, menos entrar/primeiro acesso/estáticos/`/api/saude`
+  (`proteger_paginas` em `web/identidade.py`). Senha provisória só deixa trocar a senha.
+  Detalhes e porquês: [decisão 0006](decisoes/0006-login-e-contas.md).
+- **Contas:** regras em `servicos/contas.py` (hash scrypt, bloqueio após 5 erros, nunca
+  sem administração, código de primeiro acesso). Telas: `web/identidade.py` (entrar,
+  primeiro acesso, minha conta) e `web/admin.py` (Pessoas).
 - **CSRF:** todo formulário que muda dados leva um código secreto da sessão
   (`{{ campo_csrf() }}`); sem ele o pedido é recusado (`web/identidade.py`).
-- **Cookie de sessão** assinado, `SameSite=Lax`, válido por 90 dias.
+- **Cookie de sessão** assinado, `SameSite=Lax`, válido por 90 dias; renovado a cada login;
+  deixa de valer se a senha mudar ou a conta for desativada (`Pessoa.versao_sessao`).
 - **Redirecionamento seguro** depois de "Quem é você?": só para páginas da plataforma.
 - **Arquivos:** o formato vem do conteúdo, não do nome; o nome original nunca vira
   caminho no disco (arquivos são gravados pelo hash).
@@ -62,11 +69,11 @@ app/
 ├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
-│                         segmentação (jobs), taxonomias, pessoas
+│                         segmentação (jobs), taxonomias, contas (login)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
-│                         ("Quem é você?" + CSRF), coletas.py, anotacao.py (uma por vez, lote);
+│                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py;
 │                         apresentacao.py = ícones, menu, status, plural
 ├── api/               ✅ rotas que devolvem DADOS em JSON: saude.py, anotacao.py
 │                         (regiões da coleta, anotar, desfazer)

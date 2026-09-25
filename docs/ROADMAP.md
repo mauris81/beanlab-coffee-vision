@@ -13,8 +13,8 @@ ser revisado ou desfeito.
 | 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
-| L. Login e "aplicativo" | ⏸️ Decidir junto com a hospedagem | Contas com senha e perfis; instalar no celular como aplicativo (exige HTTPS) |
-| H. Hospedagem online | ⏸️ Decidir após a Fase 2 | Acesso pelos celulares na fazenda sem este PC ligado. Comparar opções (Render, Railway, PythonAnywhere, servidor próprio), custo, internet na fazenda e troca de SQLite por PostgreSQL |
+| L1. Login e contas | ✅ Concluída (25/09/2026) | Login obrigatório; contas criadas pela administração (senha provisória); perfis membro/administração; bloqueio após tentativas; primeiro acesso com código ([decisão 0006](decisoes/0006-login-e-contas.md)) |
+| L2. Aplicativo e publicação | ⏳ Próxima | Instalar no celular como aplicativo; fila de fotos no celular para sinal fraco; publicar no PC do responsável com Tailscale Funnel (HTTPS grátis) |
 
 Extras já entregues fora das fases:
 - **Atalho de duplo clique** `Iniciar BeanLab.bat`: instala e inicia sozinho.
@@ -34,7 +34,11 @@ Extras já entregues fora das fases:
 - **Código no GitHub, em repositório público:**
   https://github.com/mauris81/beanlab-coffee-vision. Fotos e banco nunca sobem
   (`.gitignore`). Ainda sem licença, a decidir.
-- **Hospedagem online:** decidir depois da Fase 2.
+- **Hospedagem:** no PC do responsável, com Tailscale Funnel (endereço HTTPS grátis). As
+  opções gratuitas na nuvem foram descartadas: Render apaga os arquivos e dorme; a
+  Oracle cortou o plano grátis pela metade em 06/2026 e recolhe servidores ociosos.
+- **Login:** contas criadas pela administração; perfis membro e administração; sem
+  e-mail. Sinal no campo às vezes fraco: o aplicativo vai guardar fotos no celular.
 - **Ordem:** Fase 3 (design system) feita antes da Fase 2, para as telas de envio já
   nascerem no visual novo, sem retrabalho.
 - **Dados (fotos e banco) em `C:\CafeData`**, fora do OneDrive

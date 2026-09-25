@@ -33,6 +33,11 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_segmentacao.py` | Motor clássico, cores preservadas (regressão), jobs, erros do motor, retomada da fila |
 | `tests/test_web_coletas.py` | "Quem é você?", CSRF, redirecionamento seguro, coletas, envio, status, miniaturas |
 | `tests/test_anotacao.py` | Recortes (cache, concorrência), situação das regiões, lote, regras do desfazer, API e páginas de anotação |
+| `tests/test_contas.py` | Senhas, login, bloqueio, "nunca sem administração", código do primeiro acesso |
+| `tests/test_web_login.py` | Porta de entrada, primeiro acesso, senha provisória, administração, desconectar outros aparelhos, redirecionamento seguro |
+
+Fixtures prontas (`tests/conftest.py`): `cliente` (sem login), `logado` (membro),
+`logado_admin`, `administracao`; `criar_pessoa(...)` e `entrar_como(cliente, pessoa)`.
 
 As fotos dos testes são geradas na hora (`tests/fabrica_imagens.py`): nenhum binário no git.
 
@@ -71,6 +76,9 @@ em segundo plano como no uso real, e a **anotação** pelo teclado, pelo toque e
 ```powershell
 # Aplicar migrações e sincronizar taxonomias sem iniciar o servidor
 .\.venv\Scripts\flask.exe --app app preparar-banco
+
+# Emergência: a única conta de administração esqueceu a senha
+.\.venv\Scripts\flask.exe --app app redefinir-senha USUARIO
 
 # Servidor em modo desenvolvimento (recarrega ao salvar; só neste PC)
 $env:CAFE_DEBUG = "1"; .\.venv\Scripts\python.exe run.py
