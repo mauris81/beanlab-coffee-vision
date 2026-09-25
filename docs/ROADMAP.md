@@ -7,8 +7,8 @@ ser revisado ou desfeito.
 |------|--------|---------|
 | 0. Fundação | ✅ Concluída (25/09/2026) | Git, backup, limpeza de duplicatas, depurador fechado, esta documentação |
 | 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
-| 2. Ingestão | ⏳ Próxima | Envio por câmera/arquivo/lote, imagens já segmentadas, segmentação em segundo plano com progresso |
-| 3. Design system | — | Cores, tipografia, componentes; tema claro/escuro; acessibilidade WCAG 2.2 AA; pensado para celular |
+| 2. Ingestão | ⏳ Próxima (depois da 3, por decisão) | Envio por câmera/arquivo/lote, imagens já segmentadas, segmentação em segundo plano com progresso |
+| 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
 | 4. Dashboard | — | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
 | 5. Anotação | — | Atalhos de teclado, avanço automático, anotação em lote, desfazer, edição de contorno |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
@@ -34,6 +34,8 @@ Extras já entregues fora das fases:
   https://github.com/mauris81/beanlab-coffee-vision. Fotos e banco nunca sobem
   (`.gitignore`). Ainda sem licença, a decidir.
 - **Hospedagem online:** decidir depois da Fase 2.
+- **Ordem:** Fase 3 (design system) feita antes da Fase 2, para as telas de envio já
+  nascerem no visual novo, sem retrabalho.
 - **Dados (fotos e banco) em `C:\CafeData`**, fora do OneDrive
   (ver [decisoes/0003](decisoes/0003-dados-fora-do-onedrive.md)).
 - **Classes:** começar com as listas propostas; ajustes depois, editando `taxonomias/`.

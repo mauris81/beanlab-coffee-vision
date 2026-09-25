@@ -50,10 +50,10 @@ app/
 ├── servicos/          ✅ CASOS DE USO: regras (anotar, progresso, taxonomias, pessoas)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ◐ motores; hoje só o clássico, no formato antigo (Fase 2)
-├── web/               ✅ rotas que devolvem PÁGINAS (hoje só a inicial provisória)
+├── web/               ✅ rotas que devolvem PÁGINAS; apresentacao.py = ícones, menu, status
 ├── api/               ✅ rotas que devolvem DADOS em JSON (hoje só /api/saude)
-├── templates/         HTML (Jinja)
-└── static/            CSS, JavaScript e ícones
+├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system
+└── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg
 taxonomias/            ✅ listas de classes por tipo de amostra (YAML, editável)
 migrations/            ✅ histórico de mudanças no banco (Alembic)
 tests/                 ✅ testes automáticos (pytest)
@@ -83,6 +83,8 @@ Ver [decisão 0003](decisoes/0003-dados-fora-do-onedrive.md).
 - **Nada de lógica em templates.** O template só exibe o que a rota entregou.
 - **JavaScript em módulos ES nativos**, sem etapa de build
   (ver [decisão 0001](decisoes/0001-manter-flask-sem-build.md)).
+- **Visual só com tokens e componentes do design system**; nada carregado da internet
+  (ver [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) e [decisão 0004](decisoes/0004-visual-offline.md)).
 - **Toda mudança no banco passa por migração**; nunca apagar o banco para "consertar".
   Um teste falha se um modelo mudar sem migração. Como fazer:
   [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md).

@@ -20,10 +20,9 @@ Problemas das telas antigas que as novas precisam evitar:
 
 - Anotar um item exigia 3 cliques (classe, salvar, próximo). → Fase 5: 1 tecla ou 1 toque.
 - Sem atalhos de teclado e sem anotação em lote. → Fase 5
-- Lista não funcionava pelo teclado; foco invisível; avisos com `alert()`. → Fases 3 e 5
+- Lista não funcionava pelo teclado. → Fase 5 (foco visível e avisos acessíveis já existem: Fase 3)
 - Observações sumiam ao trocar de item. → Fase 5 (o dado já é guardado por anotação)
 - Imagens trafegavam em base64 dentro de JSON. → Fase 5: arquivos servidos direto, com cache
-- Sem modo claro e sem layout para celular. → Fase 3
 
 ## Resolvidos
 
@@ -40,3 +39,6 @@ Problemas das telas antigas que as novas precisam evitar:
 | Tabelas `project` e `projeto` duplicadas; sem migrações | Banco novo em `C:\CafeData`, com migrações Alembic | 1 | `test_modelos_e_migracoes_estao_em_sincronia` |
 | `reset_db.py` não apagava o banco certo | Removido; as migrações substituem o "reset" | 1 | — |
 | Banco dentro do OneDrive (risco de corrupção) | Dados em `C:\CafeData` | 1 | — |
+| Sem modo claro e sem layout para celular | Tema claro/escuro; menu na base da tela no celular; alvos de 48 px | 3 | `tests/navegador/test_interacao.py` |
+| Foco invisível ao usar teclado; avisos com `alert()` | Foco sempre visível; avisos acessíveis (`aria-live`, erros não somem sozinhos) | 3 | `tests/navegador/` |
+| Fonte do Google: página dependia de internet | Fonte do sistema e ícones próprios | 3 | `test_paginas_nao_dependem_de_internet` |

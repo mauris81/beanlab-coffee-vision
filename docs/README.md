@@ -6,6 +6,7 @@
 | [ARQUITETURA.md](ARQUITETURA.md) | Quem programa | Como o código está organizado e por quê |
 | [MODELO_DE_DADOS.md](MODELO_DE_DADOS.md) | Quem programa / pesquisa | Quais dados guardamos e como se relacionam |
 | [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md) | Quem programa | Como rodar testes e mudar o banco |
+| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Quem programa / desenha | Cores, componentes, acessibilidade, como escrever textos da tela |
 | [../taxonomias/LEIAME.md](../taxonomias/LEIAME.md) | Agrônomos / pesquisa | Como editar as classes de cada tipo de amostra |
 | [PROBLEMAS_CONHECIDOS.md](PROBLEMAS_CONHECIDOS.md) | Todos | Bugs conhecidos e em que fase serão resolvidos |
 | [decisoes/](decisoes/) | Quem programa | Registro de decisões técnicas (ADRs) |

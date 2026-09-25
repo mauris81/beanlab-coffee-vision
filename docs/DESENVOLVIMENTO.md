@@ -28,6 +28,18 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_geometria.py` | Área e bbox dos polígonos |
 | `tests/test_pessoas_e_armazenamento.py` | Identificação por nome, fotos por hash, configuração |
 | `tests/test_migracoes_e_paginas.py` | Modelos e migrações em sincronia; páginas respondem |
+| `tests/test_design_system.py` | Contraste de todas as cores (dois temas), ícones existentes, páginas sem internet, macros acessíveis |
+
+### Testes no navegador (opcionais, mais lentos)
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -m navegador
+```
+
+Abrem as páginas no Chrome ou Edge já instalados (via Playwright), num servidor
+próprio com banco temporário. Rodam a auditoria de acessibilidade **axe-core** (WCAG 2.2
+AA) e testam teclado, tema, diálogo, avisos e layout no celular
+(`tests/navegador/`). Rode antes de mexer em telas, CSS ou JavaScript.
 
 ## Mudar o banco de dados (migrações)
 
@@ -64,7 +76,9 @@ $env:CAFE_DATA_DIR = "C:\CafeData-teste"; .\.venv\Scripts\python.exe run.py
 |--------------|--------|
 | Uma tabela ou campo novo | `app/dominio/` + migração |
 | Uma regra ("não pode anotar X se Y") | `app/servicos/` + teste |
-| Uma página | rota em `app/web/rotas.py` + template em `app/templates/` |
+| Uma página | rota em `app/web/rotas.py` + template em `app/templates/` (siga o checklist de [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)) |
+| Um componente visual | macro em `templates/componentes.html` + CSS em `static/css/componentes.css` + exemplo em `/guia-visual` |
+| Um ícone | `<symbol>` em `static/icones.svg` |
 | Um endpoint JSON | `app/api/rotas.py` |
 | Uma classe ou tipo de amostra | `taxonomias/*.yaml` (sem código) |
 
