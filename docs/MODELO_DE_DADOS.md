@@ -1,7 +1,7 @@
 # Modelo de dados
 
-> **Rascunho.** Será implementado e revisado na Fase 1. Serve para discutir antes de
-> programar.
+Implementado na Fase 1. O código está em `app/dominio/` (um arquivo por assunto) e a
+estrutura das tabelas em `migrations/versions/`.
 
 ## Diagrama
 
@@ -10,58 +10,79 @@ TipoAmostra ──1:N── Classe
     │
    1:N
     │
-  Coleta ──1:N── Imagem ──1:N── Região ──1:N── Anotação ──N:1── Pessoa
+  Coleta ──1:N── Imagem ──1:N── Regiao ──1:N── Anotacao ──N:1── Pessoa
                    │
                   1:N
                    │
-             JobSegmentação
+             JobSegmentacao
 ```
 
 ## Entidades
 
-**TipoAmostra**: grão, folha, flor, fruto. Define quais classes existem e qual motor
-de segmentação usar por padrão.
+| Entidade | Tabela | O que é | Campos principais |
+|----------|--------|---------|-------------------|
+| **TipoAmostra** | `tipo_amostra` | Grãos, folhas, flores, frutos. Vem de `taxonomias/*.yaml`. | `codigo`, `nome`, `descricao`, `ordem` |
+| **Classe** | `classe` | Um rótulo possível para aquele tipo (ex.: "Ferrugem"). Vem do YAML. | `codigo` (fixo), `nome`, `cor`, `tecla_atalho`, `descricao`, `ordem`, `ativa` |
+| **Pessoa** | `pessoa` | Quem coleta e anota. Por enquanto só o nome, sem senha. | `nome`, `nome_normalizado` (único), `ativa` |
+| **Coleta** | `coleta` | Um conjunto de fotos tiradas juntas (o antigo "Projeto"). | tipo de amostra, `nome`, `fazenda`, `talhao`, `variedade`, `data_coleta`, coletor |
+| **Imagem** | `imagem` | Uma foto. O arquivo fica no disco, com o nome igual ao hash. | `hash_sha256`, `extensao`, `nome_original`, `largura`, `altura`, EXIF (`capturada_em`, `latitude`, `longitude`), `origem`, `status`, `ja_segmentada` |
+| **Regiao** | `regiao` | Um objeto dentro da foto (um grão, uma folha...). | `poligono`, `bbox_*`, `area_px`, `origem`, `motor`, `versao_motor`, `pontuacao` |
+| **Anotacao** | `anotacao` | "Esta região é da classe X", dito por alguém. | região, classe, pessoa, `origem`, `confianca`, `observacao`, `criada_em` |
+| **JobSegmentacao** | `job_segmentacao` | Cada execução de segmentação. | `motor`, `parametros`, `status`, tempos, `num_regioes`, `mensagem_erro` |
 
-**Classe**: um rótulo possível para aquele tipo (ex.: "Ferrugem" para folhas).
-Campos: `codigo` (fixo, ex. `ferrugem`), `nome` (exibido), `cor`, `tecla_atalho`,
-`descricao`, `ordem`. O `codigo` nunca muda, então renomear uma classe não quebra
-dados antigos.
+### Listas de opções (enums)
 
-**Coleta**: um conjunto de fotos tiradas juntas (o antigo "Projeto"). Campos: tipo de
-amostra, nome, fazenda/talhão, variedade, data da coleta, quem coletou, observações.
+| Campo | Valores |
+|-------|---------|
+| `Imagem.origem` | `camera`, `arquivo`, `importacao` |
+| `Imagem.status` | `aguardando`, `segmentando`, `pronta`, `erro` |
+| `Regiao.origem` | `automatica`, `manual`, `importada` |
+| `Anotacao.origem` | `manual`, `importada`, `modelo` |
+| `JobSegmentacao.status` | `na_fila`, `processando`, `concluido`, `erro` |
 
-**Imagem**: uma foto. Campos: `hash_sha256`, nome original, largura, altura, data e
-GPS do EXIF (se houver), origem (`camera`, `arquivo`, `importacao`), status
-(`aguardando`, `segmentando`, `pronta`, `erro`), `ja_segmentada` (sim/não).
+## Duas regras centrais
 
-**Região**: um objeto dentro da imagem (um grão, uma folha...). Campos: `poligono`,
-`bbox`, `area_px` (área real), origem (`automatica`, `manual`, `importada`),
-`motor` e `versao_motor`, `pontuacao` do modelo.
+**1. "Pendente" é calculado, nunca gravado.** Uma região está pendente quando não tem
+nenhuma anotação. (O sistema antigo gravava o texto `'Pendente'` como classificação,
+e o código contava isso como "anotado": o painel mostrava 100% com 4 de 309 grãos.)
 
-**Anotação**: "esta região é da classe X", dito por uma pessoa. Campos: região,
-classe, pessoa, confiança, observação, data.
-
-**Pessoa**: quem coleta e anota. Por enquanto só `nome`. Os campos de login serão
-adicionados se e quando for decidido usar senha.
-
-**JobSegmentação**: registro de cada execução de segmentação: motor, parâmetros,
-status, tempo gasto, mensagem de erro.
+**2. Anotações só são acrescentadas.** Mudar de ideia cria uma anotação nova; a
+**vigente** é a mais recente (maior `id`). O histórico permite desfazer, auditar e
+comparar anotadores. O cálculo de progresso está em
+`app/servicos/anotacoes.py:progresso_da_coleta`.
 
 ## Escolhas de estrutura de dados (e por quê)
 
 | Escolha | Alternativa descartada | Motivo |
 |---------|------------------------|--------|
 | Região guardada como **polígono** (lista de pontos `[x, y]` em pixels da imagem original, em JSON) | Só o recorte retangular (como era antes) | O polígono é editável na tela, pequeno (dezenas de pontos) e converte direto para COCO e YOLO. Sem ele não há como treinar segmentação. |
-| `bbox` no formato COCO `[x, y, largura, altura]` | `[x1, y1, x2, y2]` | É o padrão da ferramenta de exportação mais usada. |
-| Arquivos nomeados pelo **hash SHA-256** do conteúdo | Nome original do arquivo | Duas fotos com o mesmo nome não se sobrescrevem, e a mesma foto enviada duas vezes é detectada. O nome original fica guardado no banco. |
-| Anotações **só são adicionadas, nunca editadas** (histórico) | Sobrescrever a classificação | Permite desfazer, auditar e comparar anotadores. A anotação vigente é a mais recente. |
-| Classes definidas em **arquivos YAML** (`taxonomias/`) | Classes escritas no HTML (como era antes) | Um agrônomo ajusta a lista sem mexer em código. |
-| Recortes e máscaras são **gerados a partir do polígono** | Guardar recortes como fonte da verdade | Evita dados duplicados que podem ficar inconsistentes (foi assim que surgiu o bug das cores invertidas). |
+| `bbox` em **4 colunas** (`bbox_x`, `bbox_y`, `bbox_largura`, `bbox_altura`), formato COCO | Um campo JSON | Permite consultas no banco (ex.: "regiões menores que 20 px"). |
+| `area_px` é a **área real** do objeto (fórmula do laço ou contagem da máscara) | Largura × altura da caixa (como era antes) | A área da caixa superestima objetos que não são retangulares. |
+| Arquivos nomeados pelo **hash SHA-256** do conteúdo | Nome original do arquivo | Duas fotos com o mesmo nome não se sobrescrevem, e a mesma foto enviada duas vezes é detectada. O nome original fica no banco. |
+| Anotações **só acrescentadas** (histórico) | Sobrescrever a classificação | Desfazer, auditoria, concordância entre anotadores. |
+| Classes em **arquivos YAML** (`taxonomias/`) com `codigo` fixo | Classes escritas no HTML (como era antes) | Um agrônomo ajusta a lista sem mexer em código; renomear não quebra dados antigos. |
+| Classe removida do YAML fica **inativa**, não é apagada | Apagar | Anotações antigas continuam válidas e exportáveis. |
+| Enums guardados como **texto legível** (`'aguardando'`), sem restrição CHECK | Números, ou CHECK no banco | Legível numa consulta direta; adicionar uma opção não exige migração. O SQLAlchemy recusa valores fora da lista. |
+| Recortes e máscaras **gerados a partir do polígono** | Guardar recortes como fonte da verdade | Evita cópias que ficam inconsistentes (foi assim que surgiu o bug das cores invertidas). |
 
-## Classes propostas por tipo de amostra
+## Proteções no próprio banco
 
-> ⚠️ **Proposta para validar com agrônomos.** São um ponto de partida e mudam
-> editando os arquivos YAML.
+Valem mesmo que o código tenha um erro. Cada uma tem um teste em `tests/test_integridade.py`.
+
+- **Chaves estrangeiras ligadas** (`PRAGMA foreign_keys = ON`). O SQLite as deixa
+  desligadas por padrão.
+- **Apagar uma coleta apaga** suas imagens, regiões, anotações e jobs (`ON DELETE CASCADE`).
+- **Classe com anotações não pode ser apagada** (`ON DELETE RESTRICT`), só desativada.
+- **A mesma foto não entra duas vezes na mesma coleta** (único: coleta + hash).
+- **Uma tecla por classe** e **um código por classe** dentro de cada tipo de amostra.
+- **Faixas válidas:** `confianca` e `pontuacao` entre 0 e 1; `area_px`, `largura` e
+  `altura` positivas.
+- **Modo WAL:** o banco resiste a quedas de energia e permite ler enquanto se grava.
+
+## Classes atuais por tipo de amostra
+
+> ⚠️ **Proposta a validar com agrônomos.** Para mudar, edite os arquivos em
+> `taxonomias/` (instruções em [taxonomias/LEIAME.md](../taxonomias/LEIAME.md)).
 
 | Grãos | Folhas | Flores | Frutos |
 |-------|--------|--------|--------|
@@ -74,3 +95,8 @@ status, tempo gasto, mensagem de erro.
 | Concha | Deficiência nutricional | | Brocado |
 | Chocho / mal granado | Outro | | Outro |
 | Outro | | | |
+
+## Previsto para as próximas fases
+
+- `TipoAmostra.motor_padrao`: qual motor de segmentação usar para cada tipo (Fase 2).
+- Campos de login em `Pessoa`, se for decidido usar senha.

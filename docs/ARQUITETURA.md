@@ -1,13 +1,12 @@
 # Arquitetura
 
-> Este documento descreve a **arquitetura-alvo** da reestruturação. Cada fase do
-> [ROADMAP](ROADMAP.md) move o código um passo em direção a ela. Quando uma parte já
-> existir de verdade, ela é marcada com ✅.
+> Partes marcadas com ✅ já existem. As demais são o alvo das próximas fases do
+> [ROADMAP](ROADMAP.md).
 
 ## Visão geral em uma frase
 
 Um servidor Flask recebe fotos, divide cada foto em **regiões** (um grão, uma folha,
-uma flor...), e oferece telas para que pessoas digam **o que é cada região**. Tudo fica
+uma flor...) e oferece telas para que pessoas digam **o que é cada região**. Tudo fica
 salvo num banco de dados e pode ser exportado para treinar modelos.
 
 ## Fluxo de uma foto
@@ -15,70 +14,89 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
 ```
  Celular / PC                     Servidor                                 Disco
  ────────────                     ────────                                 ─────
- 1. Tira ou escolhe a foto  ──►   Ingestão: valida, calcula hash,   ──►   data/imagens/
-                                  lê EXIF (data, GPS)                      (nome = hash)
+ 1. Tira ou escolhe a foto  ──►   Ingestão: valida, calcula hash,   ──►   C:\CafeData\imagens\
+                                  lê EXIF (data, GPS)                      (nome = hash)  ✅
                                         │
                                         ▼
                                   Fila de segmentação (segundo plano)
                                         │  escolhe o motor pelo tipo de amostra
                                         ▼
-                                  Segmentador ──► regiões (polígonos)  ──►  banco
+                                  Segmentador ──► regiões (polígonos)  ──►  banco ✅
                                         │
  2. Acompanha o progresso   ◄──   Status do job (na fila / processando /
                                   concluído / erro)
- 3. Anota cada região       ──►   Serviço de anotação (grava histórico) ──►  banco
+ 3. Anota cada região       ──►   Serviço de anotação (grava histórico) ✅ ──► banco
  4. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
 ```
+
+## O que acontece ao iniciar ✅
+
+`Iniciar BeanLab.bat` → `run.py`:
+1. Cria a aplicação (`app/__init__.py`) com a configuração de `app/config.py`.
+2. `preparar_banco()`: aplica as migrações pendentes (`migrations/`) e sincroniza as
+   classes com os arquivos `taxonomias/*.yaml`.
+   - Se um YAML tiver erro, a plataforma **não abre** e mostra a mensagem.
+3. Mostra os endereços (PC e celulares) e começa a atender.
 
 ## Camadas do código
 
 ```
 app/
-├── config.py          Configurações por ambiente (desenvolvimento / produção)
-├── extensions.py      Instâncias compartilhadas (banco, migrações)
-├── dominio/           ENTIDADES: o que existe no sistema (Coleta, Imagem, Região...)
-├── servicos/          CASOS DE USO: importar foto, segmentar, anotar, exportar
-├── segmentacao/       MOTORES de segmentação, todos com a mesma interface
-├── armazenamento/     Onde e como os arquivos são gravados no disco
-├── web/               Rotas que devolvem PÁGINAS (HTML)
-├── api/               Rotas que devolvem DADOS (JSON) para o JavaScript
+├── __init__.py        ✅ create_app(): monta a aplicação
+├── config.py          ✅ configurações (pasta de dados, limites); lidas do ambiente
+├── extensions.py      ✅ banco (SQLAlchemy) e migrações; liga proteções do SQLite
+├── cli.py             ✅ comandos de terminal (flask --app app preparar-banco)
+├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
+├── servicos/          ✅ CASOS DE USO: regras (anotar, progresso, taxonomias, pessoas)
+├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
+├── segmentacao/       ◐ motores; hoje só o clássico, no formato antigo (Fase 2)
+├── web/               ✅ rotas que devolvem PÁGINAS (hoje só a inicial provisória)
+├── api/               ✅ rotas que devolvem DADOS em JSON (hoje só /api/saude)
 ├── templates/         HTML (Jinja)
 └── static/            CSS, JavaScript e ícones
-taxonomias/            Listas de classes por tipo de amostra (YAML, editável)
-migrations/            Histórico de mudanças no banco (Alembic)
-tests/                 Testes automáticos
+taxonomias/            ✅ listas de classes por tipo de amostra (YAML, editável)
+migrations/            ✅ histórico de mudanças no banco (Alembic)
+tests/                 ✅ testes automáticos (pytest)
 ```
 
-**Regra das camadas:** as rotas (`web/`, `api/`) só recebem o pedido e chamam um
-serviço. Toda regra de negócio fica em `servicos/`. Assim, a mesma regra serve à tela,
-à API e aos testes, e trocar a interface não exige mexer na lógica.
+**Dados ficam fora do projeto**, em `C:\CafeData` (ou na pasta da variável
+`CAFE_DATA_DIR`): banco `beanlab.db`, fotos em `imagens/` e a chave secreta.
+Ver [decisão 0003](decisoes/0003-dados-fora-do-onedrive.md).
+
+### Regras das camadas
+
+- **Rotas só recebem o pedido e chamam um serviço.** Toda regra de negócio fica em
+  `servicos/`. Assim a mesma regra serve à tela, à API e aos testes.
+- **Serviços preparam, quem chama confirma.** Os serviços fazem `add`/`flush`; a rota,
+  o comando ou o teste faz `db.session.commit()`. Uma operação que usa vários
+  serviços é gravada inteira ou não é gravada.
+- **O domínio não conhece Flask nem disco.** `dominio/` só descreve dados e cálculos
+  (ex.: área do polígono), então pode ser testado sem servidor.
 
 ## Convenções
 
 - **Nomes do domínio em português** (`Coleta`, `Regiao`, `anotar_regiao`), porque é a
   língua de quem usa e pesquisa. Termos técnicos consagrados ficam em inglês (`job`,
   `hash`, `bbox`).
+- **Datas sempre em UTC** no banco (`agora_utc()`); a conversão para o horário local
+  é feita só na tela.
 - **Nada de lógica em templates.** O template só exibe o que a rota entregou.
 - **JavaScript em módulos ES nativos**, sem etapa de build
   (ver [decisão 0001](decisoes/0001-manter-flask-sem-build.md)).
 - **Toda mudança no banco passa por migração**; nunca apagar o banco para "consertar".
+  Um teste falha se um modelo mudar sem migração. Como fazer:
+  [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md).
 
 ## Segmentação
 
-Todos os motores implementam a mesma interface: recebem uma imagem e devolvem uma
+Todos os motores vão implementar a mesma interface: recebem uma imagem e devolvem uma
 lista de regiões (polígono + pontuação). Detalhes e escolha dos modelos em
 [decisão 0002](decisoes/0002-segmentacao-plugavel.md).
 
 | Motor | Quando usar | Estado |
 |-------|-------------|--------|
-| Clássico (watershed) | Grãos em fundo uniforme | Existe, com bugs (Fase 2 corrige) |
+| Clássico (watershed) | Grãos em fundo uniforme | Código antigo em `app/segmentacao/classico.py`; Fase 2 corrige e integra |
 | Importado | Fotos que já chegam segmentadas | Fase 2 |
 | FastSAM | Automático, qualquer tipo de amostra | Fase 6 |
 | SAM leve (MobileSAM / SAM 2.1-tiny) | Refinar com cliques | Fase 6 |
 | YOLO11-seg treinado | Quando houver dados anotados suficientes | Futuro |
-
-## Estado atual (antes da Fase 1)
-
-Hoje o código ainda está no formato antigo: `app/routes.py`, `app/models.py` e
-`app/segmentation.py` concentram tudo. Os problemas conhecidos estão em
-[PROBLEMAS_CONHECIDOS.md](PROBLEMAS_CONHECIDOS.md).

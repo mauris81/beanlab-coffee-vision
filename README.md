@@ -41,19 +41,27 @@ conexões só deste computador):
 ```powershell
 $env:CAFE_DEBUG = "1"; .\.venv\Scripts\python.exe run.py
 ```
+
+Testes, migrações do banco e onde colocar cada coisa:
+[docs/DESENVOLVIMENTO.md](docs/DESENVOLVIMENTO.md).
 </details>
 
 ## Onde está cada coisa
 
 | Pasta / arquivo   | O que é |
 |-------------------|---------|
-| `app/`            | Código da aplicação (rotas, modelos, segmentação, telas) |
-| `app/uploads/`    | Fotos enviadas e recortes gerados (fora do git) |
-| `instance/`       | Banco de dados SQLite (fora do git) |
-| `backups/`        | Cópias de segurança (fora do git) |
-| `docs/`           | Documentação: arquitetura, modelo de dados, decisões |
 | `Iniciar BeanLab.bat` | Atalho de duplo clique para instalar e iniciar |
+| `app/`            | Código da aplicação (detalhes em [docs/ARQUITETURA.md](docs/ARQUITETURA.md)) |
+| `taxonomias/`     | **Classes de cada tipo de amostra**, editáveis sem programar ([como editar](taxonomias/LEIAME.md)) |
+| `migrations/`     | Histórico de mudanças no banco (aplicado sozinho ao iniciar) |
+| `tests/`          | Testes automáticos |
+| `docs/`           | Documentação: roteiro, arquitetura, modelo de dados, decisões |
 | `run.py`          | Ponto de entrada (usado pelo atalho) |
+| **`C:\CafeData`** | **Banco de dados e fotos** (fora do projeto e do OneDrive; faça backup desta pasta) |
+| `backups/`        | Cópia do sistema antigo (fora do git) |
+
+As pastas `app/uploads/` e `instance/`, se existirem, são do sistema antigo e não são
+mais usadas.
 
 ## Documentação
 

@@ -1,6 +1,6 @@
 # 0003 — Guardar fotos e banco fora da pasta do OneDrive
 
-**Status:** ⏳ Proposta, aguardando decisão do responsável · 25/09/2026
+**Status:** ✅ Aceita (opção A, pasta `C:\CafeData`) · 25/09/2026
 
 ## Contexto
 O projeto inteiro está dentro de `OneDrive\Documentos`. Isso já causou um problema
@@ -18,7 +18,12 @@ Outros riscos:
 | **A. Pasta de dados configurável fora do OneDrive** (ex.: `C:\CafeData`), com backup próprio | Seguro para SQLite; sem arquivos "somente online" | É preciso ter uma rotina de backup |
 | B. Manter no OneDrive e marcar "Sempre manter neste dispositivo" | Nada muda | Risco de corrupção do banco continua |
 
-## Recomendação
-**Opção A.** O código continua no OneDrive (e no git). Só `data/` (fotos e banco) sai,
-por uma variável de configuração. A Fase 1 já deixa essa configuração pronta. Onde os
-dados ficam é decisão do responsável.
+## Decisão
+**Opção A.** O código continua no OneDrive (e no git). Fotos, banco e chave secreta
+ficam em **`C:\CafeData`**, ou na pasta indicada pela variável `CAFE_DATA_DIR`
+(`app/config.py`).
+
+## Consequências
+- ✅ O banco não é mais sincronizado no meio de uma gravação.
+- ⚠️ `C:\CafeData` **não tem backup automático**. É preciso uma rotina (cópia periódica
+  para HD externo ou nuvem, com a plataforma fechada). Pendência registrada no ROADMAP.

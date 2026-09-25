@@ -6,8 +6,8 @@ ser revisado ou desfeito.
 | Fase | Status | Entrega |
 |------|--------|---------|
 | 0. Fundação | ✅ Concluída (25/09/2026) | Git, backup, limpeza de duplicatas, depurador fechado, esta documentação |
-| 1. Dados | ⏳ Próxima | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo, testes |
-| 2. Ingestão | — | Envio por câmera/arquivo/lote, imagens já segmentadas, segmentação em segundo plano com progresso |
+| 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
+| 2. Ingestão | ⏳ Próxima | Envio por câmera/arquivo/lote, imagens já segmentadas, segmentação em segundo plano com progresso |
 | 3. Design system | — | Cores, tipografia, componentes; tema claro/escuro; acessibilidade WCAG 2.2 AA; pensado para celular |
 | 4. Dashboard | — | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
 | 5. Anotação | — | Atalhos de teclado, avanço automático, anotação em lote, desfazer, edição de contorno |
@@ -34,11 +34,16 @@ Extras já entregues fora das fases:
   https://github.com/mauris81/beanlab-coffee-vision. Fotos e banco nunca sobem
   (`.gitignore`). Ainda sem licença, a decidir.
 - **Hospedagem online:** decidir depois da Fase 2.
+- **Dados (fotos e banco) em `C:\CafeData`**, fora do OneDrive
+  (ver [decisoes/0003](decisoes/0003-dados-fora-do-onedrive.md)).
+- **Classes:** começar com as listas propostas; ajustes depois, editando `taxonomias/`.
 
 ## Pendências para o responsável
 
 - [ ] Abrir o OneDrive e baixar `app/uploads/` para completar o backup antigo.
-- [ ] Validar com agrônomos as listas de classes propostas em
-      [MODELO_DE_DADOS.md](MODELO_DE_DADOS.md#classes-propostas-por-tipo-de-amostra).
-- [ ] Decidir se os dados (fotos e banco) saem da pasta do OneDrive
-      (ver [decisoes/0003](decisoes/0003-dados-fora-do-onedrive.md)).
+      Depois disso, as pastas antigas `app/uploads/` e `instance/` podem ser apagadas
+      (a plataforma nova não as usa mais).
+- [ ] Validar com agrônomos as listas de classes em
+      [MODELO_DE_DADOS.md](MODELO_DE_DADOS.md#classes-atuais-por-tipo-de-amostra).
+- [ ] Definir uma rotina de backup para `C:\CafeData` (fica fora do OneDrive).
+- [ ] Escolher uma licença para o repositório público (ou manter sem).
