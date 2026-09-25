@@ -6,22 +6,13 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 
 | Problema | Situação | Resolve em |
 |----------|----------|------------|
-| **Tela de anotação ainda não existe** | As regiões são criadas e contadas, mas ainda não dá para dizer a classe de cada uma pela tela. | Fase 5 |
+| **Motor de grãos não validado com fotos reais** | Os testes usam fotos sintéticas no cenário esperado (grãos sobre fundo azul): 48 de 48 grãos encontrados, encostados ou separados. Falta confirmar com fotos de verdade. | Pendência do responsável (enviar fotos) |
+| **Não dá para corrigir contornos** (ajustar, desenhar, excluir uma região errada) | Estava no plano da Fase 5 e ficou de fora. Por enquanto, região que não é um objeto: classe "Outro" + observação. | A definir |
 | **Filtro de fundo do motor clássico só serve para grãos** (matiz ≤ 60) | Folhas, flores e frutos ainda não têm motor: as fotos precisam chegar já segmentadas (recortes ou COCO). | Fase 6 |
 | **COCO no formato RLE não é importado** | Só contornos em polígono. Regiões em RLE são contadas e avisadas como ignoradas. | Quando alguém precisar |
 | **Fotos HEIC (iPhone) não são aceitas** | O navegador do iPhone costuma converter para JPEG ao enviar; se não converter, a foto é recusada com mensagem. | Quando alguém precisar |
 | **Sem excluir ou editar coletas pela tela** | Dá para excluir fotos; a coleta em si, ainda não. | Fase 4 |
 | **`C:\CafeData` sem backup automático** | Fica fora do OneDrive de propósito ([decisão 0003](decisoes/0003-dados-fora-do-onedrive.md)). | Pendência do responsável |
-
-## Requisitos de usabilidade para as telas novas
-
-Problemas das telas antigas que as novas precisam evitar:
-
-- Anotar um item exigia 3 cliques (classe, salvar, próximo). → Fase 5: 1 tecla ou 1 toque.
-- Sem atalhos de teclado e sem anotação em lote. → Fase 5
-- Lista não funcionava pelo teclado. → Fase 5 (foco visível e avisos acessíveis já existem: Fase 3)
-- Observações sumiam ao trocar de item. → Fase 5 (o dado já é guardado por anotação)
-- Imagens trafegavam em base64 dentro de JSON. → resolvido na Fase 2: fotos e miniaturas servidas direto, com cache de 1 ano
 
 ## Resolvidos
 
@@ -46,3 +37,8 @@ Problemas das telas antigas que as novas precisam evitar:
 | **Segmentação dentro do envio** (a tela congelava) | Fila em segundo plano, com status ao vivo e retomada após reinício | 2 | `test_fila_retoma_o_que_ficou_pela_metade`, `tests/navegador/test_fluxo_coleta.py` |
 | **Servidor de desenvolvimento em uso normal** | waitress no modo normal (vários celulares) | 2 | — |
 | **Formulários sem proteção CSRF** | Código secreto por sessão em todo formulário | 2 | `test_formulario_sem_codigo_csrf_e_recusado` |
+| **Motor clássico só via o maior grupo de grãos encostados** (com grãos separados, achava 1 de 48) | Versão 2.1 considera todos os grupos com cor de grão | 5 | `test_motor_classico_encontra_cada_grao_uma_vez`, `test_modo_antigo_so_via_o_maior_grupo_de_graos` |
+| **Recortes gerados ao mesmo tempo se atrapalhavam** ("arquivo em uso" no Windows) | Trava por foto e arquivos temporários de nome único | 5 | `test_muitos_pedidos_simultaneos_de_recorte_da_mesma_foto` |
+| Anotar exigia 3 cliques por item (classe, salvar, próximo) | 1 tecla ou 1 toque; avanço automático para a próxima pendente | 5 | `tests/navegador/test_anotacao_navegador.py` |
+| Sem atalhos de teclado e sem anotação em lote | Atalhos 1–9, ←/→, D, Z, ?; tela em lote com "marcar todas", Shift+clique e desfazer | 5 | `tests/navegador/test_anotacao_navegador.py` |
+| Observações sumiam ao trocar de item | Observação e dúvida guardadas por anotação e mostradas ao voltar à região | 5 | `test_situacao_das_regioes_mostra_a_anotacao_vigente` |

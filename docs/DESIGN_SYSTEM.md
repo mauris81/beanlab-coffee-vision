@@ -91,7 +91,11 @@ Use a macro em vez de escrever o HTML: a acessibilidade vem junto.
 Componentes só em CSS (sem macro), com exemplo no guia: **opções em cartão**
 (`.opcoes-cartao` + `.opcao-cartao`, rádios grandes), **filtros** (`.filtros` + `.filtro`
 com `aria-current`), **cartão de foto** (`.grade-fotos` + `.foto`) e **área de envio**
-(`.envio`, com botão de câmera e botão de arquivos separados).
+(`.envio`, com botão de câmera e botão de arquivos separados), **botão de classe**
+(`.botao-classe` com `aria-pressed` e `aria-keyshortcuts`).
+
+Atalhos de teclado: todo botão com atalho declara `aria-keyshortcuts`; os atalhos nunca
+disparam enquanto a pessoa digita num campo; Z e D são reservados na anotação.
 
 Mensagens depois de uma ação: `flash('…', 'sucesso' | 'info' | 'aviso' | 'perigo')` na
 rota; o `base.html` mostra como alerta no topo da página seguinte.

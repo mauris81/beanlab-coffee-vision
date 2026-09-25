@@ -25,7 +25,8 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
                                         │
  2. Acompanha o progresso   ◄──   Status do job (na fila / processando /    ✅
                                   concluído / erro), consultado a cada 2 s
- 3. Anota cada região       ──►   Serviço de anotação (grava histórico) ✅ ──► banco
+ 3. Anota cada região       ──►   Tela de anotação (API JSON) ─► serviço  ✅ ──► banco
+    (uma por vez ou em lote)       recortes e foto média em cache no disco  ✅
  4. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
 ```
 
@@ -60,12 +61,15 @@ app/
 ├── fila.py            ✅ fila de segmentação em segundo plano (decisão 0005)
 ├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
-│                         (EXIF, orientação, miniaturas), segmentação (jobs), taxonomias, pessoas
+│                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
+│                         segmentação (jobs), taxonomias, pessoas
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
-│                         ("Quem é você?" + CSRF), coletas.py; apresentacao.py = ícones, menu, status
-├── api/               ✅ rotas que devolvem DADOS em JSON (hoje só /api/saude)
+│                         ("Quem é você?" + CSRF), coletas.py, anotacao.py (uma por vez, lote);
+│                         apresentacao.py = ícones, menu, status, plural
+├── api/               ✅ rotas que devolvem DADOS em JSON: saude.py, anotacao.py
+│                         (regiões da coleta, anotar, desfazer)
 ├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system
 └── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg
 taxonomias/            ✅ listas de classes por tipo de amostra (YAML, editável)
@@ -112,7 +116,7 @@ motor de cada tipo de amostra é o campo `motor:` do YAML (`taxonomias/`). Detal
 
 | Motor | Quando usar | Estado |
 |-------|-------------|--------|
-| Clássico (watershed) | Grãos em fundo uniforme | ✅ `app/segmentacao/classico.py` (v2.0: contornos, área real, cores corretas) |
+| Clássico (watershed) | Grãos sobre **fundo azul**, encostados ou separados | ✅ `app/segmentacao/classico.py` v2.1 (contornos, área real, cores corretas, todos os grupos de grãos) |
 | Importado | Recortes prontos (PNG transparente) ou COCO | ✅ `app/servicos/ingestao.py` |
 | FastSAM | Automático, qualquer tipo de amostra | Fase 6 |
 | SAM leve (MobileSAM / SAM 2.1-tiny) | Refinar com cliques | Fase 6 |

@@ -107,6 +107,11 @@ Valem mesmo que o código tenha um erro. Cada uma tem um teste em `tests/test_in
 - **Segmentar de novo** substitui só as regiões `automatica` daquela foto; as `manual`
   e `importada` ficam.
 
+- **"Tenho dúvida" é `confianca = 0,5`**; sem dúvida, `confianca` fica vazia.
+- **Desfazer é a única exceção a "anotações só são acrescentadas"**: apaga a anotação
+  recém-feita, e só se ela for da própria pessoa e ainda for a vigente da região
+  (`desfazer_anotacoes`). Corrige um engano; mudar de ideia depois é anotar de novo.
+
 ## Previsto para as próximas fases
 
 - Campos de login em `Pessoa`, se for decidido usar senha.

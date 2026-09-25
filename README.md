@@ -31,7 +31,9 @@ usar nos **celulares conectados ao mesmo Wi-Fi**. Para desligar, feche a janela 
    sem precisar recarregar. Folhas, flores e frutos, por enquanto, precisam chegar já
    segmentados (recortes em PNG transparente ou um conjunto COCO).
 
-A tela de anotação (dizer a classe de cada região) chega na Fase 5.
+5. **Anotar:** na página da coleta, "Começar a anotar". Escolha a classe de cada região
+   com um toque ou uma tecla (1–9) e a tela já vai para a próxima. Z desfaz; D marca
+   dúvida; ? mostra os atalhos. Para muitas regiões iguais, use **Anotar em lote**.
 
 ### Baixando o projeto em outro computador
 

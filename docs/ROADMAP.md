@@ -9,10 +9,11 @@ ser revisado ou desfeito.
 | 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
 | 2. Ingestão | ✅ Concluída (25/09/2026) | Coletas, "Quem é você?", envio pela câmera ou em lote (rotação, GPS, repetidas, miniaturas), recortes prontos e COCO, segmentação em segundo plano com status ao vivo, motor clássico corrigido, servidor waitress |
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
-| 4. Dashboard | ⏳ Próxima | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
-| 5. Anotação | — | Atalhos de teclado, avanço automático, anotação em lote, desfazer, edição de contorno |
+| 4. Dashboard | ⏳ Próxima (depois da 5, por decisão) | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
+| 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
+| L. Login e "aplicativo" | ⏸️ Decidir junto com a hospedagem | Contas com senha e perfis; instalar no celular como aplicativo (exige HTTPS) |
 | H. Hospedagem online | ⏸️ Decidir após a Fase 2 | Acesso pelos celulares na fazenda sem este PC ligado. Comparar opções (Render, Railway, PythonAnywhere, servidor próprio), custo, internet na fazenda e troca de SQLite por PostgreSQL |
 
 Extras já entregues fora das fases:
@@ -41,6 +42,9 @@ Extras já entregues fora das fases:
 - **Classes:** começar com as listas propostas; ajustes depois, editando `taxonomias/`.
 
 ## Pendências para o responsável
+
+- [ ] **Testar o motor de grãos com fotos reais** (fundo azul). Os testes usam fotos
+      sintéticas; a foto original do projeto (`teste_1.jpeg`) está só na nuvem do OneDrive.
 
 - [ ] Abrir o OneDrive e baixar `app/uploads/` para completar o backup antigo.
       Depois disso, as pastas antigas `app/uploads/` e `instance/` podem ser apagadas

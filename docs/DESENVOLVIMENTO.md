@@ -32,6 +32,7 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_ingestao.py` | Fotos válidas/inválidas, rotação de celular, data e GPS, repetidas, recortes, COCO, exclusão segura |
 | `tests/test_segmentacao.py` | Motor clássico, cores preservadas (regressão), jobs, erros do motor, retomada da fila |
 | `tests/test_web_coletas.py` | "Quem é você?", CSRF, redirecionamento seguro, coletas, envio, status, miniaturas |
+| `tests/test_anotacao.py` | Recortes (cache, concorrência), situação das regiões, lote, regras do desfazer, API e páginas de anotação |
 
 As fotos dos testes são geradas na hora (`tests/fabrica_imagens.py`): nenhum binário no git.
 
@@ -46,7 +47,8 @@ próprio com banco temporário. Rodam a auditoria de acessibilidade **axe-core**
 AA) e testam teclado, tema, diálogo, avisos e layout no celular
 (`tests/navegador/`), além do **fluxo completo** de quem coleta (entrar, criar coleta,
 enviar foto, acompanhar a segmentação, excluir) no celular e no computador, com a fila
-em segundo plano como no uso real. Rode antes de mexer em telas, CSS ou JavaScript.
+em segundo plano como no uso real, e a **anotação** pelo teclado, pelo toque e em lote
+(`test_anotacao_navegador.py`). Rode antes de mexer em telas, CSS ou JavaScript.
 
 ## Mudar o banco de dados (migrações)
 
