@@ -5,7 +5,7 @@ from flask import abort, flash, redirect, render_template, request, send_file, u
 from sqlalchemy import func, select
 
 from app.armazenamento import armazenamento_de_imagens
-from app.dominio import Coleta, Imagem, JobSegmentacao, Regiao, StatusImagem, TipoAmostra
+from app.dominio import Anotacao, Coleta, Imagem, JobSegmentacao, Regiao, StatusImagem, TipoAmostra
 from app.extensions import db
 from app.fila import fila
 from app.servicos.anotacoes import progresso_da_coleta
@@ -15,7 +15,7 @@ from app.servicos.coletas import (
 from app.servicos.ingestao import (
     ImportacaoInvalida, excluir_imagem, importar_coco, receber_foto, receber_recorte,
 )
-from app.servicos.segmentacao import agendar_segmentacao, ultimo_erro
+from app.servicos.segmentacao import agendar_segmentacao, motor_antigo, ultimo_erro
 from app.web import web_bp
 from app.web.apresentacao import plural
 from app.web.identidade import pessoa_atual
@@ -105,10 +105,14 @@ def coleta(coleta_id):
         select(Regiao.imagem_id, func.count(Regiao.id))
         .join(Regiao.imagem).where(Imagem.coleta_id == coleta.id)
         .group_by(Regiao.imagem_id)).all())
+    anotacoes_por_imagem = dict(db.session.execute(
+        select(Regiao.imagem_id, func.count(Anotacao.id)).join(Anotacao.regiao).join(Regiao.imagem)
+        .where(Imagem.coleta_id == coleta.id).group_by(Regiao.imagem_id)).all())
     conteudo = conteudo_da_coleta(coleta)
     return render_template(
         'coleta.html', coleta=coleta, progresso=progresso_da_coleta(coleta.id),
-        regioes_por_imagem=regioes_por_imagem, conteudo=conteudo,
+        regioes_por_imagem=regioes_por_imagem, anotacoes_por_imagem=anotacoes_por_imagem,
+        conteudo=conteudo, motores_antigos={i.id: m for i in coleta.imagens if (m := motor_antigo(i))},
         motivo_para_nao_excluir=motivo_para_nao_excluir(coleta, pessoa_atual(), conteudo),
         erros={i.id: ultimo_erro(i) for i in coleta.imagens if i.status == StatusImagem.ERRO},
     )

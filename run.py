@@ -27,7 +27,7 @@ import time
 import webbrowser
 
 from app import create_app
-from app.cli import descrever_resumo
+from app.cli import descrever_motores, descrever_resumo
 from app.publicacao import endereco_publico, manter_pc_acordado
 from app.servicos.banco import preparar_banco
 from app.servicos.contas import codigo_de_primeiro_acesso
@@ -88,6 +88,8 @@ if __name__ == '__main__':
         print()
         print(f'  Dados em: {app.config["PASTA_DADOS"]}')
         print(f'  {descrever_resumo(resumo)}')
+        with app.app_context():
+            print(f'  {descrever_motores()}')
         print()
         print('  BeanLab Coffee Vision está no ar')
         print(f'  {"Neste computador:":<28} http://127.0.0.1:{port}')

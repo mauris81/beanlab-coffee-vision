@@ -23,4 +23,13 @@ class Segmentador(Protocol):
     versao: str   # gravado em Regiao.versao_motor; mude quando o resultado mudar
     dica_foto: str  # como fotografar para este motor funcionar bem (aparece na tela de envio)
 
+    @property
+    def parametros(self) -> dict:
+        """Configuração usada, gravada em cada JobSegmentacao (a pesquisa pode repetir)."""
+        ...
+
+    def disponivel(self) -> bool:
+        """Pode rodar neste computador? (ex.: a IA é opcional e pode não estar instalada)"""
+        ...
+
     def segmentar(self, rgb: np.ndarray) -> list[RegiaoEncontrada]: ...

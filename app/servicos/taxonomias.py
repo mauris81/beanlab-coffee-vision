@@ -13,7 +13,7 @@ from sqlalchemy import select
 from app.dominio import Classe, TipoAmostra
 from app.dominio.taxonomia import TECLAS_RESERVADAS
 from app.extensions import db
-from app.segmentacao import MOTORES
+from app.segmentacao import MOTORES, primeiro_disponivel
 
 _CODIGO = re.compile(r'^[a-z][a-z0-9_]{0,39}$')
 _COR = re.compile(r'^#[0-9A-Fa-f]{6}$')
@@ -43,7 +43,9 @@ class DefinicaoTipo:
     descricao: str | None
     ordem: int
     classes: tuple[DefinicaoClasse, ...]
-    motor: str | None = None  # motor de segmentação automática (None = sem motor)
+    # Motores de segmentação automática, em ordem de preferência: usa o primeiro que
+    # estiver instalado neste computador. Vazio = sem segmentação automática.
+    motores: tuple[str, ...] = ()
 
 
 @dataclass
@@ -103,10 +105,12 @@ def _ler_arquivo(caminho: Path) -> DefinicaoTipo:
     _conferir_repetidos([c for c in classes if c.tecla], 'tecla', local)
 
     motor = dados.get('motor')
-    if motor is not None and str(motor) not in MOTORES:
-        raise TaxonomiaInvalida(
-            f'{local}: motor "{motor}" não existe. Disponíveis: {", ".join(MOTORES)}. '
-            f'Para não usar segmentação automática, apague a linha "motor:".')
+    motores = tuple(str(m) for m in (motor if isinstance(motor, list) else [motor] if motor is not None else []))
+    for nome in motores:
+        if nome not in MOTORES:
+            raise TaxonomiaInvalida(
+                f'{local}: motor "{nome}" não existe. Disponíveis: {", ".join(MOTORES)}. '
+                f'Para não usar segmentação automática, apague a linha "motor:".')
 
     return DefinicaoTipo(
         codigo=codigo,
@@ -114,7 +118,7 @@ def _ler_arquivo(caminho: Path) -> DefinicaoTipo:
         descricao=_texto_opcional(dados.get('descricao')),
         ordem=int(dados.get('ordem', 0)),
         classes=classes,
-        motor=str(motor) if motor is not None else None,
+        motores=motores,
     )
 
 
@@ -210,7 +214,7 @@ def sincronizar_taxonomias(definicoes: list[DefinicaoTipo]) -> ResumoSincronizac
         tipo.nome = definicao.nome
         tipo.descricao = definicao.descricao
         tipo.ordem = definicao.ordem
-        tipo.motor_padrao = definicao.motor
+        tipo.motor_padrao = primeiro_disponivel(definicao.motores)
 
         # Libera todas as teclas antes de redistribuir; senão trocar a tecla de duas
         # classes entre si violaria a regra "uma tecla por classe" no meio do caminho.

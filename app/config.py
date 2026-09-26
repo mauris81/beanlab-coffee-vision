@@ -45,6 +45,7 @@ class Config:
             pasta_dados or os.environ.get('CAFE_DATA_DIR') or PASTA_DADOS_PADRAO
         )
         self.PASTA_IMAGENS = self.PASTA_DADOS / 'imagens'
+        self.PASTA_MODELOS = self.PASTA_DADOS / 'modelos'  # pesos da IA (opcional, ~180 MB)
         self.SQLALCHEMY_DATABASE_URI = f"sqlite:///{(self.PASTA_DADOS / 'beanlab.db').as_posix()}"
 
 

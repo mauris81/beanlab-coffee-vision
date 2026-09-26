@@ -15,7 +15,7 @@ Etapas: (1) acha as áreas com cor de grão (matiz baixa); (2) separa grãos do 
 com limiar adaptativo; (3) separa grãos encostados com watershed sobre a
 transformada de distância; (4) descarta regiões de tamanho muito fora do padrão.
 """
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 import cv2
 import numpy as np
@@ -48,6 +48,13 @@ class MotorClassico:
         self.p = parametros or ParametrosClassico()
 
     # ------------------------------------------------------------ interface
+
+    @property
+    def parametros(self) -> dict:
+        return asdict(self.p)
+
+    def disponivel(self) -> bool:
+        return True  # só usa bibliotecas que a plataforma já instala
 
     def segmentar(self, rgb: np.ndarray) -> list[RegiaoEncontrada]:
         rotulos = self.rotular(rgb)

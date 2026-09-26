@@ -23,8 +23,23 @@ A **ordem** das classes no arquivo é a ordem em que aparecem na tela.
 ## Segmentação automática (campo `motor`)
 
 Logo abaixo de `ordem:`, o campo opcional `motor:` diz qual motor encontra os objetos
-nas fotos deste tipo. Hoje existe só `classico` (grãos sobre fundo uniforme). Sem esse
-campo, as fotos precisam chegar já segmentadas (recortes ou COCO).
+nas fotos deste tipo. Sem esse campo, as fotos precisam chegar já segmentadas (recortes
+ou COCO). Motores:
+
+| Motor | O que faz |
+|-------|-----------|
+| `classico` | Grãos sobre **fundo azul**. Sempre disponível. |
+| `ia` | FastSAM + SAM 2.1: qualquer fundo, objetos encostados. **Opcional**: só funciona depois de rodar `Instalar IA.bat`. Calibrado e testado **só para grãos**. |
+
+Pode ser uma lista em **ordem de preferência**; a plataforma usa o primeiro que estiver
+instalado no computador:
+
+```yaml
+motor: [ia, classico]   # IA se estiver instalada; senão, o clássico
+```
+
+> Folhas, flores e frutos ainda não usam a IA: ela precisa ser testada e ajustada com
+> fotos reais de cada tipo antes (veja `ferramentas/avaliar_segmentacao.py`).
 
 ## O que pode e o que não pode
 

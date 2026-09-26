@@ -6,8 +6,9 @@ codigo: graos
 nome: Grãos
 descricao: Grãos crus ou beneficiados, para classificação de defeitos.
 ordem: 1
-# Segmentação automática: motor clássico (watershed), para grãos sobre fundo uniforme.
-motor: classico
+# Segmentação automática, em ordem de preferência: usa a IA (FastSAM + SAM 2.1) se ela
+# estiver instalada ("Instalar IA.bat"); senão, o motor clássico (grãos sobre fundo azul).
+motor: [ia, classico]
 
 classes:
   - codigo: sem_defeito

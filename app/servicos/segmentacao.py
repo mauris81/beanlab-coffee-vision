@@ -29,7 +29,8 @@ def agendar_segmentacao(imagem: Imagem) -> JobSegmentacao | None:
         imagem.status = StatusImagem.PRONTA
         return None
     motor = obter_motor(nome_motor)
-    job = JobSegmentacao(imagem=imagem, motor=motor.nome, versao_motor=motor.versao)
+    job = JobSegmentacao(imagem=imagem, motor=motor.nome, versao_motor=motor.versao,
+                         parametros=motor.parametros)  # a pesquisa sabe exatamente como foi feito
     imagem.status = StatusImagem.AGUARDANDO
     db.session.add(job)
     db.session.flush()
@@ -83,6 +84,19 @@ def jobs_para_retomar() -> list[int]:
         job.imagem.status = StatusImagem.AGUARDANDO
     db.session.commit()
     return [job.id for job in jobs]
+
+
+def motor_antigo(imagem: Imagem) -> str | None:
+    """Se a foto foi segmentada por outro motor (ou outra versão) que não o atual do seu tipo
+    de amostra, devolve o nome desse motor; senão None. Ex.: foto segmentada pelo motor
+    clássico antes de instalar a IA: vale oferecer "Segmentar de novo"."""
+    atual = imagem.coleta.tipo_amostra.motor_padrao
+    concluidos = [j for j in imagem.jobs if j.status == StatusJob.CONCLUIDO]
+    if not atual or imagem.ja_segmentada or imagem.status != StatusImagem.PRONTA or not concluidos:
+        return None
+    motor = obter_motor(atual)
+    ultimo = concluidos[-1]
+    return ultimo.motor if (ultimo.motor, ultimo.versao_motor) != (motor.nome, motor.versao) else None
 
 
 def ultimo_erro(imagem: Imagem) -> str | None:

@@ -62,6 +62,13 @@ def porcentagem(valor: float) -> str:
     return f'{round(valor)}%'
 
 
+_NOMES_DOS_MOTORES = {'classico': 'motor clássico', 'ia': 'IA (FastSAM + SAM 2.1)'}
+
+
+def nome_do_motor(nome: str | None) -> str:
+    return _NOMES_DOS_MOTORES.get(nome, nome or 'nenhum')
+
+
 _ICONE_POR_TIPO = {'graos': 'grao', 'folhas': 'folha', 'flores': 'flor', 'frutos': 'fruto'}
 
 

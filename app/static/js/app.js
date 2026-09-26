@@ -6,6 +6,7 @@
 //     + data-acao="/url" data-nome="texto"         (opcional) aponta o formulário do diálogo
 //                                                  ([data-form-acao]) para a url e escreve o
 //                                                  texto em [data-nome-alvo]: um diálogo serve a vários itens
+//     + data-detalhe="texto"                       (opcional) escreve o texto em [data-detalhe-alvo]
 //   data-fechar-dialogo                           fecha o diálogo em que está
 
 import { iniciarAplicativo } from './aplicativo.js';
@@ -29,6 +30,7 @@ document.addEventListener('click', (evento) => {
         if (dialogo && abrir.dataset.acao) {
             dialogo.querySelector('[data-form-acao]')?.setAttribute('action', abrir.dataset.acao);
             dialogo.querySelectorAll('[data-nome-alvo]').forEach((el) => { el.textContent = abrir.dataset.nome ?? ''; });
+            dialogo.querySelectorAll('[data-detalhe-alvo]').forEach((el) => { el.textContent = abrir.dataset.detalhe ?? ''; });
         }
         dialogo?.showModal();
     }

@@ -129,6 +129,16 @@
                         {{ c.botao('Tentar de novo', 'secundario', tipo='submit', icone_nome='processando') }}
                     </form>
                     {% endif %}
+                    {%- if motores_antigos.get(imagem.id) %}
+                    {%- set n_anotacoes = anotacoes_por_imagem.get(imagem.id, 0) %}
+                    <p class="texto-suave">Segmentada com o {{ nome_do_motor(motores_antigos[imagem.id]) }}.</p>
+                    <div>{{ c.botao('Segmentar de novo', 'secundario', icone_nome='processando', attrs={
+                        'data-abrir-dialogo': 'dialogo-segmentar', 'data-nome': imagem.nome_original,
+                        'data-acao': url_for('web.segmentar_de_novo', imagem_id=imagem.id),
+                        'data-detalhe': 'As ' ~ plural(n_regioes, 'região atual', 'regiões atuais') ~ ' desta foto serão substituídas'
+                                        ~ (' e ' ~ plural(n_anotacoes, 'anotação será perdida', 'anotações serão perdidas') if n_anotacoes else '') ~ '.',
+                        'aria-label': 'Segmentar de novo a foto ' ~ imagem.nome_original}) }}</div>
+                    {%- endif %}
                 </div>
                 {{ c.botao_icone('lixeira', 'Excluir a foto ' ~ imagem.nome_original, 'fantasma',
                                  attrs={'data-abrir-dialogo': 'dialogo-excluir',
@@ -174,6 +184,21 @@
         </form>
     </dialog>
     {% endif %}
+
+    <dialog class="dialogo" id="dialogo-segmentar" aria-labelledby="dialogo-segmentar-titulo">
+        <form method="post" data-form-acao>
+            {{ campo_csrf() }}
+            <div class="dialogo__corpo pilha pilha--pequena">
+                <h2 id="dialogo-segmentar-titulo">Segmentar "<span data-nome-alvo></span>" de novo?</h2>
+                <p>Agora com o {{ nome_do_motor(tipo.motor_padrao) }}. <span data-detalhe-alvo></span></p>
+                <p class="texto-suave">Regiões desenhadas à mão ou importadas não mudam.</p>
+            </div>
+            <div class="dialogo__acoes">
+                {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+                {{ c.botao('Segmentar de novo', tipo='submit', icone_nome='processando') }}
+            </div>
+        </form>
+    </dialog>
 
     <dialog class="dialogo" id="dialogo-excluir" aria-labelledby="dialogo-excluir-titulo">
         <form method="post" data-form-acao>

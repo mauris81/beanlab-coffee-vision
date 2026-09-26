@@ -1,0 +1,2 @@
+# Instalado com --no-deps (ver requirements-ia.txt e "Instalar IA.bat").
+ultralytics==8.4.163

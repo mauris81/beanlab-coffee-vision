@@ -92,7 +92,9 @@ def test_tipo_sem_motor_fica_pronto_sem_regioes(app):
 
 def test_falha_do_motor_vira_erro_visivel_e_nao_trava(app, monkeypatch):
     class MotorQuebrado:
-        nome, versao = 'classico', '9'
+        nome, versao, parametros = 'classico', '9', {}
+        def disponivel(self):
+            return True
         def segmentar(self, rgb):
             raise MemoryError('sem memória para esta foto')
     monkeypatch.setitem(pacote_segmentacao.MOTORES, 'classico', MotorQuebrado())

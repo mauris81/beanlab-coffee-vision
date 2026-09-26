@@ -5,7 +5,9 @@
 testpaths = ["tests"]
 # Testes de navegador (tests/navegador) são mais lentos e precisam do Chrome ou Edge:
 # rodam só com  pytest -m navegador
-addopts = "-m 'not navegador'"
+# Testes da IA de verdade precisam do "Instalar IA.bat" e levam minutos:  pytest -m ia
+addopts = "-m 'not navegador and not ia'"
 markers = [
     "navegador: abre as páginas num navegador de verdade (Playwright + Chrome/Edge)",
+    "ia: roda os modelos de IA de verdade (precisa do Instalar IA.bat)",
 ]

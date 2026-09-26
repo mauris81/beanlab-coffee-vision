@@ -14,13 +14,13 @@ from app.servicos.painel import Dia, Painel, fatias_do_tipo, montar_painel
 from app.web import web_bp
 from app.web.apresentacao import (
     apresentar_status, data_por_extenso, hora_local, icone, icone_do_tipo, itens_de_navegacao,
-    numero, plural, porcentagem,
+    nome_do_motor, numero, plural, porcentagem,
 )
 from app.web.identidade import pessoa_atual
 
 # Funções disponíveis em todos os templates.
 for _funcao in (icone, icone_do_tipo, apresentar_status, itens_de_navegacao, numero, plural,
-                porcentagem, data_por_extenso):
+                porcentagem, data_por_extenso, nome_do_motor):
     web_bp.add_app_template_global(_funcao)
 web_bp.add_app_template_filter(hora_local)
 
