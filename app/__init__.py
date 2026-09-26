@@ -4,6 +4,7 @@ Estrutura das pastas e responsabilidades: docs/ARQUITETURA.md
 """
 from flask import Flask
 
+from app import seguranca
 from app.config import Config, carregar_chave_secreta
 from app.extensions import db, migrate
 
@@ -16,6 +17,7 @@ def create_app(config: Config | None = None) -> Flask:
     app.config['PASTA_IMAGENS'].mkdir(parents=True, exist_ok=True)
     app.config['SECRET_KEY'] = carregar_chave_secreta(app.config['PASTA_DADOS'])
 
+    seguranca.instalar(app)
     db.init_app(app)
     # render_as_batch: o SQLite não altera colunas diretamente; o Alembic recria a tabela.
     migrate.init_app(app, db, directory=str(app.config['PASTA_MIGRACOES']), render_as_batch=True)

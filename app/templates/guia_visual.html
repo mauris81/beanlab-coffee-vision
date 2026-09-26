@@ -199,7 +199,7 @@
         <h2 id="t-formularios">Formulários</h2>
         <p class="texto-suave">Rótulo sempre visível acima do campo (nunca só o texto de exemplo).
            Erros dizem o que houve e como corrigir.</p>
-        <form class="formulario-exemplo" onsubmit="return false">
+        <form class="formulario-exemplo" data-exemplo-sem-envio>
             {{ c.campo('nome', 'Nome da coleta', dica='Algo que ajude a encontrar depois. Ex.: Talhão 3, março.') }}
             {{ c.campo('talhao', 'Talhão', erro='Informe o talhão ou marque "Não sei".', valor='') }}
             {{ c.campo('tipo', 'Tipo de amostra', tipo='select', opcoes=opcoes_tipos) }}

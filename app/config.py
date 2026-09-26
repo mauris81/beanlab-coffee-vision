@@ -28,6 +28,14 @@ class Config:
     # sites (proteção extra contra CSRF) e dura 90 dias.
     SESSION_COOKIE_SAMESITE = 'Lax'
     PERMANENT_SESSION_LIFETIME = timedelta(days=90)
+    # Além do bloqueio por conta (5 erros), um limite por endereço de internet:
+    # impede alguém de testar senhas em várias contas. Ver app/seguranca.py.
+    LOGIN_MAXIMO_POR_IP = 20
+    LOGIN_JANELA_POR_IP = timedelta(minutes=15)
+
+    # Endereço na internet (Tailscale Funnel), descoberto por run.py ao iniciar. Só para
+    # mostrar às pessoas (ex.: "para instalar, abra ..."); nada depende dele.
+    ENDERECO_PUBLICO = None
 
     PASTA_TAXONOMIAS = RAIZ_DO_PROJETO / 'taxonomias'
     PASTA_MIGRACOES = RAIZ_DO_PROJETO / 'migrations'

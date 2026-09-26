@@ -5,22 +5,41 @@
 
 {% block conteudo %}
 <div class="pilha pilha--grande">
-    {{ c.cabecalho_pagina(
+    {% call c.cabecalho_pagina(
         'Anotação de amostras de café',
         sobretitulo='BeanLab Coffee Vision',
         descricao='Fotografe, separe cada objeto da foto e diga o que ele é. '
-                  'As anotações viram dados para pesquisa e para treinar modelos.') }}
-
-    {% call c.alerta('info', 'A plataforma está sendo refeita') %}
-        <p>O banco de dados e o novo visual já estão prontos. O envio de fotos e a tela
-           de anotação chegam nas próximas etapas.</p>
+                  'As anotações viram dados para pesquisa e para treinar modelos.') %}
+        {{ c.botao('Nova coleta', href=url_for('web.nova_coleta'), icone_nome='mais') }}
+        {{ c.botao('Ver coletas', 'secundario', href=url_for('web.coletas'), icone_nome='lista') }}
     {% endcall %}
+
+    {#- Aparece só onde dá para instalar (js/aplicativo.js escolhe a explicação certa). -#}
+    <section class="cartao pilha" data-instalar hidden aria-labelledby="titulo-instalar">
+        <div class="cartao__cabecalho">
+            <span class="cartao__icone">{{ icone('instalar') }}</span>
+            <div>
+                <h2 id="titulo-instalar">Use como aplicativo no celular</h2>
+                <p class="texto-suave">Ícone na tela inicial, abre em tela cheia e guarda as fotos
+                   quando o sinal cai no campo.</p>
+            </div>
+        </div>
+        <div data-instalar-modo="botao" hidden>
+            {{ c.botao('Instalar o aplicativo', icone_nome='instalar', attrs={'data-instalar-agora': ''}) }}
+        </div>
+        <p data-instalar-modo="ios" hidden>No iPhone ou iPad: toque em <strong>Compartilhar</strong> e
+           depois em <strong>Adicionar à Tela de Início</strong>.</p>
+        {%- if config.ENDERECO_PUBLICO %}
+        <p data-instalar-modo="sem-https" hidden>Para instalar, abra no celular o endereço seguro:
+           <a href="{{ config.ENDERECO_PUBLICO }}">{{ config.ENDERECO_PUBLICO }}</a></p>
+        {%- endif %}
+    </section>
 
     <section class="pilha" aria-labelledby="titulo-tipos">
         <div>
             <h2 id="titulo-tipos">Tipos de amostra</h2>
             <p class="texto-suave">As classes de cada tipo vêm da pasta <code>taxonomias/</code>.
-               As teclas indicam o atalho que será usado na hora de anotar.</p>
+               As teclas são os atalhos na hora de anotar.</p>
         </div>
 
         {% if tipos %}

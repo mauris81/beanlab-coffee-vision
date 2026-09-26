@@ -19,6 +19,9 @@ from app.web.identidade import pessoa_atual
 from app.web.paginas import tipos_de_amostra
 
 MODOS_DE_ENVIO = ('fotos', 'recortes', 'coco')
+# Pela fila do celular (fotos guardadas sem sinal) cada arquivo vai sozinho; COCO precisa
+# das fotos junto com o .json, então não entra na fila.
+MODOS_DA_FILA = ('fotos', 'recortes')
 
 
 def _coleta_ou_404(coleta_id: int) -> Coleta:
@@ -31,6 +34,12 @@ def _voltar_para(url: str):
     if request.headers.get('X-Envio-Via') == 'js':
         return {'destino': url}
     return redirect(url)
+
+
+def _via_fila() -> bool:
+    """Envio feito pela fila de fotos guardadas no celular (static/js/fila-fotos.js).
+    A fila mostra o resultado ela mesma: resposta em JSON, sem mensagens na sessão."""
+    return request.headers.get('X-Envio-Via') == 'fila'
 
 
 # --------------------------------------------------------------------- listar
@@ -106,9 +115,12 @@ def coleta(coleta_id):
 def enviar_fotos(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     modo = request.form.get('modo', 'fotos')
-    if modo not in MODOS_DE_ENVIO:
-        abort(400)
     arquivos = [a for a in request.files.getlist('arquivos') if a and a.filename]
+    if _via_fila():
+        if modo not in MODOS_DA_FILA or not arquivos:
+            return {'erro': 'Envio incompleto: guarde a foto de novo.'}, 400
+    elif modo not in MODOS_DE_ENVIO:
+        abort(400)
     if not arquivos:
         flash('Nenhum arquivo foi escolhido.', 'aviso')
         return _voltar_para(url_for('web.coleta', coleta_id=coleta.id) + '#enviar')
@@ -135,6 +147,9 @@ def enviar_fotos(coleta_id):
     jobs = [agendar_segmentacao(r.imagem) for r in resultados if r.situacao == 'nova']
     db.session.commit()
     fila().enviar([j.id for j in jobs if j is not None])
+    if _via_fila():
+        return {'resultados': [{'nome': r.nome_arquivo, 'situacao': r.situacao, 'mensagem': r.mensagem}
+                               for r in resultados]}
     _avisar_resultado(resultados, segmentando=any(jobs))
     return _voltar_para(url_for('web.coleta', coleta_id=coleta.id) + '#fotos')
 

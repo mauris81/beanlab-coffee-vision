@@ -78,7 +78,9 @@ REGRAS_WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 def violacoes_wcag(pagina) -> str:
     """Roda o axe-core na página aberta; devolve '' se não houver problemas."""
-    pagina.add_script_tag(content=AXE)
+    # evaluate (e não uma tag <script>): a política de segurança da plataforma bloqueia,
+    # com razão, qualquer script embutido na página, inclusive o de um teste.
+    pagina.evaluate(AXE)
     resultado = pagina.evaluate(
         '(regras) => axe.run(document, {runOnly: {type: "tag", values: regras}})', REGRAS_WCAG)
     linhas = []
@@ -126,6 +128,9 @@ def abrir(navegador, endereco, sessoes):
         pagina = contexto.new_page()
         pagina.erros_js = []
         pagina.on('pageerror', lambda erro: pagina.erros_js.append(str(erro)))
+        # Algo bloqueado pela política de segurança (CSP) também conta como erro.
+        pagina.on('console', lambda mensagem: pagina.erros_js.append(mensagem.text)
+                  if 'Content Security Policy' in mensagem.text else None)
         pagina.goto(endereco + caminho, wait_until='networkidle')
         return pagina
 

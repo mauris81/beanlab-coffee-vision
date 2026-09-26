@@ -33,3 +33,8 @@ function atualizar() {
 document.addEventListener('tema-alterado', () => requestAnimationFrame(atualizar));
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', atualizar);
 atualizar();
+
+// Formulário de exemplo: mostra os campos, mas não envia nada.
+document.querySelectorAll('[data-exemplo-sem-envio]').forEach((formulario) => {
+    formulario.addEventListener('submit', (evento) => evento.preventDefault());
+});

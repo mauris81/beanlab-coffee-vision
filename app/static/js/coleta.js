@@ -1,12 +1,17 @@
 // Página da coleta: envio de fotos com barra de progresso e status que se atualiza
 // sozinho durante a segmentação. Sem JavaScript, o formulário continua funcionando
 // (envio normal) e o status aparece ao recarregar a página.
+//
+// Sem sinal (ou se a pessoa preferir não esperar), as fotos ficam guardadas no celular
+// (fila-fotos.js) e sobem sozinhas quando a conexão voltar.
 
 import { avisar } from './avisos.js';
+import { guardarFotos } from './fila-fotos.js';
 
 const pagina = document.getElementById('pagina-coleta');
 const LIMITE_BYTES = 100 * 1024 * 1024;
 const INTERVALO_MS = 2000;
+const MODOS_DA_FILA = ['fotos', 'recortes'];  // COCO precisa ir tudo junto: não entra na fila
 
 const formatarMB = (bytes) => `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
 
@@ -31,9 +36,32 @@ function atualizarResumo(formulario) {
     }
 }
 
+// ------------------------------------------------------------ guardar no celular
+
+/** Guarda os arquivos escolhidos na fila do celular. Devolve false se não deu. */
+async function guardarNoCelular(formulario, motivo) {
+    const arquivos = arquivosEscolhidos(formulario);
+    const modo = new FormData(formulario).get('modo') ?? 'fotos';
+    if (!MODOS_DA_FILA.includes(modo)) return false;
+    try {
+        await guardarFotos(arquivos, {
+            coletaId: Number(pagina.dataset.coleta), coletaNome: pagina.dataset.coletaNome,
+            envio: formulario.action, modo,
+        });
+    } catch {
+        return false;  // navegador sem espaço ou sem IndexedDB
+    }
+    formulario.querySelectorAll('[data-arquivos]').forEach((entrada) => { entrada.value = ''; });
+    atualizarResumo(formulario);
+    const quantas = arquivos.length === 1 ? 'A foto ficou guardada' : `As ${arquivos.length} fotos ficaram guardadas`;
+    avisar(`${motivo} ${quantas} no celular e sobe${arquivos.length === 1 ? '' : 'm'} sozinha${arquivos.length === 1 ? '' : 's'} quando a conexão voltar.`,
+        { tipo: 'sucesso', duracao: 10000 });
+    return true;
+}
+
 // ------------------------------------------------------------ envio com progresso
 
-function enviar(formulario, evento) {
+async function enviar(formulario, evento) {
     const arquivos = arquivosEscolhidos(formulario);
     if (!arquivos.length) {
         evento.preventDefault();
@@ -46,14 +74,20 @@ function enviar(formulario, evento) {
         return;
     }
     evento.preventDefault();
+    if (!navigator.onLine && await guardarNoCelular(formulario, 'Sem sinal agora.')) return;
 
     const botao = formulario.querySelector('button[type="submit"]');
     const caixa = formulario.querySelector('[data-progresso-envio]');
     const trilho = caixa.querySelector('[role="progressbar"]');
     const barra = caixa.querySelector('.progresso__barra');
     const texto = caixa.querySelector('[data-progresso-texto]');
+    const guardar = caixa.querySelector('[data-guardar-no-celular]');
     botao.setAttribute('aria-busy', 'true');
     caixa.hidden = false;
+    const terminar = () => {
+        botao.removeAttribute('aria-busy');
+        caixa.hidden = true;
+    };
 
     const pedido = new XMLHttpRequest();
     pedido.open('POST', formulario.action);
@@ -68,6 +102,15 @@ function enviar(formulario, evento) {
         trilho.setAttribute('aria-valuenow', String(pct));
         texto.textContent = pct < 100 ? `${pct}%` : 'Processando…';
     });
+    // Sinal fraco: a pessoa pode desistir de esperar e deixar as fotos para depois.
+    guardar.onclick = async () => {
+        pedido.abort();
+        terminar();
+        if (!await guardarNoCelular(formulario, 'Envio interrompido.')) {
+            avisar('Não foi possível guardar no celular. Tente enviar de novo.', { tipo: 'perigo' });
+        }
+    };
+    guardar.hidden = !MODOS_DA_FILA.includes(new FormData(formulario).get('modo') ?? 'fotos');
     pedido.addEventListener('load', () => {
         if (pedido.status < 400 && pedido.response?.destino) {
             const destino = new URL(pedido.response.destino, window.location.href);
@@ -79,16 +122,19 @@ function enviar(formulario, evento) {
             }
             return;
         }
-        botao.removeAttribute('aria-busy');
-        caixa.hidden = true;
-        avisar(pedido.status === 413
-            ? 'O envio ficou grande demais. Envie as fotos em partes menores.'
-            : 'Não foi possível enviar. Confira a conexão e tente de novo.', { tipo: 'perigo' });
+        terminar();
+        const mensagens = {
+            401: 'Sua sessão terminou. Recarregue a página e entre de novo; as fotos escolhidas continuam aqui.',
+            413: 'O envio ficou grande demais. Envie as fotos em partes menores.',
+        };
+        avisar(mensagens[pedido.status] ?? pedido.response?.erro ?? 'Não foi possível enviar. Tente de novo.',
+            { tipo: 'perigo' });
     });
-    pedido.addEventListener('error', () => {
-        botao.removeAttribute('aria-busy');
-        caixa.hidden = true;
-        avisar('Sem conexão com a plataforma. Confira o Wi-Fi e tente de novo; nada foi perdido.', { tipo: 'perigo' });
+    pedido.addEventListener('error', async () => {
+        terminar();
+        if (!await guardarNoCelular(formulario, 'Sem conexão com a plataforma.')) {
+            avisar('Sem conexão com a plataforma. Confira o sinal e tente de novo; nada foi perdido.', { tipo: 'perigo' });
+        }
     });
     pedido.send(new FormData(formulario));
 }
@@ -160,4 +206,17 @@ if (pagina) {
     if (Number(pagina.dataset.pendentes) > 0) {
         setTimeout(acompanharSegmentacao, INTERVALO_MS);
     }
+
+    // Fotos guardadas no celular acabaram de subir para esta coleta: mostra na página.
+    document.addEventListener('fila:enviadas', ({ detail }) => {
+        if (!detail.enviadas.some((foto) => foto.coletaId === Number(pagina.dataset.coleta))) return;
+        // Espera um pouco para dar tempo de ler o aviso; nunca recarrega no meio de algo.
+        setTimeout(() => {
+            if (pessoaOcupada()) {
+                avisar('Atualize a página quando quiser para ver as fotos que subiram.', { tipo: 'info' });
+            } else {
+                window.location.reload();
+            }
+        }, 2500);
+    });
 }

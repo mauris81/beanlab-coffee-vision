@@ -1,7 +1,7 @@
 // Tema claro/escuro.
 // Padrão: segue o aparelho. Depois que a pessoa escolhe no botão, a escolha fica
-// guardada neste navegador (localStorage). O <head> de base.html aplica a escolha
-// antes de a página aparecer, para não "piscar".
+// guardada neste navegador (localStorage). tema-inicial.js (no <head> de base.html)
+// aplica a escolha antes de a página aparecer, para não "piscar".
 
 const CHAVE = 'tema';
 const consultaEscuro = window.matchMedia('(prefers-color-scheme: dark)');

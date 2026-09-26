@@ -1,7 +1,8 @@
 """Quem está usando a plataforma: login, primeiro acesso, minha conta, e proteção CSRF.
 
-PORTA DE ENTRADA (proteger_paginas): toda página exige login, menos as da lista
-PAGINAS_PUBLICAS. Assim uma página nova nasce protegida, sem precisar lembrar.
+PORTA DE ENTRADA (proteger_paginas): toda página exige login, menos as das listas
+PAGINAS_PUBLICAS e SEMPRE_LIBERADAS. Assim uma página nova nasce protegida, sem
+precisar lembrar. Pedidos do JavaScript recebem erros em JSON (pedido_do_javascript).
 Enquanto não existir administrador, tudo leva para "Primeiro acesso".
 
 CSRF: todo formulário que muda dados leva um código secreto da sessão
@@ -18,6 +19,7 @@ from markupsafe import Markup
 
 from app.dominio import Pessoa
 from app.extensions import db
+from app.seguranca import endereco_de_quem_pede, limite_de_login
 from app.servicos.contas import (
     ContaInvalida, FalhaDeLogin, autenticar, codigo_de_primeiro_acesso, criar_primeiro_administrador,
     existe_administrador, trocar_senha,
@@ -25,6 +27,10 @@ from app.servicos.contas import (
 from app.web import web_bp
 
 PAGINAS_PUBLICAS = {'web.entrar', 'web.primeiro_acesso'}
+# Liberadas sempre, até antes de existir administração: arquivos estáticos, o teste de
+# conexão e as peças do aplicativo que o celular guarda para usar sem sinal (sem dados
+# de ninguém: a página "Fotos no celular" lê as fotos do próprio aparelho).
+SEMPRE_LIBERADAS = {'static', 'api.saude', 'web.service_worker', 'web.fotos_no_celular'}
 # Com senha provisória, só dá para trocar a senha (ou sair).
 PERMITIDAS_COM_SENHA_PROVISORIA = {'web.minha_conta', 'web.sair', 'static'}
 
@@ -61,6 +67,12 @@ def _iniciar_sessao(pessoa: Pessoa) -> None:
     session.permanent = True  # continua conectado no celular, como um aplicativo
 
 
+def pedido_do_javascript() -> bool:
+    """O pedido veio do JavaScript (API, envio com barra de progresso ou fila de fotos)?
+    Nesses casos erros voltam em JSON, nunca como página ou redirecionamento."""
+    return request.blueprint == 'api' or bool(request.headers.get('X-Envio-Via'))
+
+
 def _destino_seguro(endereco: str | None) -> str:
     """Só aceita endereços desta plataforma (evita redirecionar para outro site)."""
     if endereco and endereco.startswith('/') and not endereco.startswith('//') \
@@ -74,7 +86,7 @@ def _destino_seguro(endereco: str | None) -> str:
 @web_bp.before_app_request
 def proteger_paginas():
     endpoint = request.endpoint
-    if endpoint in ('static', 'api.saude'):
+    if endpoint in SEMPRE_LIBERADAS:
         return None
     if not existe_administrador():  # plataforma recém-instalada
         return None if endpoint == 'web.primeiro_acesso' else redirect(url_for('web.primeiro_acesso'))
@@ -83,12 +95,12 @@ def proteger_paginas():
 
     pessoa = pessoa_atual()
     if pessoa is None:
-        if request.blueprint == 'api':
+        if pedido_do_javascript():
             return {'erro': 'Sua sessão terminou. Entre de novo (recarregue a página).'}, 401
         destino = request.full_path.rstrip('?') if request.method == 'GET' else None
         return redirect(url_for('web.entrar', proximo=destino))
     if pessoa.precisa_trocar_senha and endpoint not in PERMITIDAS_COM_SENHA_PROVISORIA:
-        if request.blueprint == 'api':
+        if pedido_do_javascript():
             return {'erro': 'Troque a senha provisória antes de continuar.'}, 403
         return redirect(url_for('web.minha_conta'))
     return None
@@ -101,10 +113,14 @@ def entrar():
     proximo = request.values.get('proximo')
     erro = None
     if request.method == 'POST':
+        if limite_de_login().excedido(endereco_de_quem_pede()):
+            return _muitas_tentativas('entrar.html', proximo=proximo,
+                                      usuario=request.form.get('usuario', ''))
         try:
             pessoa = autenticar(request.form.get('usuario', ''), request.form.get('senha', ''))
         except FalhaDeLogin as falha:
             db.session.commit()  # registra a tentativa errada (conta para o bloqueio)
+            limite_de_login().registrar(endereco_de_quem_pede())
             erro = str(falha)
         else:
             db.session.commit()
@@ -117,6 +133,13 @@ def entrar():
         return redirect(_destino_seguro(proximo))
     return render_template('entrar.html', proximo=proximo, erro=erro,
                            usuario=request.form.get('usuario', '')), (401 if erro else 200)
+
+
+def _muitas_tentativas(template, **contexto):
+    minutos = int(current_app.config['LOGIN_JANELA_POR_IP'].total_seconds() // 60)
+    erro = (f'Muitas tentativas erradas a partir desta conexão. Espere {minutos} minutos e '
+            'tente de novo. Se esqueceu a senha, peça uma nova à administração.')
+    return render_template(template, erro=erro, **contexto), 429
 
 
 @web_bp.post('/sair')
@@ -135,6 +158,8 @@ def primeiro_acesso():
         return redirect(url_for('web.entrar'))
     erro = None
     if request.method == 'POST':
+        if limite_de_login().excedido(endereco_de_quem_pede()):
+            return _muitas_tentativas('primeiro_acesso.html', dados=request.form)
         senha, confirmacao = request.form.get('senha', ''), request.form.get('confirmacao', '')
         try:
             if senha != confirmacao:
@@ -143,6 +168,7 @@ def primeiro_acesso():
                                                   request.form.get('nome', ''),
                                                   request.form.get('usuario', ''), senha)
         except ContaInvalida as problema:
+            limite_de_login().registrar(endereco_de_quem_pede())  # protege o código de adivinhação
             erro = str(problema)
         else:
             db.session.commit()
@@ -193,7 +219,10 @@ def conferir_csrf():
         return
     enviado = request.form.get('_csrf') or request.headers.get('X-CSRF')
     if not enviado or not secrets.compare_digest(enviado, session.get('_csrf', '')):
-        abort(400, 'Formulário expirado ou inválido. Recarregue a página e tente de novo.')
+        mensagem = 'Formulário expirado ou inválido. Recarregue a página e tente de novo.'
+        if pedido_do_javascript():
+            return {'erro': mensagem, 'motivo': 'csrf'}, 400
+        abort(400, mensagem)
 
 
 web_bp.add_app_template_global(pessoa_atual)

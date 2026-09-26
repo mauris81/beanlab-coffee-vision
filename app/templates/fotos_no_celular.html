@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+{#- Página genérica: fica guardada no celular e abre sem sinal (ver app/web/aplicativo.py).
+    Nada aqui vem do banco; tudo o que muda é preenchido por js/fotos-no-celular.js,
+    a partir das fotos e da lista de coletas guardadas no próprio aparelho. -#}
+{% set pagina_generica = true %}
+
+{% block titulo %}Fotos no celular · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande" id="pagina-fotos-no-celular"
+     data-endereco="{{ url_for('web.fotos_no_celular') }}"
+     data-saude="{{ url_for('api.saude') }}">
+
+    {% call c.cabecalho_pagina('Fotos no celular',
+            descricao='Sem sinal no campo? Continue fotografando. As fotos ficam guardadas neste '
+                      'aparelho e sobem sozinhas para a plataforma quando a conexão voltar.') %}
+        {{ c.botao('Ir para a plataforma', 'secundario', href=url_for('web.inicio'), icone_nome='inicio') }}
+    {% endcall %}
+
+    {#- Situação da conexão: o JavaScript mostra só uma destas. -#}
+    <div data-conexao="verificando">
+        {% call c.alerta('info') %}<p>Verificando a conexão com a plataforma…</p>{% endcall %}
+    </div>
+    <div data-conexao="outra-pagina" hidden>
+        {% call c.alerta('aviso', 'Sem conexão com a plataforma') %}
+            <p>A página que você abriu precisa de internet. Enquanto isso, você pode fotografar
+               aqui: as fotos sobem quando o sinal voltar.</p>
+            <p>{{ c.botao('Tentar abrir de novo', 'secundario', icone_nome='processando', attrs={'data-recarregar': ''}) }}</p>
+        {% endcall %}
+    </div>
+    <div data-conexao="sem-sinal" hidden>
+        {% call c.alerta('info', 'Sem conexão agora') %}
+            <p>Tudo bem: as fotos tiradas aqui ficam guardadas no celular.</p>
+        {% endcall %}
+    </div>
+    <div data-conexao="voltou" hidden>
+        {% call c.alerta('sucesso', 'A conexão voltou') %}
+            <p>As fotos guardadas sobem agora.</p>
+            <p>{{ c.botao('Abrir a página que você pediu', icone_nome='seta-direita', icone_depois=True, attrs={'data-recarregar': ''}) }}</p>
+        {% endcall %}
+    </div>
+    <div data-conexao="conectado" hidden>
+        {% call c.alerta('sucesso', 'Conectado à plataforma') %}
+            <p>Com sinal, as fotos sobem na hora.</p>
+        {% endcall %}
+    </div>
+
+    {# ------------------------------------------------------------ fotografar #}
+    <section class="cartao pilha" aria-labelledby="titulo-fotografar">
+        <h2 id="titulo-fotografar">Fotografar</h2>
+
+        <div data-aviso-fotografar="sem-pessoa" hidden>
+            {% call c.alerta('aviso', 'Entre na plataforma primeiro') %}
+                <p>Com sinal, entre com seu usuário uma vez neste celular. Assim as fotos
+                   guardadas ficam no seu nome.</p>
+                <p><a href="{{ url_for('web.entrar') }}">Entrar</a></p>
+            {% endcall %}
+        </div>
+        <div data-aviso-fotografar="sem-coletas" hidden>
+            {% call c.alerta('aviso', 'Nenhuma coleta guardada neste celular') %}
+                <p>Crie a coleta antes de ir para o campo e abra a plataforma com sinal: a lista
+                   de coletas fica guardada no celular para usar aqui.</p>
+            {% endcall %}
+        </div>
+
+        <form class="pilha" data-fotografar hidden>
+            {{ c.campo('coleta', 'Para qual coleta?', tipo='select', opcoes=[('', 'Escolha a coleta…')],
+                       dica='A lista é a última que este celular recebeu com sinal.') }}
+            <div class="escolha-arquivos">
+                <label class="envio">
+                    {{ icone('camera') }}
+                    <span class="envio__titulo">Tirar foto</span>
+                    <span class="texto-suave">Abre a câmera do celular</span>
+                    <input type="file" accept="image/*" capture="environment" multiple data-arquivos>
+                </label>
+                <label class="envio">
+                    {{ icone('imagem') }}
+                    <span class="envio__titulo">Escolher da galeria</span>
+                    <span class="texto-suave">Várias de uma vez</span>
+                    <input type="file" accept="image/*" multiple data-arquivos>
+                </label>
+            </div>
+            <p class="texto-suave">Cada foto é guardada assim que você a tira.</p>
+        </form>
+    </section>
+
+    {# -------------------------------------------------------------- guardadas #}
+    <section class="pilha" aria-labelledby="titulo-guardadas">
+        <div class="linha linha--entre">
+            <h2 id="titulo-guardadas">Guardadas neste celular <span data-total></span></h2>
+            {{ c.botao('Enviar agora', icone_nome='enviar', attrs={'data-enviar-agora': '', 'hidden': true}) }}
+        </div>
+        <p class="texto-suave" data-andamento aria-live="polite"></p>
+
+        <ul class="grade-fotos" data-lista></ul>
+        <div data-vazio>
+            {{ c.vazio('Nenhuma foto guardada', 'Tudo o que foi fotografado neste celular já subiu para a plataforma.', 'check') }}
+        </div>
+        <p class="texto-suave" data-de-outras-contas hidden></p>
+
+        <template data-modelo-foto>
+            <li class="foto">
+                <div class="foto__imagem"><img alt="" width="240" height="180"></div>
+                <div class="foto__info">
+                    <span class="foto__nome" data-nome></span>
+                    <span class="texto-suave" data-coleta></span>
+                    <span data-situacao></span>
+                    <a class="foto__salvar" data-salvar hidden>Salvar no aparelho</a>
+                </div>
+                {{ c.botao_icone('lixeira', 'Excluir foto guardada', 'fantasma', attrs={'data-excluir': ''}) }}
+            </li>
+        </template>
+    </section>
+
+    <dialog class="dialogo" id="dialogo-excluir-guardada" aria-labelledby="dialogo-excluir-guardada-titulo">
+        <div class="dialogo__corpo">
+            <h2 id="dialogo-excluir-guardada-titulo">Excluir a foto "<span data-nome-alvo></span>"?</h2>
+            <p class="texto-suave">Ela ainda não subiu para a plataforma: excluindo aqui, ela se perde.</p>
+        </div>
+        <div class="dialogo__acoes">
+            {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+            {{ c.botao('Excluir foto', 'perigo', attrs={'data-confirmar-exclusao': ''}) }}
+        </div>
+    </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/fotos-no-celular.js') }}"></script>
+{% endblock %}

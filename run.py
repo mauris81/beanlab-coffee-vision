@@ -5,7 +5,11 @@ Jeito mais fácil: dois cliques em "Iniciar BeanLab.bat".
 Pelo terminal (celulares na mesma rede Wi-Fi conseguem acessar):
     python run.py
 
-No modo normal usa o servidor waitress, feito para vários celulares ao mesmo tempo.
+No modo normal usa o servidor waitress, feito para vários celulares ao mesmo tempo,
+e o PC não suspende sozinho enquanto a janela estiver aberta.
+
+Na internet (fora do Wi-Fi): "Publicar na internet.bat" liga o Tailscale Funnel, que
+repassa os acessos para este servidor. Ver docs/PUBLICACAO.md.
 
 Modo desenvolvimento (servidor do Flask: recarrega ao salvar e mostra erros
 detalhados, mas só aceita conexões deste computador):
@@ -24,6 +28,7 @@ import webbrowser
 
 from app import create_app
 from app.cli import descrever_resumo
+from app.publicacao import endereco_publico, manter_pc_acordado
 from app.servicos.banco import preparar_banco
 from app.servicos.contas import codigo_de_primeiro_acesso
 from app.servicos.taxonomias import TaxonomiaInvalida
@@ -64,6 +69,7 @@ if __name__ == '__main__':
     # Por isso, com debug ligado, o servidor fica restrito a este computador.
     host = '127.0.0.1' if debug else '0.0.0.0'
     port = int(os.environ.get('CAFE_PORT', '5000'))
+    app.config['ENDERECO_PUBLICO'] = publico = endereco_publico(port)
 
     # Com debug, o Flask reinicia o script num segundo processo; a mensagem e o
     # navegador só devem aparecer uma vez.
@@ -87,6 +93,10 @@ if __name__ == '__main__':
         print(f'  {"Neste computador:":<28} http://127.0.0.1:{port}')
         if ip and not debug:
             print(f'  {"Nos celulares (mesmo Wi-Fi):":<28} http://{ip}:{port}')
+        if publico and not debug:
+            print(f'  {"Na internet (qualquer lugar):":<28} {publico}')
+        elif publico:
+            print('  Na internet: desligado no modo desenvolvimento (por segurança).')
         print('  Para desligar, feche esta janela (ou Ctrl+C).')
         print()
         with app.app_context():
@@ -110,4 +120,5 @@ if __name__ == '__main__':
         app.run(debug=True, host=host, port=port)
     else:
         from waitress import serve
+        manter_pc_acordado()
         serve(app, host=host, port=port, threads=8)

@@ -51,7 +51,7 @@ def test_anotar_pelo_teclado_com_duvida_e_desfazer(abrir, coleta_pronta):
     pagina.keyboard.press('3')  # Ardido
     assert pagina.inner_text('[data-legenda]').startswith(f'Região 2 de {total}')
     assert 'Região 1: Ardido.' in pagina.inner_text('[data-ultima]')
-    pagina.wait_for_function(f"document.querySelector('[data-progresso] strong').textContent.startsWith('1 de {total}')")
+    pagina.wait_for_function(f"() => document.querySelector('[data-progresso] strong').textContent.startsWith('1 de {total}')")
 
     pagina.keyboard.press('d')  # dúvida
     assert pagina.is_checked('[data-duvida]')
@@ -60,8 +60,8 @@ def test_anotar_pelo_teclado_com_duvida_e_desfazer(abrir, coleta_pronta):
     assert pagina.inner_text('[data-legenda]').startswith(f'Região 3 de {total}')
 
     pagina.keyboard.press('z')  # desfaz a região 2
-    pagina.wait_for_function("document.querySelector('[data-legenda]').textContent.startsWith('Região 2 ')")
-    pagina.wait_for_function(f"document.querySelector('[data-progresso] strong').textContent.startsWith('1 de {total}')")
+    pagina.wait_for_function("() => document.querySelector('[data-legenda]').textContent.startsWith('Região 2 ')")
+    pagina.wait_for_function(f"() => document.querySelector('[data-progresso] strong').textContent.startsWith('1 de {total}')")
     assert pagina.get_attribute('[data-classe="sem_defeito"]', 'aria-pressed') == 'false'
 
     pagina.keyboard.press('ArrowLeft')  # volta para a 1: continua Ardido

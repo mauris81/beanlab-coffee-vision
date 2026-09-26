@@ -8,10 +8,12 @@
 //                                                  texto em [data-nome-alvo]: um diálogo serve a vários itens
 //   data-fechar-dialogo                           fecha o diálogo em que está
 
+import { iniciarAplicativo } from './aplicativo.js';
 import { avisar } from './avisos.js';
 import { iniciarAlternadorDeTema } from './tema.js';
 
 iniciarAlternadorDeTema(document.getElementById('alternar-tema'));
+iniciarAplicativo();
 
 document.addEventListener('click', (evento) => {
     const alvo = evento.target;

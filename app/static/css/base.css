@@ -264,6 +264,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .pilha--grande { gap: var(--espaco-7); }
 .pilha--pequena { gap: var(--espaco-2); }
 .linha { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-3); }
+.linha--entre { justify-content: space-between; }
 .grade {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
@@ -271,6 +272,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .grade--larga { grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); }
 .texto-suave { color: var(--cor-texto-suave); }
+.texto-perigo { color: var(--cor-perigo); }
 .texto-centro { text-align: center; margin-inline: auto; }
 
 /* Botão de tema: mostra a lua no tema claro (vai para o escuro) e o sol no escuro. */

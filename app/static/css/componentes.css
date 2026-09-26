@@ -394,6 +394,7 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 
 /* --- Grade de fotos --------------------------------------------------------- */
 .grade-fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--espaco-4); margin: 0; padding: 0; list-style: none; }
+.grade-fotos:empty { display: none; }
 .foto {
     position: relative;
     display: flex; flex-direction: column;
@@ -412,6 +413,23 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 .foto__erro summary { cursor: pointer; color: var(--cor-perigo); font-size: var(--texto-sm); font-weight: var(--peso-medio); min-height: 32px; }
 .foto__erro code { display: block; margin-top: var(--espaco-2); white-space: pre-wrap; word-break: break-word; font-size: var(--texto-xs); }
 .linha--compacta { gap: var(--espaco-2); }
+.foto__salvar { align-self: flex-start; font-size: var(--texto-sm); font-weight: var(--peso-medio); padding-block: var(--espaco-1); }
+
+/* --- Faixa "fotos guardadas no celular" (preenchida por js/aplicativo.js) ---- */
+.faixa-fila { margin-bottom: var(--espaco-5); }
+.faixa-fila__link {
+    display: flex; align-items: center; gap: var(--espaco-3);
+    min-height: var(--alvo-toque);
+    padding: var(--espaco-2) var(--espaco-4);
+    border: 1px solid var(--cor-info);
+    border-radius: var(--raio-md);
+    background: var(--cor-info-suave);
+    color: var(--cor-texto);
+    font-weight: var(--peso-medio);
+    text-decoration: none;
+}
+.faixa-fila__link:hover { border-color: var(--cor-primaria); }
+.faixa-fila__link .icone { width: 22px; height: 22px; flex: none; color: var(--cor-info); }
 
 /* --- Filtros (links em pílula) --------------------------------------------- */
 .filtros { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin: 0; padding: 0; list-style: none; }
