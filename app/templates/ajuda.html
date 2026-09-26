@@ -9,7 +9,7 @@
 
 {% set secoes = [
     ('comecar', 'Primeiros passos'), ('fotografar', 'Coletar e fotografar'), ('sem-sinal', 'Sem sinal no campo'),
-    ('anotar', 'Anotar'), ('painel', 'Painel'), ('corrigir', 'Corrigir enganos'),
+    ('anotar', 'Anotar'), ('marcar', 'Marcar na foto'), ('painel', 'Painel'), ('corrigir', 'Corrigir enganos'),
     ('administracao', 'Para a administração'), ('perguntas', 'Perguntas frequentes'),
 ] %}
 
@@ -60,7 +60,8 @@
                     azul</strong> (a própria página da coleta diz qual é o caso).</li>
             </ul>
         {% endcall %}
-        <p class="texto-suave">Folhas, flores e frutos ainda não são separados sozinhos: por enquanto, envie
+        <p class="texto-suave">Folhas, flores e frutos ainda não são separados sozinhos: envie a foto inteira
+           e marque cada objeto com um toque (veja <a href="#marcar">Marcar na foto</a>), ou envie
            <strong>recortes prontos</strong> (um objeto por arquivo) ou um conjunto COCO.</p>
     </section>
 
@@ -108,6 +109,27 @@
     </section>
 
     {# ------------------------------------------------------------------ #}
+    <section id="marcar" class="cartao pilha" aria-labelledby="t-marcar">
+        <h2 id="t-marcar">Marcar na foto</h2>
+        <p>Para marcar objetos que a plataforma não separou sozinha (flores numa foto da planta, um grão que
+           faltou) e para excluir regiões erradas. No cartão da foto, toque em <strong>Marcar na foto</strong>.</p>
+        <ol class="ajuda__passos">
+            <li><strong>Aproxime</strong> com dois dedos (ou os botões + e −) e arraste para chegar ao objeto.</li>
+            <li><strong>Toque bem no meio do objeto.</strong> Aparece um contorno tracejado amarelo. A primeira vez
+                em cada parte da foto leva alguns segundos.</li>
+            <li>Se o contorno pegou pouco ou muito (uma pétala, o cacho inteiro), use <strong>Menor</strong> ou
+                <strong>Maior</strong>.</li>
+            <li><strong>Toque na classe.</strong> Pronto: a região está salva e anotada. Siga para o próximo objeto.</li>
+        </ol>
+        <ul class="ajuda__lista">
+            <li>Tocar num contorno já marcado seleciona a região: dá para trocar a classe ou <strong>Excluir região</strong>.</li>
+            <li>No computador: setas movem a foto, + e − aproximam, Enter marca o que está na mira do centro, e as
+                teclas das classes funcionam.</li>
+            <li>Marcar com um toque precisa da IA instalada no PC da plataforma.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
     <section id="painel" class="cartao pilha" aria-labelledby="t-painel">
         <h2 id="t-painel">Painel (página inicial)</h2>
         <ul class="ajuda__lista">
@@ -126,8 +148,9 @@
             <li><strong>Classe errada:</strong> volte à região e escolha a certa. A anterior fica no histórico.</li>
             <li><strong>Acabou de errar:</strong> <strong>Desfazer</strong> ({{ c.tecla('Z') }}) apaga a sua última anotação.</li>
             <li><strong>Foto errada:</strong> a lixeira no cartão da foto a exclui, com as regiões e anotações dela.</li>
-            <li><strong>Região errada</strong> (dois grãos numa região só, pedaço de fundo): marque dúvida e explique
-                na observação. Editar contornos na tela ainda não é possível.</li>
+            <li><strong>Região errada</strong> (dois grãos numa região só, pedaço de fundo): em <strong>Marcar na
+                foto</strong>, toque no contorno, <strong>Excluir região</strong>, e marque o objeto certo com um toque.</li>
+            <li><strong>Faltou um objeto:</strong> em <strong>Marcar na foto</strong>, toque nele.</li>
             <li><strong>Segmentar de novo:</strong> aparece em fotos feitas por um motor antigo. Substitui as regiões
                 automáticas; o aviso diz quantas anotações se perdem.</li>
             <li><strong>Coleta criada por engano:</strong> no fim da página da coleta, <strong>Excluir coleta</strong>.

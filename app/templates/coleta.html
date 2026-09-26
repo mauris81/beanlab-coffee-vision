@@ -48,7 +48,7 @@
             {% call c.alerta('info', tipo.nome ~ ' ainda não têm segmentação automática') %}
                 <p>Ela chega numa próxima etapa. Por enquanto, envie <strong>recortes prontos</strong>
                    (um objeto por arquivo) ou um <strong>conjunto COCO</strong>. Fotos inteiras também
-                   são aceitas, mas ficam sem regiões.</p>
+                   são aceitas: marque cada objeto com um toque em <strong>Marcar na foto</strong>.</p>
             {% endcall %}
         {% endif %}
 
@@ -59,7 +59,7 @@
                 <legend class="campo__rotulo">O que você vai enviar?</legend>
                 <div class="opcoes-cartao opcoes-cartao--lista">
                     {% for valor, titulo, texto in [
-                        ('fotos', 'Fotos para segmentar', 'Fotos inteiras. A plataforma encontra cada objeto sozinha.' if tipo.motor_padrao else 'Fotos inteiras (ficam sem regiões por enquanto).'),
+                        ('fotos', 'Fotos para segmentar', 'Fotos inteiras. A plataforma encontra cada objeto sozinha.' if tipo.motor_padrao else 'Fotos inteiras: você marca cada objeto com um toque.'),
                         ('recortes', 'Recortes prontos', 'Um objeto por arquivo. PNG com fundo transparente dá o contorno exato.'),
                         ('coco', 'Conjunto COCO', 'As fotos e um arquivo .json com os contornos (formato COCO).'),
                     ] %}
@@ -119,6 +119,10 @@
                         <span data-selo>{{ c.selo_status(imagem.status) }}</span>
                         <span class="texto-suave" data-regioes>{{ plural(n_regioes, 'região', 'regiões') }}</span>
                     </div>
+                    {%- if imagem.status.value == 'pronta' %}
+                    <div>{{ c.botao('Marcar na foto', 'secundario', href=url_for('web.marcar_na_foto', imagem_id=imagem.id),
+                                    icone_nome='mais', attrs={'aria-label': 'Marcar na foto ' ~ imagem.nome_original}) }}</div>
+                    {%- endif %}
                     {% if erros.get(imagem.id) %}
                     <details class="foto__erro">
                         <summary>O que deu errado?</summary>

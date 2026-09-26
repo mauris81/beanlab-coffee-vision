@@ -10,7 +10,7 @@ ser revisado ou desfeito.
 | 2. Ingestão | ✅ Concluída (25/09/2026) | Coletas, "Quem é você?", envio pela câmera ou em lote (rotação, GPS, repetidas, miniaturas), recortes prontos e COCO, segmentação em segundo plano com status ao vivo, motor clássico corrigido, servidor waitress |
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
 | 4. Painel (dashboard) | ✅ Concluída (25/09/2026) | Página inicial com "quanto falta", filtro por tipo de amostra, progresso e classes, "Continuar anotando", "Precisa de atenção" (erros, dúvidas, coletas sem foto), atividade por dia e, para a administração, quem anotou ([decisão 0008](decisoes/0008-painel.md)) |
-| 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
+| 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Depois (26/09):** "Marcar na foto" com um toque (SAM 2.1) e excluir regiões ([decisão 0011](decisoes/0011-marcar-com-um-toque.md)). Ainda falta ajustar um contorno ponto a ponto |
 | 6. IA | ✅ Concluída para grãos (26/09/2026) | Motor `ia`: FastSAM encontra, SAM 2.1 contorna; testado na foto real (33 de ~33 grãos no recorte, contra 20 do motor clássico); opcional ("Instalar IA.bat"); parâmetros de cada segmentação guardados; "Segmentar de novo". Folhas, flores e frutos aguardam fotos reais ([decisão 0009](decisoes/0009-modelo-de-segmentacao.md)) |
 | 7. Exportação e guia | ✅ Concluída (26/09/2026) | Exportar (administração): planilha para o Excel, histórico, COCO, YOLO e recortes por classe num .zip com LEIAME e manifesto; treino sem dúvidas e só com fotos completas (padrão); ida e volta COCO testada; o Ultralytics abre o YOLO. Guia de uso dentro da plataforma (Ajuda), que abre sem sinal ([decisão 0010](decisoes/0010-exportacao.md)) |
 | L1. Login e contas | ✅ Concluída (25/09/2026) | Login obrigatório; contas criadas pela administração (senha provisória); perfis membro/administração; bloqueio após tentativas; primeiro acesso com código ([decisão 0006](decisoes/0006-login-e-contas.md)) |
@@ -68,5 +68,6 @@ Extras já entregues fora das fases:
 - [x] ~~Escolher uma licença~~: AGPL-3.0 (26/09/2026).
 - [ ] **Instalar a IA** no PC da plataforma: `Instalar IA.bat` (já feito neste PC em 26/09/2026).
 - [ ] Ler a **Ajuda** (menu) e ajustar o que não bater com o jeito da equipe trabalhar.
+- [ ] **Enviar de novo a foto de flores** (a primeira foi excluída) e testar "Marcar na foto" nela.
 - [ ] **Mandar 5 a 10 fotos reais de folhas, flores e frutos** (e mais de grãos), para
       ligar e ajustar a IA nesses tipos (`ferramentas/avaliar_segmentacao.py`).

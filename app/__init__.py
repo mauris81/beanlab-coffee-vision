@@ -2,6 +2,8 @@
 
 Estrutura das pastas e responsabilidades: docs/ARQUITETURA.md
 """
+from pathlib import Path
+
 from flask import Flask
 
 from app import seguranca
@@ -24,7 +26,10 @@ def create_app(config: Config | None = None) -> Flask:
 
     from app import dominio  # noqa: F401  (registra as tabelas no SQLAlchemy)
     from app.fila import FilaDeSegmentacao
+    from app.segmentacao.toque import MarcadorPorToque
     app.extensions['fila_segmentacao'] = FilaDeSegmentacao(app)
+    # "Marcar com um toque" (SAM 2.1): lê a pasta dos modelos na hora de usar.
+    app.extensions['marcador'] = MarcadorPorToque(lambda: Path(app.config['PASTA_MODELOS']))
     from app.api import api_bp
     from app.cli import registrar_comandos
     from app.web import web_bp

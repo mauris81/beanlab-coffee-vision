@@ -46,6 +46,9 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
 5. **Anotar:** na página da coleta, "Começar a anotar". Escolha a classe de cada região
    com um toque ou uma tecla (1–9) e a tela já vai para a próxima. Z desfaz; D marca
    dúvida; ? mostra os atalhos. Para muitas regiões iguais, use **Anotar em lote**.
+   Faltou um objeto, há uma região errada ou a foto não é separada sozinha (flores da
+   planta inteira)? **Marcar na foto**: toque no objeto e o contorno aparece
+   (precisa da IA).
 6. **Acompanhar:** a página inicial (**Painel**) diz quanto falta, tem o botão
    **Continuar anotando** e lista o que precisa de atenção (fotos com erro, dúvidas).
    Dá para ver só um tipo de amostra (Grãos, Folhas...).

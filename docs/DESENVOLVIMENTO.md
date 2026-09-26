@@ -36,6 +36,7 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_contas.py` | Senhas, login, bloqueio, "nunca sem administração", código do primeiro acesso |
 | `tests/test_web_login.py` | Porta de entrada, primeiro acesso, senha provisória, administração, desconectar outros aparelhos, redirecionamento seguro |
 | `tests/test_seguranca.py` | Cabeçalhos (CSP), nenhuma página com código embutido, proxy só de 127.0.0.1, cookie seguro, limite por IP, modo desenvolvimento fora da internet, erros em JSON para o JavaScript |
+| `tests/test_marcacao.py` | Marcar na foto: janelas do SAM, escolha dos contornos (sem repetidos nem "o pote inteiro"), criar região já anotada, quem pode excluir, API e caminhos até a tela. Um "marcador falso" faz o papel do SAM; com `-m ia`, o SAM de verdade |
 | `tests/test_exportacao.py` | Planilhas (Excel pt-BR, histórico), regras de treino, COCO (ida e volta pela importação), YOLO (arranjo padrão; com `-m ia`, lido pelo próprio Ultralytics), recortes, foto girada, quem pode, temporário apagado, comando de terminal |
 | `tests/test_segmentacao_ia.py` | Motor de IA sem precisar do PyTorch: filtro das máscaras (uma região por objeto, foto de longe e de perto), escolha do motor pelo YAML, parâmetros guardados, download com conferência de hash, "Segmentar de novo". Com `-m ia`: os modelos de verdade |
 | `tests/test_exclusao.py` | Excluir coleta (cascata, arquivos compartilhados, quem pode, confirmação pelo nome) e conta (apagar ou tornar anônima, sair dos aparelhos, usuário liberado) |

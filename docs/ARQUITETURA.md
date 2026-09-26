@@ -110,18 +110,20 @@ app/
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
 │                         segmentação (jobs), taxonomias, contas (login e exclusão), coletas
 │                         (quem pode excluir e o quê), exportacao (.zip para análise e treino),
+│                         marcacao (criar regiões com um toque, excluir regiões),
 │                         painel (números da
 │                         página inicial, contados no banco)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py): clássico (watershed) e ia
-│                         (FastSAM + SAM 2.1, opcional)
+│                         (FastSAM + SAM 2.1, opcional); toque.py = marcar com um toque
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
 │                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py,
 │                         aplicativo.py (service worker, "Fotos no celular", Ajuda),
 │                         exportacao.py (Exportar, só administração);
 │                         apresentacao.py = ícones, menu, status, plural
 ├── api/               ✅ rotas que devolvem DADOS em JSON: saude.py, anotacao.py
-│                         (regiões da coleta, anotar, desfazer), coletas.py (lista p/ celular)
+│                         (regiões da coleta, anotar, desfazer), coletas.py (lista p/ celular),
+│                         marcacao.py (tocar, criar e excluir regiões)
 ├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system; sw.js
 └── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg,
                           manifest.json e aplicativo/ (ícones do aplicativo)
@@ -174,7 +176,7 @@ motor de cada tipo de amostra é o campo `motor:` do YAML (`taxonomias/`). Detal
 | Clássico (watershed) | Grãos sobre **fundo azul**, encostados ou separados | ✅ `app/segmentacao/classico.py` v2.1 (contornos, área real, cores corretas, todos os grupos de grãos) |
 | Importado | Recortes prontos (PNG transparente) ou COCO | ✅ `app/servicos/ingestao.py` |
 | **IA: FastSAM-s + SAM 2.1-tiny** | Grãos em **qualquer fundo** (folhas, flores, frutos: quando houver fotos para validar) | ✅ `app/segmentacao/ia.py` (opcional: `Instalar IA.bat`; [decisão 0009](decisoes/0009-modelo-de-segmentacao.md)) |
-| SAM 2.1 com cliques | Corrigir um contorno clicando no objeto | Futuro (edição de contornos) |
+| **Toque: SAM 2.1 com um ponto** | A pessoa toca no objeto e o contorno aparece (qualquer tipo de amostra) | ✅ `app/segmentacao/toque.py`, tela "Marcar na foto" ([decisão 0011](decisoes/0011-marcar-com-um-toque.md)) |
 | YOLO11-seg treinado | Quando houver dados anotados suficientes | Futuro |
 
 O `motor:` do YAML pode ser uma lista em ordem de preferência (`[ia, classico]`); ao

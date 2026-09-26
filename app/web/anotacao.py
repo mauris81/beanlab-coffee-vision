@@ -95,6 +95,16 @@ def desfazer_lote(coleta_id):
                             mostrar=request.form.get('mostrar', 'pendentes')))
 
 
+# ----------------------------------------------------------- marcar na foto
+
+@web_bp.get('/imagens/<int:imagem_id>/marcar')
+def marcar_na_foto(imagem_id):
+    """Tocar num objeto cria a região (SAM 2.1); tocar num contorno seleciona. Ver marcar.js."""
+    imagem = db.session.get(Imagem, imagem_id) or abort(404)
+    return render_template('marcar.html', imagem=imagem, coleta=imagem.coleta,
+                           classes=imagem.coleta.tipo_amostra.classes_ativas)
+
+
 # ------------------------------------------------------------- imagens
 
 @web_bp.get('/regioes/<int:regiao_id>/recorte.jpg', endpoint='recorte_da_regiao')

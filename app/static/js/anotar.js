@@ -120,6 +120,7 @@ function desenharContexto(atual) {
     const svg = $('[data-sobreposicao]');
     if (estado.imagemNoContexto !== atual.imagem_id) {
         estado.imagemNoContexto = atual.imagem_id;
+        $('[data-marcar-link]').href = raiz.dataset.paginaMarcar.replace('/0/', `/${atual.imagem_id}/`);
         foto.src = imagem.media;
         foto.alt = `Foto ${imagem.nome}, com os contornos das regiões`;
         svg.setAttribute('viewBox', `0 0 ${imagem.largura} ${imagem.altura}`);

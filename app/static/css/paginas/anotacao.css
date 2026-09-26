@@ -125,3 +125,82 @@
 .barra-lote__selecao { gap: var(--espaco-2); }
 .barra-lote__classes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); gap: var(--espaco-2); }
 .barra-lote .botao-classe { min-height: 44px; }
+
+/* --- Marcar na foto (/imagens/<id>/marcar) ------------------------------------ */
+.marcar__foto-atual { margin: 0; font-size: var(--texto-sm); }
+.marcar__area { display: grid; gap: var(--espaco-4); }
+@media (min-width: 1024px) {
+    .marcar__area { grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem); align-items: start; }
+    .marcar__painel { position: sticky; top: calc(var(--altura-topo) + var(--espaco-4)); }
+}
+/* A foto: fundo escuro fixo (fora dos tokens) de propósito, é moldura de foto nos dois temas.
+   touch-action: none = os dedos controlam o zoom da foto, não o da página. */
+.marcar__visor {
+    position: relative; height: min(62vh, 46rem); overflow: hidden;
+    border-radius: var(--raio-lg); background: #1A1A1A;
+    touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair;
+}
+.marcar__visor:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 2px; }
+.marcar__camada { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.marcar__camada img, .marcar__camada svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.marcar__camada img { pointer-events: none; }
+.marcar__camada .contorno { stroke-width: 2px; }
+.marcar__camada .contorno--atual { stroke-width: 4px; }
+.contorno--previa {
+    stroke: #FFD400; stroke-width: 3px; stroke-dasharray: 6 3; pointer-events: none;
+    fill: rgb(255 212 0 / 0.18); filter: drop-shadow(0 0 2px #000);
+}
+/* Mira no centro: aparece com o teclado (Enter marca o que está nela). */
+.marcar__mira {
+    position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px;
+    border: 2px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 0 2px rgb(0 0 0 / 0.6);
+    pointer-events: none; opacity: 0;
+}
+.marcar__visor:focus-visible .marcar__mira { opacity: 1; }
+.marcar__zoom { position: absolute; right: var(--espaco-2); bottom: var(--espaco-2); display: flex; gap: var(--espaco-2); }
+.marcar__menos { font-size: 1.5rem; font-weight: var(--peso-forte); line-height: 1; }
+.marcar__aguarde {
+    position: absolute; left: 50%; top: var(--espaco-3); transform: translateX(-50%);
+    display: flex; align-items: center; gap: var(--espaco-2); max-width: calc(100% - 2 * var(--espaco-3));
+    padding: var(--espaco-2) var(--espaco-4); border-radius: var(--raio-pilula);
+    background: var(--cor-superficie); color: var(--cor-texto); box-shadow: var(--sombra-2);
+    font-size: var(--texto-sm);
+}
+.marcar__painel { display: flex; flex-direction: column; gap: var(--espaco-3); }
+.marcar__painel h2 { margin: 0; font-size: var(--texto-xl); }
+.marcar__painel p { margin: 0; }
+
+/* Celular: com um contorno proposto ou uma região selecionada, o painel vira uma gaveta
+   fixa logo acima do menu, compacta, para escolher a classe sem rolar a página. */
+@media (max-width: 1023px) {
+    .marcar__painel[data-aberto="true"] {
+        position: fixed; left: 0; right: 0; z-index: var(--camada-navegacao);
+        bottom: calc(var(--altura-navegacao-inferior) + env(safe-area-inset-bottom));
+        gap: var(--espaco-2); max-height: 50vh; overflow-y: auto;
+        padding: var(--espaco-3) var(--espaco-4);
+        background: var(--cor-superficie); border-top: 1px solid var(--cor-borda);
+        border-radius: var(--raio-lg) var(--raio-lg) 0 0; box-shadow: var(--sombra-2);
+    }
+    .marcar__painel[data-aberto="true"] {
+        display: grid; align-items: center; column-gap: var(--espaco-3);
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "titulo acoes" "tamanhos duvida" "classes classes";
+    }
+    .marcar__painel[data-aberto="true"] > :first-child { grid-area: titulo; }
+    .marcar__painel[data-aberto="true"] [data-acoes] { grid-area: acoes; }
+    .marcar__painel[data-aberto="true"] [data-tamanhos] { grid-area: tamanhos; }
+    .marcar__painel[data-aberto="true"] [data-duvida-rotulo] { grid-area: duvida; }
+    .marcar__painel[data-aberto="true"] [data-classes] { grid-area: classes; }
+    .marcar__painel[data-aberto="true"] h2 { font-size: var(--texto-lg); }
+    .marcar__painel[data-aberto="true"] [data-tamanhos] { flex-wrap: nowrap; gap: var(--espaco-2); }
+    .marcar__painel[data-aberto="true"] [data-tamanhos] .botao { padding-inline: var(--espaco-3); }
+    .marcar__painel[data-aberto="true"] [data-texto-painel],
+    .marcar__painel[data-aberto="true"] [data-contagem],
+    .marcar__painel[data-aberto="true"] #marcar-dica-tamanho { display: none; }
+    .marcar__painel[data-aberto="true"] .botoes-classe {
+        display: flex; flex-wrap: nowrap; overflow-x: auto; padding-bottom: var(--espaco-1);
+    }
+    .marcar__painel[data-aberto="true"] .botao-classe { flex: 0 0 auto; max-width: 70vw; }
+    /* Espaço no fim da página para dar para rolar a foto para cima da gaveta. */
+    .marcar[data-painel-aberto="true"] { padding-bottom: 45vh; }
+}

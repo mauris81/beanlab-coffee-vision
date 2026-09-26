@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{#- Marcar na foto: tocar num objeto cria a região (o SAM 2.1 desenha o contorno); tocar
+    num contorno seleciona a região. Tudo o que muda é feito por static/js/marcar.js, com
+    a API de app/api/marcacao.py. -#}
+
+{% block titulo %}Marcar na foto · {{ imagem.nome_original }} · BeanLab{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paginas/anotacao.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+<div class="marcar" id="marcar" data-api="{{ url_for('api.dados_da_marcacao', imagem_id=imagem.id) }}"
+     data-imagem="{{ imagem.id }}" data-pagina-da-foto="{{ url_for('web.marcar_na_foto', imagem_id=0) }}">
+
+    <header class="anotar__topo">
+        <div class="anotar__titulo">
+            <a class="link-voltar" href="{{ url_for('web.coleta', coleta_id=coleta.id) }}">{{ icone('seta-esquerda') }}{{ coleta.nome }}</a>
+            <h1>Marcar na foto</h1>
+            <p class="texto-suave marcar__foto-atual" data-foto-atual>{{ imagem.nome_original }}</p>
+        </div>
+        <div class="linha">
+            {{ c.botao('Anotar uma por vez', 'secundario', href=url_for('web.anotar', coleta_id=coleta.id), icone_nome='check') }}
+            {{ c.botao_icone('seta-esquerda', 'Foto anterior', 'secundario', attrs={'data-foto-anterior': '', 'disabled': true}) }}
+            {{ c.botao_icone('seta-direita', 'Próxima foto', 'secundario', attrs={'data-foto-proxima': '', 'disabled': true}) }}
+        </div>
+    </header>
+
+    <div data-sem-ia hidden>
+        {% call c.alerta('info', 'Marcar com um toque não está disponível') %}<p data-sem-ia-texto></p>{% endcall %}
+    </div>
+
+    <div class="marcar__area">
+        <div class="marcar__visor" data-visor tabindex="0"
+             aria-label="Foto {{ imagem.nome_original }}. Toque num objeto para marcar; toque num contorno para selecionar."
+             aria-describedby="marcar-ajuda-teclado">
+            <div class="marcar__camada" data-camada>
+                <img data-foto alt="" draggable="false">
+                <svg data-contornos aria-hidden="true" preserveAspectRatio="none"></svg>
+            </div>
+            <div class="marcar__mira" aria-hidden="true"></div>
+            <div class="marcar__zoom">
+                {{ c.botao_icone('mais', 'Aproximar', 'secundario', attrs={'data-zoom': 'mais'}) }}
+                <button type="button" class="botao botao--secundario botao--icone" data-zoom="menos" aria-label="Afastar" title="Afastar">
+                    <span class="marcar__menos" aria-hidden="true">−</span></button>
+                {{ c.botao('Foto inteira', 'secundario', attrs={'data-zoom': 'ajustar'}) }}
+            </div>
+            <div class="marcar__aguarde" data-aguarde hidden role="status">
+                <div class="girador"></div><span data-aguarde-texto>Carregando…</span>
+            </div>
+        </div>
+        <p class="visualmente-oculto" id="marcar-ajuda-teclado">Teclado: setas movem a foto, + e − aproximam e
+            afastam, Enter marca ou seleciona o que está no centro (na mira), Esc cancela.</p>
+
+        <section class="marcar__painel" aria-labelledby="marcar-titulo-painel" data-painel>
+            <div>
+                <h2 id="marcar-titulo-painel" data-titulo-painel>Toque num objeto na foto</h2>
+                <p class="texto-suave" data-texto-painel>Aproxime com dois dedos (ou os botões +/−) e toque bem no meio
+                    do objeto. Um contorno aparece; escolha a classe para salvar.</p>
+            </div>
+            <div class="linha" data-tamanhos hidden>
+                {{ c.botao('Menor', 'secundario', attrs={'data-tamanho': '-1', 'aria-describedby': 'marcar-dica-tamanho'}) }}
+                {{ c.botao('Maior', 'secundario', attrs={'data-tamanho': '1', 'aria-describedby': 'marcar-dica-tamanho'}) }}
+                <span class="texto-suave" id="marcar-dica-tamanho">Troca o contorno (ex.: pétala, flor, cacho).</span>
+            </div>
+            <div class="botoes-classe" role="group" aria-labelledby="marcar-titulo-painel" data-classes hidden>
+                {% for classe in classes %}
+                <button type="button" class="botao-classe" data-classe="{{ classe.codigo }}" aria-pressed="false"
+                        {% if classe.tecla_atalho %}aria-keyshortcuts="{{ classe.tecla_atalho }}"{% endif %}
+                        {% if classe.descricao %}title="{{ classe.descricao }}"{% endif %}>
+                    <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>
+                    <span class="botao-classe__nome">{{ classe.nome }}</span>
+                    {% if classe.tecla_atalho %}<kbd class="tecla" aria-hidden="true">{{ classe.tecla_atalho }}</kbd>{% endif %}
+                </button>
+                {% endfor %}
+            </div>
+            <label class="opcao" data-duvida-rotulo hidden><input type="checkbox" data-duvida> Tenho dúvida</label>
+            <div class="linha" data-acoes hidden>
+                {{ c.botao('Descartar', 'fantasma', icone_nome='fechar', attrs={'data-descartar': '', 'aria-keyshortcuts': 'Escape'}) }}
+                {{ c.botao('Excluir região', 'fantasma', icone_nome='lixeira', attrs={'data-excluir-regiao': ''}) }}
+            </div>
+            <p class="texto-suave" data-contagem></p>
+        </section>
+    </div>
+
+    <p class="visualmente-oculto" aria-live="polite" data-anuncio></p>
+
+    <dialog class="dialogo" id="dialogo-excluir-regiao" aria-labelledby="dialogo-excluir-regiao-titulo">
+        <div class="dialogo__corpo">
+            <h2 id="dialogo-excluir-regiao-titulo">Excluir esta região?</h2>
+            <p class="texto-suave" data-excluir-texto>A região e as anotações dela serão apagadas.</p>
+        </div>
+        <div class="dialogo__acoes">
+            {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+            {{ c.botao('Excluir região', 'perigo', attrs={'data-confirmar-exclusao': ''}) }}
+        </div>
+    </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/marcar.js') }}"></script>
+{% endblock %}

@@ -14,6 +14,7 @@
 {% block conteudo %}
 <div class="anotar" id="anotar"
      data-api="{{ url_for('api.regioes_da_coleta', coleta_id=coleta.id) }}"
+     data-pagina-marcar="{{ url_for('web.marcar_na_foto', imagem_id=0) }}"
      data-regiao-inicial="{{ regiao_inicial or '' }}">
 
     <header class="anotar__topo">
@@ -30,8 +31,12 @@
 
     {% if not progresso.total %}
         {% call c.vazio('Nenhuma região para anotar',
-                        'Envie fotos na página da coleta. Quando a segmentação terminar, as regiões aparecem aqui.', 'imagem') %}
-            {{ c.botao('Ir para a coleta', href=url_for('web.coleta', coleta_id=coleta.id), icone_nome='seta-esquerda') }}
+                        'Envie fotos na página da coleta. Quando a segmentação terminar, as regiões aparecem aqui. '
+                        'Se a foto não é separada sozinha, marque cada objeto com um toque.', 'imagem') %}
+            {%- if coleta.imagens %}
+            {{ c.botao('Marcar na foto', href=url_for('web.marcar_na_foto', imagem_id=coleta.imagens[0].id), icone_nome='mais') }}
+            {%- endif %}
+            {{ c.botao('Ir para a coleta', 'secundario', href=url_for('web.coleta', coleta_id=coleta.id), icone_nome='seta-esquerda') }}
         {% endcall %}
     {% else %}
 
@@ -87,7 +92,8 @@
                 <img data-foto alt="">
                 <svg data-sobreposicao aria-hidden="true" preserveAspectRatio="none"></svg>
             </div>
-            <p class="texto-suave">Clique num contorno para ir até a região.</p>
+            <p class="texto-suave">Clique num contorno para ir até a região. Faltou um objeto, ou há um
+               contorno errado? <a data-marcar-link href="#">Marcar nesta foto</a>.</p>
         </details>
     </div>
 
