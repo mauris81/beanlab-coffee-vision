@@ -36,6 +36,7 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_contas.py` | Senhas, login, bloqueio, "nunca sem administração", código do primeiro acesso |
 | `tests/test_web_login.py` | Porta de entrada, primeiro acesso, senha provisória, administração, desconectar outros aparelhos, redirecionamento seguro |
 | `tests/test_seguranca.py` | Cabeçalhos (CSP), nenhuma página com código embutido, proxy só de 127.0.0.1, cookie seguro, limite por IP, modo desenvolvimento fora da internet, erros em JSON para o JavaScript |
+| `tests/test_exclusao.py` | Excluir coleta (cascata, arquivos compartilhados, quem pode, confirmação pelo nome) e conta (apagar ou tornar anônima, sair dos aparelhos, usuário liberado) |
 | `tests/test_painel.py` | Números do painel (anotação vigente, dúvida, classes desativadas), ordem do "Continuar anotando", pendências, atividade por dia, quem vê "Quem anotou", consultas que não crescem com o número de coletas |
 | `tests/test_aplicativo.py` | Manifesto e ícones, service worker (tudo que ele guarda existe), "Fotos no celular" sem dados de ninguém, envio pela fila (JSON, sem duplicar), endereço do Funnel |
 

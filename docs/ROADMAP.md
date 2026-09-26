@@ -19,6 +19,10 @@ ser revisado ou desfeito.
 Extras já entregues fora das fases:
 - **Atalho de duplo clique** `Iniciar BeanLab.bat`: instala e inicia sozinho.
 - **Python atualizado de 3.11 para 3.14**, com as bibliotecas nas versões mais recentes.
+- **Excluir coleta e excluir conta** (pedido do responsável, 25/09/2026). Coleta: a
+  administração sempre; quem criou, enquanto ninguém anotou; com anotações, confirma
+  digitando o nome. Conta: nunca usada some; com trabalho vira "Pessoa removida nº X"
+  (as anotações continuam, sem identificar ninguém).
 
 ## Decisões já tomadas com o responsável pelo projeto
 

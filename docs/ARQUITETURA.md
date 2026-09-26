@@ -107,7 +107,8 @@ app/
 ├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
-│                         segmentação (jobs), taxonomias, contas (login), painel (números da
+│                         segmentação (jobs), taxonomias, contas (login e exclusão), coletas
+│                         (quem pode excluir e o quê), painel (números da
 │                         página inicial, contados no banco)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)

@@ -50,3 +50,4 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | Página inicial não dizia quanto faltava nem por onde continuar | Painel com "Faltam N regiões", "Continuar anotando" e "Precisa de atenção" | 4 | `tests/test_painel.py` |
 | Regiões marcadas com dúvida ficavam esquecidas (não havia como achá-las) | Dúvidas listadas no painel; filtro "Em dúvida" na anotação em lote | 4 | `test_duvidas_levam_para_a_revisao_no_lote` |
 | "Guia visual" (ferramenta de quem programa) no menu de quem coleta | Movido para o rodapé | 4 | `test_guia_visual_saiu_do_menu_e_foi_para_o_rodape` |
+| Não dava para excluir uma coleta nem uma conta | Excluir coleta (com confirmação pelo nome quando há anotações) e excluir conta (some ou vira anônima, preservando a pesquisa) | Extra | `tests/test_exclusao.py` |

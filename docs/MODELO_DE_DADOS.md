@@ -23,7 +23,7 @@ TipoAmostra ──1:N── Classe
 |----------|--------|---------|-------------------|
 | **TipoAmostra** | `tipo_amostra` | Grãos, folhas, flores, frutos. Vem de `taxonomias/*.yaml`. | `codigo`, `nome`, `descricao`, `ordem`, `motor_padrao` (vazio = sem segmentação automática) |
 | **Classe** | `classe` | Um rótulo possível para aquele tipo (ex.: "Ferrugem"). Vem do YAML. | `codigo` (fixo), `nome`, `cor`, `tecla_atalho`, `descricao`, `ordem`, `ativa` |
-| **Pessoa** | `pessoa` | Conta de quem coleta e anota. Criada pela administração. | `nome`, `usuario` (único, ex. `maria.silva`), `senha_hash`, `papel` (membro/administrador), `ativa`, `precisa_trocar_senha`, `ultimo_acesso`, `tentativas_falhas`, `bloqueada_ate`, `versao_sessao` |
+| **Pessoa** | `pessoa` | Conta de quem coleta e anota. Criada pela administração. | `nome`, `usuario` (único, ex. `maria.silva`), `senha_hash`, `papel` (membro/administrador), `ativa`, `precisa_trocar_senha`, `ultimo_acesso`, `tentativas_falhas`, `bloqueada_ate`, `versao_sessao`, `removida_em` |
 | **Coleta** | `coleta` | Um conjunto de fotos tiradas juntas (o antigo "Projeto"). | tipo de amostra, `nome`, `fazenda`, `talhao`, `variedade`, `data_coleta`, coletor |
 | **Imagem** | `imagem` | Uma foto. O arquivo fica no disco, com o nome igual ao hash. | `hash_sha256`, `extensao`, `nome_original`, `largura`, `altura`, EXIF (`capturada_em`, `latitude`, `longitude`), `origem`, `status`, `ja_segmentada` |
 | **Regiao** | `regiao` | Um objeto dentro da foto (um grão, uma folha...). | `poligono`, `bbox_*`, `area_px`, `origem`, `motor`, `versao_motor`, `pontuacao` |
@@ -115,5 +115,9 @@ Valem mesmo que o código tenha um erro. Cada uma tem um teste em `tests/test_in
 
 - **Senha nunca é guardada**, só o hash (scrypt). `senha_hash` vazio = a conta existe (tem
   anotações) mas ainda não pode entrar: veio do sistema antigo, que era só por nome.
+- **Conta excluída** (`removida_em` preenchido): se nunca teve trabalho, a linha é apagada;
+  se já anotou, criou coleta ou enviou foto, nome, usuário e senha são apagados e ela vira
+  "Pessoa removida nº X", para as anotações continuarem ligadas a alguém sem identificar
+  ninguém (`servicos/contas.py`, `excluir_conta`).
 - **`versao_sessao`** muda quando a senha é trocada ou a conta desativada; a sessão guarda
   a versão com que entrou, e se não bater, a pessoa sai (em todos os aparelhos).

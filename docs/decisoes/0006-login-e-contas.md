@@ -34,6 +34,12 @@ Decisões do responsável: **a administração cria as contas**; perfis **membro
   - é renovada a cada login, o que evita "fixação de sessão";
   - trocar a senha ou desativar a conta **desconecta os outros aparelhos na hora**, porque a "versão da sessão" muda.
 - **A plataforma nunca fica sem administrador ativo:** não dá para desativar a si mesmo nem rebaixar o último.
+- **Excluir conta** (acrescentado em 25/09/2026, a pedido do responsável):
+  - conta que nunca anotou, criou coleta ou enviou foto some por completo;
+  - conta com trabalho perde nome, usuário e senha e vira "Pessoa removida nº X". As
+    anotações continuam na pesquisa, sem identificar a pessoa (atende a um pedido de
+    exclusão de dados pessoais, LGPD);
+  - para uma pausa, a opção continua sendo **Desativar**, que dá para desfazer.
 
 ## Consequências
 - ✅ Pronto para publicar na internet.

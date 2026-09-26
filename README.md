@@ -47,6 +47,8 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
 6. **Acompanhar:** a página inicial (**Painel**) diz quanto falta, tem o botão
    **Continuar anotando** e lista o que precisa de atenção (fotos com erro, dúvidas).
    Dá para ver só um tipo de amostra (Grãos, Folhas...).
+7. **Excluir:** uma foto, pela lixeira no cartão dela; a coleta inteira, no fim da página
+   da coleta; uma conta, em **Pessoas** (só a administração).
 
 ### No celular, como aplicativo, e fora do Wi-Fi
 

@@ -114,6 +114,13 @@ Datas na tela: `{{ data|hora_local }}` (o banco guarda em UTC); `data_por_extens
 Atalhos de teclado: todo botão com atalho declara `aria-keyshortcuts`; os atalhos nunca
 disparam enquanto a pessoa digita num campo; Z e D são reservados na anotação.
 
+**Ações que apagam muito** (excluir coleta, excluir conta): ficam numa **zona de perigo**
+(`.zona-perigo`, no fim da página) ou atrás de um botão discreto. O diálogo diz exatamente
+o que se perde ("3 fotos, 120 regiões e 40 anotações"), começa com o foco em **Cancelar**
+e, quando há trabalho da equipe envolvido, pede para digitar o nome. Quando existe uma
+saída reversível, o diálogo a oferece (ex.: "Se for só uma pausa, use Desativar").
+Quando a pessoa não pode fazer a ação, a tela diz por quê e quem pode.
+
 Mensagens depois de uma ação: `flash('…', 'sucesso' | 'info' | 'aviso' | 'perigo')` na
 rota; o `base.html` mostra como alerta no topo da página seguinte.
 
