@@ -6,13 +6,15 @@
     /fotos-no-celular   fotografar sem sinal e ver as fotos que esperam envio. Não tem
                         dado de ninguém (as fotos são lidas do próprio aparelho), por
                         isso pode ficar guardada no celular e abrir sem conexão.
+    /ajuda              guia de uso. Com sinal, página normal (com menu); o celular guarda
+                        a versão ?offline=1 (sem menu nem dados de ninguém) para o campo.
 
 Como funciona, em palavras simples: docs/decisoes/0007-publicacao-e-aplicativo.md
 """
 import hashlib
 from pathlib import Path
 
-from flask import current_app, make_response, render_template, url_for
+from flask import current_app, make_response, render_template, request, url_for
 
 from app.web import web_bp
 
@@ -50,6 +52,8 @@ def service_worker():
     codigo = render_template(
         'sw.js', versao=versao_do_aplicativo(), arquivos=arquivos,
         pagina_sem_sinal=url_for('web.fotos_no_celular'),
+        # Páginas que abrem sem sinal pelo próprio endereço (cópia guardada, genérica).
+        paginas_guardadas={url_for('web.ajuda'): url_for('web.ajuda', offline=1)},
         fila=url_for('static', filename='js/fila-fotos.js'),
     )
     resposta = make_response(codigo)
@@ -62,3 +66,8 @@ def service_worker():
 @web_bp.get('/fotos-no-celular')
 def fotos_no_celular():
     return render_template('fotos_no_celular.html')
+
+
+@web_bp.get('/ajuda')
+def ajuda():
+    return render_template('ajuda.html', generica=request.args.get('offline') == '1')

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+{#- Guia do usuário. Sem sinal, o celular mostra uma cópia guardada (versão "genérica",
+    sem menu nem dados de ninguém: ?offline=1; ver app/web/aplicativo.py). -#}
+{% set pagina_generica = generica %}
+
+{% block titulo %}Ajuda · BeanLab{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paginas/ajuda.css') }}">{% endblock %}
+
+{% set secoes = [
+    ('comecar', 'Primeiros passos'), ('fotografar', 'Coletar e fotografar'), ('sem-sinal', 'Sem sinal no campo'),
+    ('anotar', 'Anotar'), ('painel', 'Painel'), ('corrigir', 'Corrigir enganos'),
+    ('administracao', 'Para a administração'), ('perguntas', 'Perguntas frequentes'),
+] %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande ajuda">
+    {% call c.cabecalho_pagina('Ajuda', sobretitulo='Guia de uso',
+        descricao='Como usar a plataforma no campo e no escritório. Esta página também abre sem internet.') %}
+        {%- if generica %}{{ c.botao('Ir para a plataforma', 'secundario', href=url_for('web.inicio'), icone_nome='inicio') }}{% endif %}
+    {% endcall %}
+
+    <nav class="ajuda__sumario" aria-label="Assuntos da ajuda">
+        <ol>{% for id, nome in secoes %}<li><a href="#{{ id }}">{{ nome }}</a></li>{% endfor %}</ol>
+    </nav>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="comecar" class="cartao pilha" aria-labelledby="t-comecar">
+        <h2 id="t-comecar">Primeiros passos</h2>
+        <ol class="ajuda__passos">
+            <li><strong>Entre</strong> com o usuário e a senha que a administração passou. Na primeira vez, a
+                plataforma pede para você criar a sua própria senha.</li>
+            <li><strong>Instale no celular</strong> (recomendado): abra o endereço com <code>https://</code> e, na
+                página inicial, toque em <strong>Instalar o aplicativo</strong>. No iPhone: <strong>Compartilhar</strong>
+                → <strong>Adicionar à Tela de Início</strong>. O ícone do BeanLab fica na tela inicial.</li>
+            <li>Você continua conectado por 90 dias no mesmo aparelho. Para sair: toque no seu nome, no topo, e em
+                <strong>Sair</strong>.</li>
+        </ol>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="fotografar" class="cartao pilha" aria-labelledby="t-fotografar">
+        <h2 id="t-fotografar">Coletar e fotografar</h2>
+        <ol class="ajuda__passos">
+            <li>Em <strong>Coletas → Nova coleta</strong>, escolha o que vai fotografar (grãos, folhas, flores ou frutos)
+                e dê um nome que ajude a achar depois. Ex.: "Talhão 3, março". Crie a coleta <strong>antes de ir para o
+                campo</strong>.</li>
+            <li>Na página da coleta: <strong>Tirar foto</strong> (abre a câmera) ou <strong>Escolher arquivos</strong>
+                (da galeria, várias de uma vez). Depois, <strong>Enviar</strong>.</li>
+            <li>Fotos de grãos são separadas em regiões sozinhas: o status vai de <em>Na fila</em> para
+                <em>Pronta</em>, sem precisar recarregar. Com a IA, leva uns 2 minutos por foto; pode seguir
+                trabalhando enquanto isso.</li>
+        </ol>
+        {% call c.alerta('info', 'Como fotografar bem') %}
+            <ul>
+                <li>De cima, com a bandeja ou o pote <strong>inteiro</strong> no quadro.</li>
+                <li>Luz boa e uniforme, sem sombras fortes (evite sol direto).</li>
+                <li>Grãos podem estar encostados; só evite um grão <strong>em cima</strong> do outro.</li>
+                <li>Com a IA instalada, qualquer fundo serve. Sem ela, os grãos precisam estar sobre <strong>fundo
+                    azul</strong> (a própria página da coleta diz qual é o caso).</li>
+            </ul>
+        {% endcall %}
+        <p class="texto-suave">Folhas, flores e frutos ainda não são separados sozinhos: por enquanto, envie
+           <strong>recortes prontos</strong> (um objeto por arquivo) ou um conjunto COCO.</p>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="sem-sinal" class="cartao pilha" aria-labelledby="t-sem-sinal">
+        <h2 id="t-sem-sinal">Sem sinal no campo</h2>
+        <ul class="ajuda__lista">
+            <li><strong>Pode continuar fotografando.</strong> Sem sinal, o aplicativo abre a página
+                <strong>Fotos no celular</strong>: escolha a coleta e tire as fotos. Elas ficam guardadas no aparelho.</li>
+            <li>Se o sinal cair <strong>no meio de um envio</strong>, as fotos também ficam guardadas. Com sinal fraco,
+                toque em <strong>Guardar no celular e enviar depois</strong> e siga trabalhando.</li>
+            <li><strong>Quando o sinal voltar, as fotos sobem sozinhas.</strong> Enquanto houver alguma esperando,
+                aparece no topo: "N fotos guardadas no celular".</li>
+            <li>As fotos guardadas só sobem com a <strong>mesma pessoa</strong> logada que as tirou.</li>
+            <li>Para a lista de coletas estar no celular, abra a plataforma com sinal pelo menos uma vez
+                depois de criar a coleta.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="anotar" class="cartao pilha" aria-labelledby="t-anotar">
+        <h2 id="t-anotar">Anotar</h2>
+        <p>Anotar é dizer <strong>o que é cada região</strong> (cada grão, folha...). Na página da coleta, toque em
+           <strong>Começar a anotar</strong>.</p>
+        <h3>Uma por vez</h3>
+        <ul class="ajuda__lista">
+            <li>Toque na classe (ou aperte a tecla dela). A tela já vai para a próxima região pendente.</li>
+            <li>Não tem certeza? Marque <strong>Tenho dúvida</strong> antes de escolher a classe. Dá para escrever
+                uma observação.</li>
+        </ul>
+        <dl class="ajuda__atalhos">
+            <div><dt>{{ c.tecla('1') }} … {{ c.tecla('9') }}</dt><dd>Escolhe a classe (a tecla aparece no botão)</dd></div>
+            <div><dt>{{ c.tecla('→', 'seta para a direita') }} {{ c.tecla('←', 'seta para a esquerda') }}</dt><dd>Próxima / anterior, sem anotar</dd></div>
+            <div><dt>{{ c.tecla('D') }}</dt><dd>Marca ou desmarca "Tenho dúvida"</dd></div>
+            <div><dt>{{ c.tecla('Z') }}</dt><dd>Desfaz a última anotação</dd></div>
+            <div><dt>{{ c.tecla('?') }}</dt><dd>Mostra os atalhos na tela de anotação</dd></div>
+        </dl>
+        <h3>Em lote (muitas iguais)</h3>
+        <ul class="ajuda__lista">
+            <li>Na página da coleta, <strong>Anotar em lote</strong>. Marque as regiões (ou <strong>Marcar todas desta página</strong>;
+                no computador, Shift + clique marca um intervalo) e escolha a classe. Aparece a opção
+                <strong>Desfazer</strong> logo depois.</li>
+            <li>O filtro <strong>Em dúvida</strong> mostra só as regiões marcadas com dúvida, para revisar.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="painel" class="cartao pilha" aria-labelledby="t-painel">
+        <h2 id="t-painel">Painel (página inicial)</h2>
+        <ul class="ajuda__lista">
+            <li>A primeira frase diz <strong>quanto falta</strong>. O botão <strong>Continuar anotando</strong> abre a
+                coleta mexida por último.</li>
+            <li>Dá para ver só um tipo de amostra (Grãos, Folhas...). No painel de um tipo aparece a tabela das
+                classes: quantas regiões há de cada uma.</li>
+            <li><strong>Precisa de atenção</strong> lista fotos com erro, dúvidas para revisar e coletas sem fotos.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="corrigir" class="cartao pilha" aria-labelledby="t-corrigir">
+        <h2 id="t-corrigir">Corrigir enganos</h2>
+        <ul class="ajuda__lista">
+            <li><strong>Classe errada:</strong> volte à região e escolha a certa. A anterior fica no histórico.</li>
+            <li><strong>Acabou de errar:</strong> <strong>Desfazer</strong> ({{ c.tecla('Z') }}) apaga a sua última anotação.</li>
+            <li><strong>Foto errada:</strong> a lixeira no cartão da foto a exclui, com as regiões e anotações dela.</li>
+            <li><strong>Região errada</strong> (dois grãos numa região só, pedaço de fundo): marque dúvida e explique
+                na observação. Editar contornos na tela ainda não é possível.</li>
+            <li><strong>Segmentar de novo:</strong> aparece em fotos feitas por um motor antigo. Substitui as regiões
+                automáticas; o aviso diz quantas anotações se perdem.</li>
+            <li><strong>Coleta criada por engano:</strong> no fim da página da coleta, <strong>Excluir coleta</strong>.
+                Quem criou pode excluir enquanto ninguém anotou; depois, só a administração.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="administracao" class="cartao pilha" aria-labelledby="t-administracao">
+        <h2 id="t-administracao">Para a administração</h2>
+        <ul class="ajuda__lista">
+            <li><strong>Pessoas:</strong> crie as contas (a plataforma gera uma senha provisória, mostrada uma vez só).
+                <strong>Nova senha</strong> para quem esqueceu; <strong>Desativar</strong> para uma pausa (dá para
+                reativar); <strong>Excluir</strong> apaga nome, usuário e senha (o que a pessoa anotou continua na
+                pesquisa, sem o nome).</li>
+            <li><strong>Exportar:</strong> baixa um .zip com a planilha (abre no Excel) e, se quiser, COCO, YOLO e
+                recortes por classe, para treinar modelos. O LEIAME.txt dentro do arquivo explica tudo.</li>
+            <li><strong>No PC da plataforma:</strong> <code>Iniciar BeanLab.bat</code> abre a plataforma;
+                <code>Publicar na internet.bat</code> liga ou desliga o endereço com <code>https://</code>;
+                <code>Instalar IA.bat</code> instala a segmentação com IA. O PC precisa ficar ligado.</li>
+        </ul>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="perguntas" class="cartao pilha" aria-labelledby="t-perguntas">
+        <h2 id="t-perguntas">Perguntas frequentes</h2>
+        <details class="ajuda__pergunta"><summary>Esqueci a minha senha</summary>
+            <p>Peça à administração uma <strong>Nova senha</strong>. Você recebe uma senha provisória e cria a sua
+               de novo.</p></details>
+        <details class="ajuda__pergunta"><summary>"Muitas tentativas erradas"</summary>
+            <p>Por segurança, depois de várias senhas erradas a entrada fica bloqueada por alguns minutos (5 minutos
+               para a conta; 15 minutos se foram muitas tentativas da mesma conexão). Espere e tente de novo.</p></details>
+        <details class="ajuda__pergunta"><summary>As fotos guardadas no celular não sobem</summary>
+            <p>Abra a plataforma com sinal. Se aparecer "Entre na plataforma de novo", entre com o <strong>mesmo
+               usuário</strong> que tirou as fotos. Em <strong>Fotos no celular</strong>, veja se alguma está
+               "com problema" (ex.: a coleta foi excluída).</p></details>
+        <details class="ajuda__pergunta"><summary>A foto ficou com "Erro"</summary>
+            <p>Na página da coleta, abra "O que deu errado?" e toque em <strong>Tentar de novo</strong>. Se continuar,
+               tire a foto de novo seguindo "Como fotografar bem".</p></details>
+        <details class="ajuda__pergunta"><summary>A plataforma não abre pelo endereço de sempre</summary>
+            <p>O PC da plataforma pode estar desligado ou sem internet. Avise quem cuida dele. Enquanto isso, as fotos
+               tiradas no celular ficam guardadas.</p></details>
+        <details class="ajuda__pergunta"><summary>Posso usar no computador?</summary>
+            <p>Sim, pelo navegador. No computador a anotação fica mais rápida com as teclas (veja "Anotar").</p></details>
+    </section>
+</div>
+{% endblock %}

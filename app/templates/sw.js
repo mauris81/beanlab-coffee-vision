@@ -4,8 +4,8 @@
 // Este arquivo é gerado pelo servidor (app/web/aplicativo.py). A VERSAO muda sozinha
 // quando qualquer arquivo da plataforma muda; o celular então baixa tudo de novo.
 //
-// O que fica guardado no celular: só os arquivos da pasta static/ (visual e código)
-// e a página "Fotos no celular". Páginas com dados (coletas, anotações) nunca.
+// O que fica guardado no celular: só os arquivos da pasta static/ (visual e código),
+// a página "Fotos no celular" e a ajuda. Páginas com dados (coletas, anotações) nunca.
 
 import { TAG_DE_ENVIO, enviarFila } from {{ fila|tojson }};
 
@@ -13,6 +13,7 @@ const VERSAO = {{ versao|tojson }};
 const CACHE = `beanlab-${VERSAO}`;
 const ARQUIVOS = {{ arquivos|tojson }};
 const PAGINA_SEM_SINAL = {{ pagina_sem_sinal|tojson }};
+const PAGINAS_GUARDADAS = {{ paginas_guardadas|tojson }};  // endereço -> cópia guardada (ex.: a ajuda)
 // Com sinal fraco, uma página pode demorar minutos. Depois deste tempo, mostra a
 // página "Fotos no celular" para a pessoa poder continuar trabalhando.
 const ESPERA_MAXIMA_MS = 15000;
@@ -20,7 +21,7 @@ const ESPERA_MAXIMA_MS = 15000;
 self.addEventListener('install', (evento) => {
     evento.waitUntil((async () => {
         const cache = await caches.open(CACHE);
-        await cache.addAll([...ARQUIVOS, PAGINA_SEM_SINAL]);
+        await cache.addAll([...ARQUIVOS, PAGINA_SEM_SINAL, ...Object.values(PAGINAS_GUARDADAS)]);
         await self.skipWaiting();  // a versão nova passa a valer já, sem esperar fechar o app
     })());
 });
@@ -48,7 +49,8 @@ self.addEventListener('fetch', (evento) => {
 });
 
 async function abrirPagina(pedido) {
-    const semSinal = async () => (await caches.match(PAGINA_SEM_SINAL)) || Response.error();
+    const guardada = PAGINAS_GUARDADAS[new URL(pedido.url).pathname] || PAGINA_SEM_SINAL;
+    const semSinal = async () => (await caches.match(guardada)) || Response.error();
     let prazo;
     const esgotado = new Promise((resolver) => { prazo = setTimeout(resolver, ESPERA_MAXIMA_MS, null); });
     const pagina = fetch(pedido);

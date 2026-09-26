@@ -16,6 +16,7 @@
             descricao='Sem sinal no campo? Continue fotografando. As fotos ficam guardadas neste '
                       'aparelho e sobem sozinhas para a plataforma quando a conexão voltar.') %}
         {{ c.botao('Ir para a plataforma', 'secundario', href=url_for('web.inicio'), icone_nome='inicio') }}
+        {{ c.botao('Ajuda', 'fantasma', href=url_for('web.ajuda'), icone_nome='info') }}
     {% endcall %}
 
     {#- Situação da conexão: o JavaScript mostra só uma destas. -#}

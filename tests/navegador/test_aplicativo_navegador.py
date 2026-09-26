@@ -136,3 +136,13 @@ def test_politica_de_seguranca_bloqueia_script_injetado(abrir):
     pagina.wait_for_timeout(300)
     assert pagina.evaluate('window.invadiu') is None
     assert any(re.search('Content Security Policy', erro) for erro in pagina.erros_js)
+
+
+def test_sem_sinal_a_ajuda_abre_do_celular(abrir, endereco):
+    pagina = abrir('/coletas', 'celular')
+    esperar_service_worker(pagina)
+    pagina.context.set_offline(True)
+    pagina.goto(endereco + '/ajuda')
+    assert pagina.get_by_role('heading', name='Ajuda', level=1).is_visible()
+    assert pagina.get_by_role('heading', name='Sem sinal no campo').is_visible()
+    assert pagina.erros_js == []

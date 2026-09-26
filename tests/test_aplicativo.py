@@ -167,3 +167,24 @@ def test_endereco_publico_lido_do_tailscale():
     configuracao['AllowFunnel']['pc.rede.ts.net:443'] = False
     assert extrair_endereco_publico(configuracao, 5000) is None  # só na rede Tailscale, não na internet
     assert extrair_endereco_publico({}, 5000) is None
+
+
+# --------------------------------------------------------------------- ajuda
+
+def test_ajuda_com_menu_para_quem_esta_logado(logado):
+    html = logado.get('/ajuda').get_data(as_text=True)
+    assert 'Primeiros passos' in html and 'Sem sinal no campo' in html
+    assert re.search(r'href="/ajuda" aria-current="page"', html)  # item "Ajuda" do menu
+
+
+def test_ajuda_guardada_no_celular_nao_tem_dados_de_ninguem(logado):
+    html = logado.get('/ajuda?offline=1').get_data(as_text=True)
+    assert 'Primeiros passos' in html and 'Ir para a plataforma' in html
+    assert 'name="csrf"' not in html and 'navegacao' not in html and 'Ana' not in html
+
+
+def test_service_worker_guarda_a_ajuda(cliente, administracao):
+    codigo = cliente.get('/sw.js').get_data(as_text=True)
+    guardadas = json.loads(re.search(r'const PAGINAS_GUARDADAS = (\{.*?\});', codigo).group(1))
+    assert guardadas == {'/ajuda': '/ajuda?offline=1'}
+    assert cliente.get('/ajuda?offline=1').status_code == 200  # abre sem login (o celular guarda na instalação)

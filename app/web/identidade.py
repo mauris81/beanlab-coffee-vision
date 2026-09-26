@@ -28,9 +28,9 @@ from app.web import web_bp
 
 PAGINAS_PUBLICAS = {'web.entrar', 'web.primeiro_acesso'}
 # Liberadas sempre, até antes de existir administração: arquivos estáticos, o teste de
-# conexão e as peças do aplicativo que o celular guarda para usar sem sinal (sem dados
-# de ninguém: a página "Fotos no celular" lê as fotos do próprio aparelho).
-SEMPRE_LIBERADAS = {'static', 'api.saude', 'web.service_worker', 'web.fotos_no_celular'}
+# conexão, a ajuda e as peças do aplicativo que o celular guarda para usar sem sinal (sem
+# dados de ninguém: a página "Fotos no celular" lê as fotos do próprio aparelho).
+SEMPRE_LIBERADAS = {'static', 'api.saude', 'web.service_worker', 'web.fotos_no_celular', 'web.ajuda'}
 # Com senha provisória, só dá para trocar a senha (ou sair).
 PERMITIDAS_COM_SENHA_PROVISORIA = {'web.minha_conta', 'web.sair', 'static'}
 

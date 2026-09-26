@@ -107,9 +107,11 @@ def apresentar_status(status) -> Apresentacao:
 ITENS_DE_NAVEGACAO = [
     ('web.inicio', 'Início', 'inicio'),
     ('web.coletas', 'Coletas', 'imagem'),
+    ('web.ajuda', 'Ajuda', 'info'),
 ]
 ITENS_DA_ADMINISTRACAO = [
     ('web.pessoas', 'Pessoas', 'usuario'),
+    ('web.exportar_dados', 'Exportar', 'baixar'),
 ]
 
 # Páginas "de dentro" de um item do menu: marcam o item como atual.

@@ -6,6 +6,7 @@ from app.servicos.banco import preparar_banco
 
 def registrar_comandos(app):
     registrar_comandos_da_ia(app)
+    registrar_comando_de_exportacao(app)
 
     @app.cli.command('preparar-banco')
     def comando_preparar_banco():
@@ -63,6 +64,38 @@ def registrar_comandos_da_ia(app):
         regioes = motor.segmentar(imagem)
         click.echo(f'  IA funcionando: {len(regioes)} de 12 objetos de teste em '
                    f'{time.perf_counter() - inicio:.0f} s.')
+
+
+def registrar_comando_de_exportacao(app):
+    @app.cli.command('exportar')
+    @click.argument('tipo')
+    @click.option('--coleta', 'coletas', multiple=True, type=int, help='id da coleta (pode repetir); padrão: todas')
+    @click.option('--formatos', default='coco,yolo,recortes', show_default=True,
+                  help='além da planilha, que vai sempre (vazio = só a planilha)')
+    @click.option('--incluir-duvidas', is_flag=True, help='formatos de treino com as regiões em dúvida')
+    @click.option('--incluir-incompletas', is_flag=True, help='COCO/YOLO também com fotos com pendentes')
+    @click.option('--saida', type=click.Path(), help='arquivo .zip (padrão: pasta atual)')
+    def comando_exportar(tipo, coletas, formatos, incluir_duvidas, incluir_incompletas, saida):
+        """Exporta os dados de um TIPO de amostra (ex.: graos) num .zip. Útil para exportações grandes."""
+        from pathlib import Path
+
+        from sqlalchemy import select
+
+        from app.dominio import TipoAmostra
+        from app.extensions import db
+        from app.servicos.exportacao import FORMATOS, PedidoDeExportacao, exportar, nome_do_arquivo
+        tipo_amostra = db.session.scalar(select(TipoAmostra).filter_by(codigo=tipo))
+        if tipo_amostra is None:
+            raise click.ClickException(f'Tipo de amostra "{tipo}" não existe.')
+        escolhidos = {f.strip() for f in formatos.split(',') if f.strip()}
+        if desconhecidos := escolhidos - set(FORMATOS):
+            raise click.ClickException(f'Formato desconhecido: {", ".join(desconhecidos)}. Use: {", ".join(FORMATOS)}.')
+        pedido = PedidoDeExportacao(tipo=tipo_amostra, coleta_ids=tuple(coletas), formatos=frozenset(escolhidos),
+                                    sem_duvidas=not incluir_duvidas, so_fotos_completas=not incluir_incompletas)
+        destino = Path(saida or f'{nome_do_arquivo(pedido)}.zip')
+        conteudo = exportar(pedido, destino)
+        click.echo(f'{destino}: fotos {conteudo.fotos}, regiões {len(conteudo.linhas)} '
+                   f'(anotadas {conteudo.anotadas}); fotos de treino {len(conteudo.fotos_de_treino)}.')
 
 
 def descrever_motores() -> str:

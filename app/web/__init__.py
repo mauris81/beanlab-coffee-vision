@@ -7,9 +7,10 @@ Um único blueprint, `web`, com as rotas separadas por assunto:
     coletas.py     coletas, envio de fotos, fotos e miniaturas
     anotacao.py    anotar uma por vez e em lote; recortes e foto média
     aplicativo.py  aplicativo no celular: service worker e "Fotos no celular" (sem sinal)
+    exportacao.py  exportar dados (planilha, COCO, YOLO, recortes), só a administração
 """
 from flask import Blueprint
 
 web_bp = Blueprint('web', __name__)
 
-from app.web import admin, anotacao, aplicativo, coletas, identidade, paginas  # noqa: E402,F401  (registram as rotas)
+from app.web import admin, anotacao, aplicativo, coletas, exportacao, identidade, paginas  # noqa: E402,F401  (registram as rotas)

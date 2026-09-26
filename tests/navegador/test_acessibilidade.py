@@ -15,7 +15,8 @@ pytestmark = pytest.mark.navegador
 # (endereço, com que conta abrir)
 PAGINAS = [('/', 'membro'), ('/guia-visual', 'membro'), ('/pagina-que-nao-existe', 'membro'),
            ('/coletas', 'membro'), ('/conta', 'membro'), ('/pessoas', 'admin'), ('/entrar', None),
-           ('/fotos-no-celular', 'membro'), ('/fotos-no-celular', None)]
+           ('/fotos-no-celular', 'membro'), ('/fotos-no-celular', None),
+           ('/ajuda', 'membro'), ('/ajuda?offline=1', None), ('/exportar', 'admin')]
 
 
 @pytest.mark.parametrize('tema', ['light', 'dark'])

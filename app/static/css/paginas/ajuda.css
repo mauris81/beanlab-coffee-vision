@@ -1,0 +1,25 @@
+/* Ajuda (guia de uso): só o arranjo da página; os componentes vêm de componentes.css. */
+
+.ajuda__sumario ol { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin: 0; padding: 0; list-style: none; }
+.ajuda__sumario a {
+    display: inline-flex; align-items: center;
+    min-height: var(--alvo-toque); padding: 0 var(--espaco-4);
+    border: 1px solid var(--cor-borda); border-radius: var(--raio-pilula);
+    background: var(--cor-superficie);
+    color: var(--cor-texto); text-decoration: none; font-weight: var(--peso-medio);
+}
+.ajuda__sumario a:hover { border-color: var(--cor-primaria); color: var(--cor-primaria-texto); }
+
+.ajuda section { scroll-margin-top: calc(var(--altura-topo) + var(--espaco-4)); }  /* o topo fixo não cobre o título */
+.ajuda h3 { margin: var(--espaco-2) 0 0; font-size: var(--texto-lg); }
+.ajuda p, .ajuda ul, .ajuda ol { margin: 0; }
+.ajuda__passos, .ajuda__lista { display: flex; flex-direction: column; gap: var(--espaco-3); padding-left: var(--espaco-5); }
+.ajuda .alerta ul { display: flex; flex-direction: column; gap: var(--espaco-1); padding-left: var(--espaco-5); }
+
+.ajuda__atalhos { display: grid; gap: var(--espaco-2); margin: 0; }
+.ajuda__atalhos div { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: var(--espaco-3); align-items: center; }
+.ajuda__atalhos dd { margin: 0; }
+
+.ajuda__pergunta { border-top: 1px solid var(--cor-borda); padding-block: var(--espaco-2); }
+.ajuda__pergunta summary { cursor: pointer; min-height: var(--alvo-toque); display: flex; align-items: center; font-weight: var(--peso-forte); }
+.ajuda__pergunta p { padding-bottom: var(--espaco-2); }

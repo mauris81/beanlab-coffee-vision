@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+
+{% block titulo %}Exportar dados · BeanLab{% endblock %}
+
+{% block conteudo %}
+<div class="pilha pilha--grande">
+    {{ c.cabecalho_pagina('Exportar dados', sobretitulo='Administração',
+        descricao='Baixe as anotações num arquivo .zip: planilha para analisar e formatos para treinar modelos. '
+                  'Dentro do arquivo, o LEIAME.txt explica cada parte.') }}
+
+    <nav aria-label="Tipo de amostra">
+        <ul class="filtros">
+            {%- for t in tipos %}
+            <li><a class="filtro" href="{{ url_for('web.exportar_dados', tipo=t.codigo) }}"{% if t.id == tipo.id %} aria-current="page"{% endif %}>
+                {{- icone(icone_do_tipo(t.codigo)) }}{{ t.nome }}</a></li>
+            {%- endfor %}
+        </ul>
+    </nav>
+
+    {% if not coletas %}
+        {% call c.vazio('Nenhuma coleta de ' ~ tipo.nome|lower ~ ' ainda', 'Quando houver coletas anotadas, elas aparecem aqui.', icone_do_tipo(tipo.codigo)) %}{% endcall %}
+    {% else %}
+    <form method="post" action="{{ url_for('web.baixar_exportacao') }}" class="pilha pilha--grande">
+        {{ campo_csrf() }}
+        <input type="hidden" name="tipo" value="{{ tipo.codigo }}">
+
+        <fieldset class="campo cartao pilha">
+            <legend class="campo__rotulo">Coletas</legend>
+            <div class="pilha pilha--pequena">
+                {%- for item in coletas %}
+                <label class="opcao">
+                    <input type="checkbox" name="coletas" value="{{ item.coleta.id }}" checked>
+                    <span><strong>{{ item.coleta.nome }}</strong>
+                        <span class="texto-suave"> · {{ plural(item.fotos, 'foto') }} · {{ numero(item.anotadas) }} de
+                        {{ plural(item.regioes, 'região anotada', 'regiões anotadas') }}{% if item.duvidas %} · {{ numero(item.duvidas) }} em dúvida{% endif %}</span></span>
+                </label>
+                {%- endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="campo cartao pilha">
+            <legend class="campo__rotulo">Formatos</legend>
+            <label class="opcao"><input type="checkbox" checked disabled>
+                <span><strong>Planilha (CSV)</strong> <span class="texto-suave">· sempre vai: uma linha por região, abre no Excel</span></span></label>
+            {%- for codigo, descricao in formatos.items() %}
+            <label class="opcao"><input type="checkbox" name="formatos" value="{{ codigo }}" checked>
+                <span><strong>{{ descricao.split(':')[0] }}</strong> <span class="texto-suave">·{{ descricao.split(':', 1)[1] }}</span></span></label>
+            {%- endfor %}
+        </fieldset>
+
+        <fieldset class="campo cartao pilha">
+            <legend class="campo__rotulo">Para treinar modelos</legend>
+            <label class="opcao"><input type="checkbox" name="sem_duvidas" value="1" checked>
+                <span>Deixar de fora as regiões em dúvida <span class="texto-suave">· rótulo incerto ensina errado</span></span></label>
+            <label class="opcao"><input type="checkbox" name="so_fotos_completas" value="1" checked>
+                <span>Só fotos com todas as regiões anotadas (COCO e YOLO) <span class="texto-suave">· um grão sem rótulo
+                    ensinaria ao modelo que ele é "fundo"</span></span></label>
+            <p class="texto-suave">A planilha sempre traz tudo, inclusive pendentes e dúvidas, com colunas para filtrar.</p>
+        </fieldset>
+
+        {% call c.alerta('info', 'Com todas as coletas e as opções marcadas') %}
+            <p>{{ plural(conteudo.fotos_de_treino|length, 'foto', 'fotos') }} e
+               {{ plural(conteudo.regioes_de_treino|length, 'região', 'regiões') }} para COCO e YOLO;
+               {{ plural(conteudo.recortes|length, 'recorte') }}. Arquivo de cerca de
+               {{ '%.0f'|format(tamanho / 1024 / 1024) if tamanho >= 1024 * 1024 else 'menos de 1' }} MB.
+               Pode levar alguns segundos a cada 100 fotos.</p>
+        {% endcall %}
+
+        <div>{{ c.botao('Baixar .zip', tipo='submit', icone_nome='baixar', tamanho='grande') }}</div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
