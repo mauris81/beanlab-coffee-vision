@@ -5,6 +5,7 @@
 | [ROADMAP.md](ROADMAP.md) | Todos | Em que fase estamos e o que vem depois |
 | [ARQUITETURA.md](ARQUITETURA.md) | Quem programa | Como o código está organizado e por quê |
 | [MODELO_DE_DADOS.md](MODELO_DE_DADOS.md) | Quem programa / pesquisa | Quais dados guardamos e como se relacionam |
+| [PUBLICACAO.md](PUBLICACAO.md) | Quem cuida do PC | Publicar na internet, instalar no celular, uso sem sinal, problemas comuns |
 | [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md) | Quem programa | Como rodar testes e mudar o banco |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Quem programa / desenha | Cores, componentes, acessibilidade, como escrever textos da tela |
 | [../taxonomias/LEIAME.md](../taxonomias/LEIAME.md) | Agrônomos / pesquisa | Como editar as classes de cada tipo de amostra |

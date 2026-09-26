@@ -14,6 +14,9 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
 ```
  Celular / PC                     Servidor                                 Disco
  ────────────                     ────────                                 ─────
+ 0. Sem sinal? A foto fica
+    guardada no celular e sobe
+    sozinha depois ✅ ─ ─ ─ ─ ─►
  1. Tira ou escolhe a foto  ──►   Ingestão: valida, calcula hash,   ──►   C:\CafeData\imagens\
                                   lê EXIF (data, GPS), miniatura           (nome = hash)  ✅
                                         │
@@ -30,10 +33,41 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
  4. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
 ```
 
+## Na internet e no celular ✅
+
+A plataforma roda neste PC e o **Tailscale Funnel** dá a ela um endereço HTTPS na
+internet ([decisão 0007](decisoes/0007-publicacao-e-aplicativo.md); guia para quem cuida
+do PC: [PUBLICACAO.md](PUBLICACAO.md)).
+
+```
+ celular (4G) ──HTTPS──► Tailscale (neste PC) ──http──► 127.0.0.1:5000 (waitress)
+ celular (Wi-Fi) ─────────────────────http───────────► 192.168.x.x:5000
+```
+
+- **Aplicativo (PWA):** `static/manifest.json` + ícones em `static/aplicativo/`.
+- **Service worker** (`templates/sw.js`, servido por `web/aplicativo.py` em `/sw.js`):
+  guarda os arquivos de `static/` e a página genérica **"Fotos no celular"**; sem sinal
+  (ou após 15 s), mostra essa página. A versão é um hash dos arquivos: mudou algo, o
+  celular atualiza sozinho. **Páginas com dados nunca ficam guardadas.**
+- **Fila de fotos** (`static/js/fila-fotos.js`, IndexedDB): usada pela página da coleta
+  (envio que falha ou "Guardar no celular"), por "Fotos no celular" e pelo service
+  worker ("sincronização em segundo plano"). Envia uma foto por pedido, com o
+  cabeçalho `X-Envio-Via: fila`; a rota de envio responde em JSON. Cada foto só sobe
+  com a mesma pessoa logada. `static/js/aplicativo.js` liga tudo nas páginas.
+- **`/api/coletas`**: lista curta que o celular guarda para fotografar sem sinal.
+
 ## Segurança ✅
 
+- **Política de conteúdo (CSP) e outros cabeçalhos** em toda resposta
+  (`app/seguranca.py`): só roda código da própria plataforma. **Nenhum `<script>` ou
+  `onclick` dentro do HTML**; um teste confere todas as páginas.
+- **Proxy:** `X-Forwarded-For`/`-Proto` só valem vindos de 127.0.0.1 (o Tailscale);
+  do Wi-Fi são apagados. Com HTTPS: cookie `Secure` e HSTS.
+- **Limite de tentativas por IP** (login e primeiro acesso), além do bloqueio por conta.
+- **Modo desenvolvimento não atende pela internet** (403).
 - **Login obrigatório** em tudo, menos entrar/primeiro acesso/estáticos/`/api/saude`
-  (`proteger_paginas` em `web/identidade.py`). Senha provisória só deixa trocar a senha.
+  e as peças do aplicativo (`/sw.js`, "Fotos no celular"): `proteger_paginas` em
+  `web/identidade.py`. Pedidos do JavaScript recebem erros em JSON, nunca páginas. Senha provisória só deixa trocar a senha.
   Detalhes e porquês: [decisão 0006](decisoes/0006-login-e-contas.md).
 - **Contas:** regras em `servicos/contas.py` (hash scrypt, bloqueio após 5 erros, nunca
   sem administração, código de primeiro acesso). Telas: `web/identidade.py` (entrar,
@@ -42,7 +76,7 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
   (`{{ campo_csrf() }}`); sem ele o pedido é recusado (`web/identidade.py`).
 - **Cookie de sessão** assinado, `SameSite=Lax`, válido por 90 dias; renovado a cada login;
   deixa de valer se a senha mudar ou a conta for desativada (`Pessoa.versao_sessao`).
-- **Redirecionamento seguro** depois de "Quem é você?": só para páginas da plataforma.
+- **Redirecionamento seguro** depois do login: só para páginas da plataforma.
 - **Arquivos:** o formato vem do conteúdo, não do nome; o nome original nunca vira
   caminho no disco (arquivos são gravados pelo hash).
 
@@ -53,9 +87,10 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
 2. `preparar_banco()`: aplica as migrações pendentes (`migrations/`) e sincroniza as
    classes com os arquivos `taxonomias/*.yaml`.
    - Se um YAML tiver erro, a plataforma **não abre** e mostra a mensagem.
-3. Mostra os endereços (PC e celulares), **retoma as segmentações que ficaram pela
-   metade** e começa a atender com o servidor **waitress** (vários celulares ao mesmo
-   tempo). No modo desenvolvimento usa o servidor do Flask, que recarrega ao salvar.
+3. Mostra os endereços (PC, celulares no Wi-Fi e, se o Funnel estiver ligado, o da
+   internet), **retoma as segmentações que ficaram pela metade** e começa a atender
+   com o servidor **waitress** (vários celulares ao mesmo tempo), sem deixar o PC
+   suspender. No modo desenvolvimento usa o servidor do Flask, que recarrega ao salvar.
 
 ## Camadas do código
 
@@ -66,6 +101,8 @@ app/
 ├── extensions.py      ✅ banco (SQLAlchemy) e migrações; liga proteções do SQLite
 ├── cli.py             ✅ comandos de terminal (flask --app app preparar-banco)
 ├── fila.py            ✅ fila de segmentação em segundo plano (decisão 0005)
+├── seguranca.py       ✅ CSP e cabeçalhos, proxy só de 127.0.0.1, cookie seguro, limite por IP
+├── publicacao.py      ✅ lê o endereço do Tailscale Funnel; não deixa o PC suspender
 ├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
@@ -73,12 +110,15 @@ app/
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
-│                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py;
+│                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py,
+│                         aplicativo.py (service worker, "Fotos no celular");
 │                         apresentacao.py = ícones, menu, status, plural
 ├── api/               ✅ rotas que devolvem DADOS em JSON: saude.py, anotacao.py
-│                         (regiões da coleta, anotar, desfazer)
-├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system
-└── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg
+│                         (regiões da coleta, anotar, desfazer), coletas.py (lista p/ celular)
+├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system; sw.js
+└── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg,
+                          manifest.json e aplicativo/ (ícones do aplicativo)
+ferramentas/           ✅ scripts de apoio (gerar os ícones do aplicativo a partir do logotipo)
 taxonomias/            ✅ listas de classes por tipo de amostra (YAML, editável)
 migrations/            ✅ histórico de mudanças no banco (Alembic)
 tests/                 ✅ testes automáticos (pytest)
@@ -107,7 +147,8 @@ Ver [decisão 0003](decisoes/0003-dados-fora-do-onedrive.md).
   é feita só na tela.
 - **Nada de lógica em templates.** O template só exibe o que a rota entregou.
 - **JavaScript em módulos ES nativos**, sem etapa de build
-  (ver [decisão 0001](decisoes/0001-manter-flask-sem-build.md)).
+  (ver [decisão 0001](decisoes/0001-manter-flask-sem-build.md)), **sempre em arquivo**
+  (`static/js/`), nunca dentro do HTML: a política de segurança bloqueia.
 - **Visual só com tokens e componentes do design system**; nada carregado da internet
   (ver [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) e [decisão 0004](decisoes/0004-visual-offline.md)).
 - **Toda mudança no banco passa por migração**; nunca apagar o banco para "consertar".

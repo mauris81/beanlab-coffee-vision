@@ -46,6 +46,17 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
    com um toque ou uma tecla (1–9) e a tela já vai para a próxima. Z desfaz; D marca
    dúvida; ? mostra os atalhos. Para muitas regiões iguais, use **Anotar em lote**.
 
+### No celular, como aplicativo, e fora do Wi-Fi
+
+Dê dois cliques em **`Publicar na internet.bat`** e escolha **1**: a plataforma ganha
+um endereço com cadeado (`https://...ts.net`) que funciona em qualquer lugar, até nos
+dados móveis. Por esse endereço, o celular **instala a plataforma como aplicativo**
+(cartão na página inicial) e ela **abre mesmo sem sinal**: as fotos ficam guardadas no
+celular e sobem sozinhas quando a conexão volta.
+
+O PC continua sendo o servidor: precisa ficar ligado, com o Tailscale conectado e a
+plataforma aberta. Passo a passo e cuidados: [docs/PUBLICACAO.md](docs/PUBLICACAO.md).
+
 ### Baixando o projeto em outro computador
 
 Em **https://github.com/mauris81/beanlab-coffee-vision**, clique no botão verde
@@ -77,12 +88,14 @@ Testes, migrações do banco e onde colocar cada coisa:
 | Pasta / arquivo   | O que é |
 |-------------------|---------|
 | `Iniciar BeanLab.bat` | Atalho de duplo clique para instalar e iniciar |
+| `Publicar na internet.bat` | Liga ou desliga o endereço na internet (Tailscale Funnel) |
 | `app/`            | Código da aplicação (detalhes em [docs/ARQUITETURA.md](docs/ARQUITETURA.md)) |
 | `taxonomias/`     | **Classes de cada tipo de amostra**, editáveis sem programar ([como editar](taxonomias/LEIAME.md)) |
 | `migrations/`     | Histórico de mudanças no banco (aplicado sozinho ao iniciar) |
 | `tests/`          | Testes automáticos |
 | `docs/`           | Documentação: roteiro, arquitetura, modelo de dados, decisões |
 | `run.py`          | Ponto de entrada (usado pelo atalho) |
+| `ferramentas/`    | Scripts de apoio para quem programa (ex.: gerar os ícones do aplicativo) |
 | **`C:\CafeData`** | **Banco de dados e fotos** (fora do projeto e do OneDrive; faça backup desta pasta) |
 | `backups/`        | Cópia do sistema antigo (fora do git) |
 

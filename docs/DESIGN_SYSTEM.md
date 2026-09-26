@@ -93,7 +93,13 @@ Componentes só em CSS (sem macro), com exemplo no guia: **opções em cartão**
 com `aria-current`), **cartão de foto** (`.grade-fotos` + `.foto`) e **área de envio**
 (`.envio`, com botão de câmera e botão de arquivos separados), **botão de classe**
 (`.botao-classe` com `aria-pressed` e `aria-keyshortcuts`), **tabela** (`.tabela` dentro de
-`.tabela-rolagem` focável) e **"Mostrar senha"** (macro `mostrar_senha`).
+`.tabela-rolagem` focável), **"Mostrar senha"** (macro `mostrar_senha`) e a **faixa de
+fotos guardadas no celular** (`.faixa-fila`, em `base.html`, preenchida por
+`js/aplicativo.js`).
+
+**Páginas genéricas** (`{% set pagina_generica = true %}`, ex.: "Fotos no celular"): o
+celular guarda a página para abrir sem sinal, então ela não mostra a pessoa, o menu
+nem nada do banco; o JavaScript preenche a partir do próprio aparelho.
 
 Datas na tela: `{{ data|hora_local }}` (o banco guarda em UTC).
 
@@ -117,6 +123,7 @@ Comportamentos sem JS na página: `data-abrir-dialogo="id"`, `data-fechar-dialog
 | Números escritos junto das barras: "4 de 309 · 1%" | Só a barra colorida |
 | Plural certo: "1 foto", "3 fotos" (`plural()`) | "3 foto(s)", "região(ões)" |
 | Não interromper: atualizações automáticas esperam a pessoa terminar o que está fazendo | Recarregar a página com um diálogo aberto |
+| Sem sinal, dizer que nada se perdeu e o que vai acontecer: "A foto ficou guardada no celular e sobe sozinha quando a conexão voltar." | "Erro de rede", "Falha no envio" |
 | Termos do café e da fazenda: coleta, talhão, ardido, florada | Traduções literais do inglês |
 | Estado vazio explica e oferece o próximo passo | Página em branco |
 
@@ -130,4 +137,5 @@ Comportamentos sem JS na página: `data-abrir-dialogo="id"`, `data-fechar-dialog
 - [ ] Estado vazio, carregando e erro pensados (não só o "caminho feliz")
 - [ ] Testada no celular (390 px) e no computador, nos dois temas
 - [ ] Página adicionada à lista de `tests/navegador/test_acessibilidade.py`
+- [ ] Nenhum `<script>` com código nem `onclick` no HTML (a política de segurança bloqueia)
 - [ ] Novo componente? Macro + CSS + exemplo no `/guia-visual`

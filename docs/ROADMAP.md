@@ -9,12 +9,12 @@ ser revisado ou desfeito.
 | 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
 | 2. Ingestão | ✅ Concluída (25/09/2026) | Coletas, "Quem é você?", envio pela câmera ou em lote (rotação, GPS, repetidas, miniaturas), recortes prontos e COCO, segmentação em segundo plano com status ao vivo, motor clássico corrigido, servidor waitress |
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
-| 4. Dashboard | ⏳ Próxima (depois da 5, por decisão) | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
+| 4. Dashboard | ⏳ Próxima | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
 | 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
 | 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
 | L1. Login e contas | ✅ Concluída (25/09/2026) | Login obrigatório; contas criadas pela administração (senha provisória); perfis membro/administração; bloqueio após tentativas; primeiro acesso com código ([decisão 0006](decisoes/0006-login-e-contas.md)) |
-| L2. Aplicativo e publicação | ⏳ Próxima | Instalar no celular como aplicativo; fila de fotos no celular para sinal fraco; publicar no PC do responsável com Tailscale Funnel (HTTPS grátis) |
+| L2. Aplicativo e publicação | ✅ Concluída (25/09/2026) | Instalar no celular como aplicativo; abre sem sinal; fotos guardadas no celular sobem sozinhas quando o sinal volta; segurança para a internet (CSP, limite por IP); "Publicar na internet.bat" com Tailscale Funnel ([decisão 0007](decisoes/0007-publicacao-e-aplicativo.md), [guia](PUBLICACAO.md)) |
 
 Extras já entregues fora das fases:
 - **Atalho de duplo clique** `Iniciar BeanLab.bat`: instala e inicia sozinho.
@@ -26,9 +26,8 @@ Extras já entregues fora das fases:
 - **Dados antigos:** começar do zero. O estado antigo está em
   `backups/2026-09-25_estado-original/` (ver o LEIAME de lá: 301 imagens ainda
   precisam ser baixadas do OneDrive para completar o backup).
-- **Usuários:** ainda não definido. A expectativa é uso como aplicativo no celular,
-  na fazenda. Por isso: interface pensada primeiro para celular, cada pessoa se
-  identifica pelo nome (sem senha), e o modelo de dados já prevê login no futuro.
+- **Usuários:** a equipe usa como aplicativo no celular, na fazenda. Por isso a
+  interface é pensada primeiro para celular (login e contas: fase L1).
 - **Tecnologia:** continua Python (3.14) + Flask, sem etapa de build no front-end
   (ver [decisoes/0001](decisoes/0001-manter-flask-sem-build.md)).
 - **Código no GitHub, em repositório público:**
@@ -46,6 +45,11 @@ Extras já entregues fora das fases:
 - **Classes:** começar com as listas propostas; ajustes depois, editando `taxonomias/`.
 
 ## Pendências para o responsável
+
+- [ ] **Publicar:** criar a conta de administração (código na janela preta) e depois
+      `Publicar na internet.bat` → 1, aprovando o link do Tailscale na primeira vez
+      ([guia](PUBLICACAO.md)). Testar no celular com os dados móveis (Wi-Fi desligado).
+- [ ] Deixar o PC sem atualização automática do Windows no horário de trabalho.
 
 - [ ] **Testar o motor de grãos com fotos reais** (fundo azul). Os testes usam fotos
       sintéticas; a foto original do projeto (`teste_1.jpeg`) está só na nuvem do OneDrive.

@@ -44,3 +44,6 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | Observações sumiam ao trocar de item | Observação e dúvida guardadas por anotação e mostradas ao voltar à região | 5 | `test_situacao_das_regioes_mostra_a_anotacao_vigente` |
 | **Sem login**: qualquer pessoa na rede podia usar e mudar dados | Login obrigatório, contas criadas pela administração, bloqueio após tentativas | L1 | `tests/test_web_login.py`, `tests/test_contas.py` |
 | **Página de senha provisória mostrava o usuário de quem criou a conta** (achado durante a fase, antes de publicar) | Variáveis do topo da página com nomes próprios (`pessoa_logada`) | L1 | `test_administracao_cria_conta_e_a_senha_aparece_uma_vez` |
+| **Sem sinal, o envio falhava e as fotos tinham de ser escolhidas de novo** | Fotos guardadas no celular sobem sozinhas quando a conexão volta; "Fotos no celular" funciona sem sinal | L2 | `tests/navegador/test_aplicativo_navegador.py` |
+| Scripts escritos dentro das páginas (tema, guia visual) impediam uma política de segurança rígida | Tudo em arquivos `.js`; CSP sem `unsafe-inline` para scripts | L2 | `test_nenhuma_pagina_tem_codigo_embutido` |
+| Página inicial ainda dizia que envio e anotação "chegam nas próximas etapas" | Texto trocado por atalhos para as coletas e o cartão "Use como aplicativo" | L2 | — |
