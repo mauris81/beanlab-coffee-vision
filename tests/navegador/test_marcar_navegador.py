@@ -84,6 +84,24 @@ def test_tocar_escolher_classe_e_excluir(abrir, aplicacao, foto, tela):
     assert pagina.erros_js == []
 
 
+def test_lembra_o_tamanho_preferido(abrir, aplicacao, foto):
+    """Salvou com "Menor"? O próximo toque já começa no menor."""
+    pagina = abrir(f'/imagens/{foto}/marcar')
+    pagina.wait_for_function('() => document.querySelector("[data-contornos]").getAttribute("viewBox")')
+    caixa = pagina.locator('[data-visor]').bounding_box()
+    pagina.mouse.click(caixa['x'] + caixa['width'] * 0.3, caixa['y'] + caixa['height'] * 0.5)
+    pagina.locator('.contorno--previa').wait_for()
+    assert 'Contorno 2 de 2' in pagina.inner_text('[data-texto-painel]')  # o sugerido
+    pagina.get_by_role('button', name='Menor').click()
+    pagina.get_by_role('button', name=re.compile('Botão floral')).click()
+    pagina.wait_for_selector('text=Região marcada: Botão floral.')
+    pagina.mouse.click(caixa['x'] + caixa['width'] * 0.7, caixa['y'] + caixa['height'] * 0.5)
+    pagina.locator('.contorno--previa').wait_for()
+    assert 'Contorno 1 de 2' in pagina.inner_text('[data-texto-painel]')
+    pagina.keyboard.press('Escape')
+    assert pagina.erros_js == []
+
+
 def test_zoom_e_teclado(abrir, aplicacao, foto):
     pagina = abrir(f'/imagens/{foto}/marcar')
     pagina.wait_for_function('() => document.querySelector("[data-contornos]").getAttribute("viewBox")')

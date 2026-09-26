@@ -15,6 +15,9 @@ Tela **"Marcar na foto"** (`/imagens/<id>/marcar`), uma foto por vez:
   tocado.
   - Ele devolve até três contornos (ex.: pétala, flor, cacho). **Menor/Maior** trocam
     entre eles, e o sugerido é o que o modelo acha melhor.
+  - **A tela lembra o tamanho preferido**, por tipo de amostra. Na foto real de flores, o
+    sugerido costuma pegar um cachinho de 2 a 5 botões e o botão sozinho é o "Menor". Quem
+    salva com "Menor" passa a receber o menor já no próximo toque.
   - **Escolher a classe salva a região já anotada.** São dois toques por objeto.
 - **Tocar num contorno** seleciona a região: dá para trocar a classe ou **excluir**.
   - Excluir apaga as anotações da região.
@@ -38,6 +41,22 @@ Tela **"Marcar na foto"** (`/imagens/<id>/marcar`), uma foto por vez:
   segmentação (que leva ~2 min por foto) terminar.
 
 Regiões criadas assim são **manuais** (motor `toque`). "Segmentar de novo" não mexe nelas.
+
+## Sugestões automáticas de flores: testadas e descartadas (26/09/2026)
+Numa segunda foto real (planta inteira, de baixo, com céu e nuvens), foram testadas regras
+de cor para a IA sugerir as flores sozinha:
+- flor = creme (claro, levemente amarelado, tom neutro);
+- só dentro da copa (cercada de folhas verde-escuras).
+
+A regra separou bem as nuvens, o céu e as folhas. Mas:
+- perdeu as **flores na sombra**, no meio da planta, que ficam acinzentadas;
+- confundiu com a **palha seca** do chão e com o **brilho do céu nas folhas**;
+- qualquer ajuste feito para esta luz quebraria na foto seguinte.
+
+Sugestões que erram muito dão mais trabalho do que ajudam (cada região errada custa dois
+toques para apagar). **Caminho escolhido:** marcar com o toque e, com algumas centenas de
+flores anotadas, **treinar um modelo próprio** (YOLO de segmentação, com a exportação que já
+existe), que aprende com a luz e o jeito de fotografar da equipe.
 
 ## Consequências
 - ✅ Folhas, flores e frutos, que não têm segmentação automática, passam a poder ser

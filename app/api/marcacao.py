@@ -50,6 +50,7 @@ def dados_da_marcacao(imagem_id):
     fotos = [i.id for i in imagem.coleta.imagens]
     posicao = fotos.index(imagem.id)
     return {
+        'tipo_amostra': imagem.coleta.tipo_amostra.codigo,
         'imagem': {'id': imagem.id, 'nome': imagem.nome_original, 'largura': imagem.largura,
                    'altura': imagem.altura, 'media': url_for('web.media_da_foto', imagem_id=imagem.id),
                    'original': url_for('web.arquivo_da_foto', imagem_id=imagem.id)},

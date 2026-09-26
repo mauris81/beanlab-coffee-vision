@@ -24,6 +24,15 @@ const ZOOM_MAXIMO = 12;
 const MOVIMENTO_DE_TOQUE = 8;      // px: mais que isso é arrastar, não tocar
 const ESPERA_PARA_PREPARAR = 700;  // ms parado antes de pedir a análise da parte visível
 
+// Tamanho preferido: quantos passos a pessoa costuma andar a partir do contorno sugerido
+// (ex.: nas flores, o sugerido pega o cachinho e a pessoa aperta "Menor" para pegar um
+// botão). Guardado por tipo de amostra; o próximo toque já começa nesse tamanho.
+const preferencia = {
+    chave: '',
+    ler() { try { return Number(localStorage.getItem(this.chave)) || 0; } catch { return 0; } },
+    gravar(passos) { try { localStorage.setItem(this.chave, String(passos)); } catch { /* sem armazenamento: só não lembra */ } },
+};
+
 const estado = {
     imagem: null, classes: new Map(), porTecla: new Map(), regioes: [], toqueDisponivel: false,
     selecionada: null,                     // id da região selecionada
@@ -256,7 +265,9 @@ async function marcar({ x, y }) {
             painel();
             return;
         }
-        estado.previa = { candidatos: resposta.candidatos, indice: Math.max(0, resposta.sugerido), x, y };
+        const sugerido = Math.max(0, resposta.sugerido);
+        const indice = Math.min(resposta.candidatos.length - 1, Math.max(0, sugerido + preferencia.ler()));
+        estado.previa = { candidatos: resposta.candidatos, indice, sugerido, x, y };
         $('[data-duvida]').checked = false;
         desenhar();
         painel();
@@ -284,6 +295,7 @@ async function escolherClasse(codigo) {
     const duvida = $('[data-duvida]').checked;
     if (estado.previa) {
         const candidato = estado.previa.candidatos[estado.previa.indice];
+        preferencia.gravar(estado.previa.indice - estado.previa.sugerido);
         estado.previa = null;
         desenhar();
         painel();
@@ -476,6 +488,7 @@ async function iniciar() {
     }
     estado.imagem = dados.imagem;
     estado.regioes = dados.regioes;
+    preferencia.chave = `marcar:tamanho:${dados.tipo_amostra}`;
     estado.toqueDisponivel = dados.toque_disponivel;
     dados.classes.forEach((c) => {
         estado.classes.set(c.codigo, c);
