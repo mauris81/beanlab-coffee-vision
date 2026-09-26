@@ -1,5 +1,5 @@
 """Administração de pessoas (só para administradores): criar contas, redefinir senha,
-mudar perfil, desativar e reativar.
+mudar perfil, desativar, reativar e excluir.
 
 Senhas provisórias aparecem UMA vez, na resposta da própria ação (não vão para
 mensagens da sessão, que ficam gravadas num cookie).
@@ -10,20 +10,26 @@ from sqlalchemy import select
 from app.dominio import Papel, Pessoa
 from app.extensions import db
 from app.servicos.contas import (
-    ContaInvalida, criar_conta, definir_papel, desativar, reativar, redefinir_senha,
+    ContaInvalida, criar_conta, definir_papel, desativar, excluir_conta, reativar, redefinir_senha,
+    tem_trabalho,
 )
 from app.web import web_bp
 from app.web.identidade import exige_administrador, pessoa_atual
 
 
 def _pessoa_ou_404(pessoa_id: int) -> Pessoa:
-    return db.session.get(Pessoa, pessoa_id) or abort(404)
+    pessoa = db.session.get(Pessoa, pessoa_id)
+    if pessoa is None or pessoa.removida_em:  # conta excluída não tem mais ações
+        abort(404)
+    return pessoa
 
 
 def _lista(erro=None, dados=None, status=200):
-    pessoas = db.session.scalars(select(Pessoa).order_by(Pessoa.ativa.desc(), Pessoa.nome)).all()
+    todas = db.session.scalars(select(Pessoa).order_by(Pessoa.ativa.desc(), Pessoa.nome)).all()
+    pessoas = [p for p in todas if not p.removida_em]
     return render_template('admin_pessoas.html', pessoas=pessoas, erro=erro, dados=dados or {},
-                           papeis=list(Papel)), status
+                           papeis=list(Papel), removidas=len(todas) - len(pessoas),
+                           com_trabalho={p.id for p in pessoas if tem_trabalho(p)}), status
 
 
 @web_bp.get('/pessoas')
@@ -89,4 +95,21 @@ def reativar_pessoa(pessoa_id):
     reativar(pessoa)
     db.session.commit()
     flash(f'Conta de {pessoa.nome} reativada.', 'sucesso')
+    return redirect(url_for('web.pessoas'))
+
+
+@web_bp.post('/pessoas/<int:pessoa_id>/excluir')
+@exige_administrador
+def excluir_pessoa(pessoa_id):
+    pessoa = _pessoa_ou_404(pessoa_id)
+    nome = pessoa.nome
+    try:
+        resultado = excluir_conta(pessoa, feito_por=pessoa_atual())
+    except ContaInvalida as problema:
+        flash(str(problema), 'aviso')
+    else:
+        db.session.commit()
+        flash(f'Conta de {nome} excluída.' if resultado == 'apagada' else
+              f'Conta de {nome} excluída. O que ela anotou continua na pesquisa, sem o nome '
+              f'(aparece como "{pessoa.nome}").', 'info')
     return redirect(url_for('web.pessoas'))

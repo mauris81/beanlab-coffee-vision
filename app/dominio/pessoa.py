@@ -39,6 +39,9 @@ class Pessoa(db.Model):
     # Muda quando a senha é trocada ou a conta desativada: as sessões antigas (outros
     # aparelhos) deixam de valer na hora.
     versao_sessao: Mapped[int] = mapped_column(default=1)
+    # Conta excluída que já tinha trabalho: nome, usuário e senha foram apagados, mas o
+    # registro fica para as anotações continuarem ligadas a "alguém" (sem identificar).
+    removida_em: Mapped[datetime | None]
 
     @property
     def eh_administrador(self) -> bool:

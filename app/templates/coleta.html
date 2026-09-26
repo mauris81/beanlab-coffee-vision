@@ -142,6 +142,39 @@
         {% endif %}
     </section>
 
+    {# ------------------------------------------------------- excluir coleta #}
+    {%- set perde = plural(conteudo.fotos, 'foto') ~ ', ' ~ plural(conteudo.regioes, 'região', 'regiões')
+                    ~ ' e ' ~ plural(conteudo.anotacoes, 'anotação', 'anotações') %}
+    <section class="zona-perigo pilha pilha--pequena" id="excluir" aria-labelledby="titulo-excluir-coleta">
+        <h2 id="titulo-excluir-coleta">Excluir coleta</h2>
+        {% if not motivo_para_nao_excluir %}
+        <p class="texto-suave">Apaga a coleta com {{ perde }}. Não dá para desfazer.</p>
+        <div>{{ c.botao('Excluir coleta', 'perigo', icone_nome='lixeira', attrs={'data-abrir-dialogo': 'dialogo-excluir-coleta'}) }}</div>
+        {% else %}
+        <p class="texto-suave">{{ motivo_para_nao_excluir }}</p>
+        {% endif %}
+    </section>
+
+    {% if not motivo_para_nao_excluir %}
+    <dialog class="dialogo" id="dialogo-excluir-coleta" aria-labelledby="dialogo-excluir-coleta-titulo">
+        <form method="post" action="{{ url_for('web.excluir_a_coleta', coleta_id=coleta.id) }}">
+            {{ campo_csrf() }}
+            <div class="dialogo__corpo pilha pilha--pequena">
+                <h2 id="dialogo-excluir-coleta-titulo">Excluir a coleta "{{ coleta.nome }}"?</h2>
+                <p>Serão apagadas {{ perde }}. Isso não pode ser desfeito.</p>
+                {%- if conteudo.anotacoes %}
+                {{ c.campo('confirmacao', 'Para confirmar, digite o nome da coleta',
+                           dica=coleta.nome, attrs={'autocomplete': 'off', 'spellcheck': 'false'}) }}
+                {%- endif %}
+            </div>
+            <div class="dialogo__acoes">
+                {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+                {{ c.botao('Excluir coleta', 'perigo', tipo='submit') }}
+            </div>
+        </form>
+    </dialog>
+    {% endif %}
+
     <dialog class="dialogo" id="dialogo-excluir" aria-labelledby="dialogo-excluir-titulo">
         <form method="post" data-form-acao>
             {{ campo_csrf() }}

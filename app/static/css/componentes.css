@@ -568,3 +568,8 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 .lista-atencao__item--perigo > .icone { color: var(--cor-perigo); }
 .lista-atencao__item--aviso { border-left-color: var(--cor-aviso); }
 .lista-atencao__item--aviso > .icone { color: var(--cor-aviso); }
+
+/* --- Zona de perigo (ação que apaga muita coisa, no fim da página) ------------ */
+.zona-perigo { padding: var(--espaco-5); border: 1px solid var(--cor-perigo); border-radius: var(--raio-lg); background: var(--cor-superficie); }
+.zona-perigo h2 { font-size: var(--texto-xl); }
+.zona-perigo p { margin: 0; }

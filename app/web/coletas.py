@@ -9,6 +9,9 @@ from app.dominio import Coleta, Imagem, JobSegmentacao, Regiao, StatusImagem, Ti
 from app.extensions import db
 from app.fila import fila
 from app.servicos.anotacoes import progresso_da_coleta
+from app.servicos.coletas import (
+    ExclusaoRecusada, conteudo_da_coleta, excluir_coleta, motivo_para_nao_excluir,
+)
 from app.servicos.ingestao import (
     ImportacaoInvalida, excluir_imagem, importar_coco, receber_foto, receber_recorte,
 )
@@ -102,9 +105,11 @@ def coleta(coleta_id):
         select(Regiao.imagem_id, func.count(Regiao.id))
         .join(Regiao.imagem).where(Imagem.coleta_id == coleta.id)
         .group_by(Regiao.imagem_id)).all())
+    conteudo = conteudo_da_coleta(coleta)
     return render_template(
         'coleta.html', coleta=coleta, progresso=progresso_da_coleta(coleta.id),
-        regioes_por_imagem=regioes_por_imagem,
+        regioes_por_imagem=regioes_por_imagem, conteudo=conteudo,
+        motivo_para_nao_excluir=motivo_para_nao_excluir(coleta, pessoa_atual(), conteudo),
         erros={i.id: ultimo_erro(i) for i in coleta.imagens if i.status == StatusImagem.ERRO},
     )
 
@@ -187,6 +192,23 @@ def _avisar_importacao_coco(resumo):
     if resumo.regioes_ignoradas:
         flash(f'{plural(resumo.regioes_ignoradas, "região ignorada", "regiões ignoradas")}: '
               'formato RLE ou contorno inválido.', 'aviso')
+
+
+# ------------------------------------------------------------ excluir coleta
+
+@web_bp.post('/coletas/<int:coleta_id>/excluir')
+def excluir_a_coleta(coleta_id):
+    coleta = _coleta_ou_404(coleta_id)
+    nome, fotos = coleta.nome, len(coleta.imagens)
+    try:
+        apagar_arquivos = excluir_coleta(coleta, pessoa_atual(), request.form.get('confirmacao'))
+    except ExclusaoRecusada as motivo:
+        flash(str(motivo), 'perigo')
+        return redirect(url_for('web.coleta', coleta_id=coleta.id) + '#excluir')
+    db.session.commit()
+    apagar_arquivos()
+    flash(f'Coleta "{nome}" excluída, com {plural(fotos, "foto")}.', 'info')
+    return redirect(url_for('web.coletas'))
 
 
 # ------------------------------------------------------------- ações na foto

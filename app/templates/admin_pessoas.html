@@ -65,6 +65,11 @@
                                 {{ c.botao('Desativar' if pessoa.ativa else 'Reativar', 'fantasma', tipo='submit',
                                            attrs={'aria-label': ('Desativar a conta de ' if pessoa.ativa else 'Reativar a conta de ') ~ pessoa.nome}) }}
                             </form>
+                            {#- Dois diálogos: a conta some (nunca usada) ou vira anônima (já tem trabalho). #}
+                            {{ c.botao('Excluir', 'fantasma', attrs={
+                                   'data-abrir-dialogo': 'dialogo-anonimizar-conta' if pessoa.id in com_trabalho else 'dialogo-apagar-conta',
+                                   'data-acao': url_for('web.excluir_pessoa', pessoa_id=pessoa.id), 'data-nome': pessoa.nome,
+                                   'aria-label': 'Excluir a conta de ' ~ pessoa.nome}) }}
                             {% endif %}
                         </div>
                     </td>
@@ -73,6 +78,41 @@
                 </tbody>
             </table>
         </div>
+        {%- if removidas %}
+        <p class="texto-suave">{{ plural(removidas, 'conta excluída', 'contas excluídas') }}
+           {{- ' não aparece' if removidas == 1 else ' não aparecem' }} aqui: o que anotaram continua na pesquisa, sem nome.</p>
+        {%- endif %}
     </section>
+
+    <dialog class="dialogo" id="dialogo-apagar-conta" aria-labelledby="dialogo-apagar-conta-titulo">
+        <form method="post" data-form-acao>
+            {{ campo_csrf() }}
+            <div class="dialogo__corpo">
+                <h2 id="dialogo-apagar-conta-titulo">Excluir a conta de <span data-nome-alvo></span>?</h2>
+                <p class="texto-suave">Esta conta nunca anotou nem enviou fotos: ela some por completo.</p>
+            </div>
+            <div class="dialogo__acoes">
+                {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+                {{ c.botao('Excluir conta', 'perigo', tipo='submit') }}
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="dialogo" id="dialogo-anonimizar-conta" aria-labelledby="dialogo-anonimizar-conta-titulo">
+        <form method="post" data-form-acao>
+            {{ campo_csrf() }}
+            <div class="dialogo__corpo pilha pilha--pequena">
+                <h2 id="dialogo-anonimizar-conta-titulo">Excluir a conta de <span data-nome-alvo></span>?</h2>
+                <p>O nome, o usuário e a senha são apagados, e a pessoa sai de todos os aparelhos.
+                   Isso não pode ser desfeito.</p>
+                <p class="texto-suave">O que ela anotou continua na pesquisa, sem o nome (aparece como
+                   "Pessoa removida"). Se for só uma pausa, use <strong>Desativar</strong>: dá para reativar depois.</p>
+            </div>
+            <div class="dialogo__acoes">
+                {{ c.botao('Cancelar', 'secundario', attrs={'data-fechar-dialogo': '', 'autofocus': true}) }}
+                {{ c.botao('Excluir conta', 'perigo', tipo='submit') }}
+            </div>
+        </form>
+    </dialog>
 </div>
 {% endblock %}

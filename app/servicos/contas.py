@@ -19,7 +19,7 @@ from pathlib import Path
 from sqlalchemy import func, select
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.dominio import Papel, Pessoa
+from app.dominio import Anotacao, Coleta, Imagem, Papel, Pessoa
 from app.dominio.tipos import agora_utc
 from app.extensions import db
 
@@ -179,6 +179,42 @@ def desativar(pessoa: Pessoa, feito_por: Pessoa) -> None:
 
 def reativar(pessoa: Pessoa) -> None:
     pessoa.ativa = True
+
+
+def tem_trabalho(pessoa: Pessoa) -> bool:
+    """A pessoa anotou, criou coleta ou enviou foto? (então a conta não pode sumir de vez)"""
+    return any(db.session.scalar(select(func.count()).select_from(modelo).where(coluna == pessoa.id))
+               for modelo, coluna in ((Anotacao, Anotacao.pessoa_id), (Coleta, Coleta.coletor_id),
+                                      (Imagem, Imagem.enviada_por_id)))
+
+
+def excluir_conta(pessoa: Pessoa, feito_por: Pessoa) -> str:
+    """Exclui a conta. Não confirma (commit). Devolve 'apagada' ou 'anonimizada'.
+
+    - Conta sem trabalho (criada por engano, nunca usada): some por completo.
+    - Conta com trabalho: nome, usuário, senha e último acesso são apagados; o registro
+      vira "Pessoa removida nº X", para as anotações continuarem na pesquisa sem
+      identificar ninguém (atende a um pedido de exclusão de dados pessoais, LGPD).
+    """
+    if pessoa.id == feito_por.id:
+        raise ContaInvalida('Você não pode excluir a sua própria conta.')
+    _garantir_outro_administrador(pessoa)
+    if not tem_trabalho(pessoa):
+        db.session.delete(pessoa)
+        db.session.flush()
+        return 'apagada'
+    pessoa.nome = f'Pessoa removida nº {pessoa.id}'
+    pessoa.usuario = f'removida.{pessoa.id}'  # libera o usuário antigo para outra conta
+    pessoa.senha_hash = None
+    pessoa.papel = Papel.MEMBRO
+    pessoa.ativa = False
+    pessoa.precisa_trocar_senha = False
+    pessoa.ultimo_acesso = None
+    pessoa.tentativas_falhas, pessoa.bloqueada_ate = 0, None
+    pessoa.versao_sessao += 1  # sai de todos os aparelhos na hora
+    pessoa.removida_em = agora_utc()
+    db.session.flush()
+    return 'anonimizada'
 
 
 # --------------------------------------------------------- primeiro acesso
