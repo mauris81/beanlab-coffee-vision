@@ -111,7 +111,8 @@ app/
 │                         (quem pode excluir e o quê), painel (números da
 │                         página inicial, contados no banco)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
-├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)
+├── segmentacao/       ✅ motores com interface comum (base.py): clássico (watershed) e ia
+│                         (FastSAM + SAM 2.1, opcional)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
 │                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py,
 │                         aplicativo.py (service worker, "Fotos no celular");
@@ -121,7 +122,7 @@ app/
 ├── templates/         ✅ HTML (Jinja); componentes.html = macros do design system; sw.js
 └── static/            ✅ css/ (tokens, base, componentes, paginas/), js/ (módulos ES), icones.svg,
                           manifest.json e aplicativo/ (ícones do aplicativo)
-ferramentas/           ✅ scripts de apoio (gerar os ícones do aplicativo a partir do logotipo)
+ferramentas/           ✅ scripts de apoio: ícones do aplicativo, avaliar motores de segmentação
 taxonomias/            ✅ listas de classes por tipo de amostra (YAML, editável)
 migrations/            ✅ histórico de mudanças no banco (Alembic)
 tests/                 ✅ testes automáticos (pytest)
@@ -169,6 +170,10 @@ motor de cada tipo de amostra é o campo `motor:` do YAML (`taxonomias/`). Detal
 |-------|-------------|--------|
 | Clássico (watershed) | Grãos sobre **fundo azul**, encostados ou separados | ✅ `app/segmentacao/classico.py` v2.1 (contornos, área real, cores corretas, todos os grupos de grãos) |
 | Importado | Recortes prontos (PNG transparente) ou COCO | ✅ `app/servicos/ingestao.py` |
-| FastSAM | Automático, qualquer tipo de amostra | Fase 6 |
-| SAM leve (MobileSAM / SAM 2.1-tiny) | Refinar com cliques | Fase 6 |
+| **IA: FastSAM-s + SAM 2.1-tiny** | Grãos em **qualquer fundo** (folhas, flores, frutos: quando houver fotos para validar) | ✅ `app/segmentacao/ia.py` (opcional: `Instalar IA.bat`; [decisão 0009](decisoes/0009-modelo-de-segmentacao.md)) |
+| SAM 2.1 com cliques | Corrigir um contorno clicando no objeto | Futuro (edição de contornos) |
 | YOLO11-seg treinado | Quando houver dados anotados suficientes | Futuro |
+
+O `motor:` do YAML pode ser uma lista em ordem de preferência (`[ia, classico]`); ao
+abrir, a plataforma usa o primeiro que `disponivel()` neste computador. Cada job
+guarda o nome, a versão e os **parâmetros** do motor (`JobSegmentacao.parametros`).

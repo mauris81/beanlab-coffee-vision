@@ -11,8 +11,8 @@ ser revisado ou desfeito.
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
 | 4. Painel (dashboard) | ✅ Concluída (25/09/2026) | Página inicial com "quanto falta", filtro por tipo de amostra, progresso e classes, "Continuar anotando", "Precisa de atenção" (erros, dúvidas, coletas sem foto), atividade por dia e, para a administração, quem anotou ([decisão 0008](decisoes/0008-painel.md)) |
 | 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
-| 6. IA | ⏳ Próxima | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
-| 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
+| 6. IA | ✅ Concluída para grãos (26/09/2026) | Motor `ia`: FastSAM encontra, SAM 2.1 contorna; testado na foto real (33 de ~33 grãos no recorte, contra 20 do motor clássico); opcional ("Instalar IA.bat"); parâmetros de cada segmentação guardados; "Segmentar de novo". Folhas, flores e frutos aguardam fotos reais ([decisão 0009](decisoes/0009-modelo-de-segmentacao.md)) |
+| 7. Exportação e guia | ⏳ Próxima | CSV, COCO, YOLO, recortes por classe; guia do usuário |
 | L1. Login e contas | ✅ Concluída (25/09/2026) | Login obrigatório; contas criadas pela administração (senha provisória); perfis membro/administração; bloqueio após tentativas; primeiro acesso com código ([decisão 0006](decisoes/0006-login-e-contas.md)) |
 | L2. Aplicativo e publicação | ✅ Concluída (25/09/2026) | Instalar no celular como aplicativo; abre sem sinal; fotos guardadas no celular sobem sozinhas quando o sinal volta; segurança para a internet (CSP, limite por IP); "Publicar na internet.bat" com Tailscale Funnel ([decisão 0007](decisoes/0007-publicacao-e-aplicativo.md), [guia](PUBLICACAO.md)) |
 
@@ -36,7 +36,9 @@ Extras já entregues fora das fases:
   (ver [decisoes/0001](decisoes/0001-manter-flask-sem-build.md)).
 - **Código no GitHub, em repositório público:**
   https://github.com/mauris81/beanlab-coffee-vision. Fotos e banco nunca sobem
-  (`.gitignore`). Ainda sem licença, a decidir.
+  (`.gitignore`). **Licença AGPL-3.0** (26/09/2026), por causa do FastSAM
+  ([decisão 0009](decisoes/0009-modelo-de-segmentacao.md)).
+- **Segmentação com IA:** FastSAM + SAM 2.1, opcional, testada na foto real de grãos.
 - **Hospedagem:** no PC do responsável, com Tailscale Funnel (endereço HTTPS grátis). As
   opções gratuitas na nuvem foram descartadas: Render apaga os arquivos e dorme; a
   Oracle cortou o plano grátis pela metade em 06/2026 e recolhe servidores ociosos.
@@ -55,8 +57,7 @@ Extras já entregues fora das fases:
       ([guia](PUBLICACAO.md)). Testar no celular com os dados móveis (Wi-Fi desligado).
 - [ ] Deixar o PC sem atualização automática do Windows no horário de trabalho.
 
-- [ ] **Testar o motor de grãos com fotos reais** (fundo azul). Os testes usam fotos
-      sintéticas; a foto original do projeto (`teste_1.jpeg`) está só na nuvem do OneDrive.
+- [x] ~~Testar o motor de grãos com fotos reais~~: feito na Fase 6 com a foto da equipe.
 
 - [ ] Abrir o OneDrive e baixar `app/uploads/` para completar o backup antigo.
       Depois disso, as pastas antigas `app/uploads/` e `instance/` podem ser apagadas
@@ -64,4 +65,7 @@ Extras já entregues fora das fases:
 - [ ] Validar com agrônomos as listas de classes em
       [MODELO_DE_DADOS.md](MODELO_DE_DADOS.md#classes-atuais-por-tipo-de-amostra).
 - [ ] Definir uma rotina de backup para `C:\CafeData` (fica fora do OneDrive).
-- [ ] Escolher uma licença para o repositório público (ou manter sem).
+- [x] ~~Escolher uma licença~~: AGPL-3.0 (26/09/2026).
+- [ ] **Instalar a IA** no PC da plataforma: `Instalar IA.bat` (já feito neste PC em 26/09/2026).
+- [ ] **Mandar 5 a 10 fotos reais de folhas, flores e frutos** (e mais de grãos), para
+      ligar e ajustar a IA nesses tipos (`ferramentas/avaliar_segmentacao.py`).

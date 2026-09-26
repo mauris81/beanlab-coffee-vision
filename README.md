@@ -39,8 +39,10 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
 3. Na página da coleta, **Tirar foto** (abre a câmera do celular) ou **Escolher
    arquivos** (várias de uma vez) e **Enviar**.
 4. Fotos de grãos são segmentadas sozinhas: o status muda de "Na fila" para "Pronta"
-   sem precisar recarregar. Folhas, flores e frutos, por enquanto, precisam chegar já
-   segmentados (recortes em PNG transparente ou um conjunto COCO).
+   sem precisar recarregar. Com a **IA** instalada (veja abaixo), vale qualquer fundo e
+   grãos encostados; sem ela, o motor clássico pede **fundo azul**. Folhas, flores e
+   frutos, por enquanto, precisam chegar já segmentados (recortes em PNG transparente ou
+   um conjunto COCO).
 5. **Anotar:** na página da coleta, "Começar a anotar". Escolha a classe de cada região
    com um toque ou uma tecla (1–9) e a tela já vai para a próxima. Z desfaz; D marca
    dúvida; ? mostra os atalhos. Para muitas regiões iguais, use **Anotar em lote**.
@@ -60,6 +62,15 @@ celular e sobem sozinhas quando a conexão volta.
 
 O PC continua sendo o servidor: precisa ficar ligado, com o Tailscale conectado e a
 plataforma aberta. Passo a passo e cuidados: [docs/PUBLICACAO.md](docs/PUBLICACAO.md).
+
+### Segmentação com IA (opcional)
+
+Dê dois cliques em **`Instalar IA.bat`** (uma vez só; baixa cerca de 1 GB). Depois,
+feche e abra a plataforma: a janela preta mostra "Grãos (IA)". A IA (FastSAM + SAM 2.1)
+acha praticamente todos os grãos em qualquer fundo, com contornos precisos, e leva
+cerca de 2 minutos por foto neste PC, em segundo plano. Fotos antigas: "Segmentar de
+novo", na página da coleta. Por que estes modelos:
+[docs/decisoes/0009](docs/decisoes/0009-modelo-de-segmentacao.md).
 
 ### Baixando o projeto em outro computador
 
@@ -93,6 +104,7 @@ Testes, migrações do banco e onde colocar cada coisa:
 |-------------------|---------|
 | `Iniciar BeanLab.bat` | Atalho de duplo clique para instalar e iniciar |
 | `Publicar na internet.bat` | Liga ou desliga o endereço na internet (Tailscale Funnel) |
+| `Instalar IA.bat` | Instala a segmentação com IA (opcional, ~1 GB) |
 | `app/`            | Código da aplicação (detalhes em [docs/ARQUITETURA.md](docs/ARQUITETURA.md)) |
 | `taxonomias/`     | **Classes de cada tipo de amostra**, editáveis sem programar ([como editar](taxonomias/LEIAME.md)) |
 | `migrations/`     | Histórico de mudanças no banco (aplicado sozinho ao iniciar) |
@@ -109,3 +121,11 @@ mais usadas.
 ## Documentação
 
 Comece por [docs/README.md](docs/README.md).
+
+## Licença
+
+[AGPL-3.0](LICENSE). O código é aberto; quem oferecer uma versão modificada pela
+internet precisa disponibilizar o código dessa versão. A escolha vem do FastSAM
+(Ultralytics, AGPL-3.0), usado na segmentação com IA
+([decisão 0009](docs/decisoes/0009-modelo-de-segmentacao.md)). A fonte Atkinson
+Hyperlegible Next é OFL (`app/static/fontes/`).

@@ -51,3 +51,6 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | Regiões marcadas com dúvida ficavam esquecidas (não havia como achá-las) | Dúvidas listadas no painel; filtro "Em dúvida" na anotação em lote | 4 | `test_duvidas_levam_para_a_revisao_no_lote` |
 | "Guia visual" (ferramenta de quem programa) no menu de quem coleta | Movido para o rodapé | 4 | `test_guia_visual_saiu_do_menu_e_foi_para_o_rodape` |
 | Não dava para excluir uma coleta nem uma conta | Excluir coleta (com confirmação pelo nome quando há anotações) e excluir conta (some ou vira anônima, preservando a pesquisa) | Extra | `tests/test_exclusao.py` |
+| **Motor clássico perdia ~1/3 dos grãos numa foto real** (grãos claros e com defeito; contornos serrilhados; só fundo azul) | Motor de IA (FastSAM + SAM 2.1): 33 de ~33 grãos no recorte, qualquer fundo | 6 | `tests/test_segmentacao_ia.py`, decisão 0009 |
+| Filtro de tamanho da IA calibrado só para "muitos grãos pequenos" (foto de perto: 0 de 12) | Tamanho relativo à mediana da própria foto | 6 | `test_filtro_se_adapta_a_foto_de_perto` |
+| Fotos segmentadas por um motor antigo não tinham como ser refeitas | "Segmentar de novo", avisando o que será substituído | 6 | `test_foto_de_motor_antigo_oferece_segmentar_de_novo` |

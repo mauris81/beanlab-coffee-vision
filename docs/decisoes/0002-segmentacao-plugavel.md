@@ -1,6 +1,6 @@
 # 0002 — Segmentação com motores intercambiáveis
 
-**Status:** Aceita (a escolha final de modelos depende do teste da Fase 6) · 25/09/2026
+**Status:** Aceita · 25/09/2026. A escolha dos modelos, testada na Fase 6, está na [decisão 0009](0009-modelo-de-segmentacao.md): FastSAM-s + SAM 2.1-tiny, juntos.
 
 ## Contexto
 Grãos, folhas, flores e frutos são problemas visuais muito diferentes. O algoritmo
