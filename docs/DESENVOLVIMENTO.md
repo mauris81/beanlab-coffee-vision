@@ -36,6 +36,7 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_contas.py` | Senhas, login, bloqueio, "nunca sem administração", código do primeiro acesso |
 | `tests/test_web_login.py` | Porta de entrada, primeiro acesso, senha provisória, administração, desconectar outros aparelhos, redirecionamento seguro |
 | `tests/test_seguranca.py` | Cabeçalhos (CSP), nenhuma página com código embutido, proxy só de 127.0.0.1, cookie seguro, limite por IP, modo desenvolvimento fora da internet, erros em JSON para o JavaScript |
+| `tests/test_painel.py` | Números do painel (anotação vigente, dúvida, classes desativadas), ordem do "Continuar anotando", pendências, atividade por dia, quem vê "Quem anotou", consultas que não crescem com o número de coletas |
 | `tests/test_aplicativo.py` | Manifesto e ícones, service worker (tudo que ele guarda existe), "Fotos no celular" sem dados de ninguém, envio pela fila (JSON, sem duplicar), endereço do Funnel |
 
 Fixtures prontas (`tests/conftest.py`): `cliente` (sem login), `logado` (membro),
@@ -58,7 +59,8 @@ em segundo plano como no uso real, e a **anotação** pelo teclado, pelo toque e
 (`test_anotacao_navegador.py`), e o **aplicativo sem sinal**: service worker, página
 "Fotos no celular", fila de fotos subindo quando a conexão volta e a política de
 segurança bloqueando script injetado (`test_aplicativo_navegador.py`; "sem sinal" é
-simulado pelo Chrome). Rode antes de mexer em telas, CSS ou JavaScript.
+simulado pelo Chrome), e o **painel** com dados de verdade, nos dois temas, no celular e
+no computador (`test_painel_navegador.py`). Rode antes de mexer em telas, CSS ou JavaScript.
 
 Qualquer bloqueio da política de segurança (CSP) conta como erro de JavaScript nos
 testes. Em `wait_for_function`, escreva a condição como função (`"() => ..."`): a

@@ -41,10 +41,12 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
 4. Fotos de grãos são segmentadas sozinhas: o status muda de "Na fila" para "Pronta"
    sem precisar recarregar. Folhas, flores e frutos, por enquanto, precisam chegar já
    segmentados (recortes em PNG transparente ou um conjunto COCO).
-
 5. **Anotar:** na página da coleta, "Começar a anotar". Escolha a classe de cada região
    com um toque ou uma tecla (1–9) e a tela já vai para a próxima. Z desfaz; D marca
    dúvida; ? mostra os atalhos. Para muitas regiões iguais, use **Anotar em lote**.
+6. **Acompanhar:** a página inicial (**Painel**) diz quanto falta, tem o botão
+   **Continuar anotando** e lista o que precisa de atenção (fotos com erro, dúvidas).
+   Dá para ver só um tipo de amostra (Grãos, Folhas...).
 
 ### No celular, como aplicativo, e fora do Wi-Fi
 

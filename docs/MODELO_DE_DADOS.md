@@ -27,7 +27,7 @@ TipoAmostra ──1:N── Classe
 | **Coleta** | `coleta` | Um conjunto de fotos tiradas juntas (o antigo "Projeto"). | tipo de amostra, `nome`, `fazenda`, `talhao`, `variedade`, `data_coleta`, coletor |
 | **Imagem** | `imagem` | Uma foto. O arquivo fica no disco, com o nome igual ao hash. | `hash_sha256`, `extensao`, `nome_original`, `largura`, `altura`, EXIF (`capturada_em`, `latitude`, `longitude`), `origem`, `status`, `ja_segmentada` |
 | **Regiao** | `regiao` | Um objeto dentro da foto (um grão, uma folha...). | `poligono`, `bbox_*`, `area_px`, `origem`, `motor`, `versao_motor`, `pontuacao` |
-| **Anotacao** | `anotacao` | "Esta região é da classe X", dito por alguém. | região, classe, pessoa, `origem`, `confianca`, `observacao`, `criada_em` |
+| **Anotacao** | `anotacao` | "Esta região é da classe X", dito por alguém. | região, classe, pessoa, `origem`, `confianca`, `observacao`, `criada_em` (com índice: o painel conta os últimos dias) |
 | **JobSegmentacao** | `job_segmentacao` | Cada execução de segmentação. | `motor`, `parametros`, `status`, tempos, `num_regioes`, `mensagem_erro` |
 
 ### Listas de opções (enums)

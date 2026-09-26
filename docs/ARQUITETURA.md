@@ -30,7 +30,8 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
                                   concluído / erro), consultado a cada 2 s
  3. Anota cada região       ──►   Tela de anotação (API JSON) ─► serviço  ✅ ──► banco
     (uma por vez ou em lote)       recortes e foto média em cache no disco  ✅
- 4. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
+ 4. Acompanha no painel     ◄──   Quanto falta, classes, pendências, atividade ✅
+ 5. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
 ```
 
 ## Na internet e no celular ✅
@@ -106,7 +107,8 @@ app/
 ├── dominio/           ✅ ENTIDADES: o que existe (Coleta, Imagem, Regiao, Anotacao...)
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
-│                         segmentação (jobs), taxonomias, contas (login)
+│                         segmentação (jobs), taxonomias, contas (login), painel (números da
+│                         página inicial, contados no banco)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py); hoje: clássico (watershed)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py

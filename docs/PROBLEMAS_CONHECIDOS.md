@@ -47,3 +47,6 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | **Sem sinal, o envio falhava e as fotos tinham de ser escolhidas de novo** | Fotos guardadas no celular sobem sozinhas quando a conexão volta; "Fotos no celular" funciona sem sinal | L2 | `tests/navegador/test_aplicativo_navegador.py` |
 | Scripts escritos dentro das páginas (tema, guia visual) impediam uma política de segurança rígida | Tudo em arquivos `.js`; CSP sem `unsafe-inline` para scripts | L2 | `test_nenhuma_pagina_tem_codigo_embutido` |
 | Página inicial ainda dizia que envio e anotação "chegam nas próximas etapas" | Texto trocado por atalhos para as coletas e o cartão "Use como aplicativo" | L2 | — |
+| Página inicial não dizia quanto faltava nem por onde continuar | Painel com "Faltam N regiões", "Continuar anotando" e "Precisa de atenção" | 4 | `tests/test_painel.py` |
+| Regiões marcadas com dúvida ficavam esquecidas (não havia como achá-las) | Dúvidas listadas no painel; filtro "Em dúvida" na anotação em lote | 4 | `test_duvidas_levam_para_a_revisao_no_lote` |
+| "Guia visual" (ferramenta de quem programa) no menu de quem coleta | Movido para o rodapé | 4 | `test_guia_visual_saiu_do_menu_e_foi_para_o_rodape` |

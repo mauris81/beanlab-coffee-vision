@@ -9,9 +9,9 @@ ser revisado ou desfeito.
 | 1. Dados | ✅ Concluída (25/09/2026) | Novo modelo de dados com migrações, classes por tipo de amostra (YAML), banco novo em `C:\CafeData`, 56 testes automáticos |
 | 2. Ingestão | ✅ Concluída (25/09/2026) | Coletas, "Quem é você?", envio pela câmera ou em lote (rotação, GPS, repetidas, miniaturas), recortes prontos e COCO, segmentação em segundo plano com status ao vivo, motor clássico corrigido, servidor waitress |
 | 3. Design system | ✅ Concluída (25/09/2026) | Tokens, componentes e guia visual (`/guia-visual`); tema claro/escuro; WCAG 2.2 AA verificada por testes (axe-core); pensado para celular; funciona offline |
-| 4. Dashboard | ⏳ Próxima | Visão por tipo de amostra: progresso, distribuição de classes, pendências |
+| 4. Painel (dashboard) | ✅ Concluída (25/09/2026) | Página inicial com "quanto falta", filtro por tipo de amostra, progresso e classes, "Continuar anotando", "Precisa de atenção" (erros, dúvidas, coletas sem foto), atividade por dia e, para a administração, quem anotou ([decisão 0008](decisoes/0008-painel.md)) |
 | 5. Anotação | ✅ Concluída (25/09/2026) | Uma por vez (atalhos, avanço automático, dúvida, observação, desfazer, contexto na foto) e em lote (marcar várias, aplicar, desfazer); motor clássico 2.1 (grãos separados). **Ficou de fora:** edição de contornos |
-| 6. IA | — | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
+| 6. IA | ⏳ Próxima | Segmentação automática (FastSAM / SAM) testada nas fotos reais |
 | 7. Exportação e guia | — | CSV, COCO, YOLO, recortes por classe; guia do usuário |
 | L1. Login e contas | ✅ Concluída (25/09/2026) | Login obrigatório; contas criadas pela administração (senha provisória); perfis membro/administração; bloqueio após tentativas; primeiro acesso com código ([decisão 0006](decisoes/0006-login-e-contas.md)) |
 | L2. Aplicativo e publicação | ✅ Concluída (25/09/2026) | Instalar no celular como aplicativo; abre sem sinal; fotos guardadas no celular sobem sozinhas quando o sinal volta; segurança para a internet (CSP, limite por IP); "Publicar na internet.bat" com Tailscale Funnel ([decisão 0007](decisoes/0007-publicacao-e-aplicativo.md), [guia](PUBLICACAO.md)) |

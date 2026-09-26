@@ -101,7 +101,15 @@ fotos guardadas no celular** (`.faixa-fila`, em `base.html`, preenchida por
 celular guarda a página para abrir sem sinal, então ela não mostra a pessoa, o menu
 nem nada do banco; o JavaScript preenche a partir do próprio aparelho.
 
-Datas na tela: `{{ data|hora_local }}` (o banco guarda em UTC).
+**Gráficos** (barras em HTML/CSS, sem biblioteca; o número sempre escrito ao lado):
+`grafico_classes(fatias, legenda)` (tabela com barra por classe),
+`barra_classes(fatias)` (barra empilhada + legenda das classes mais anotadas) e
+`grafico_dias(dias, legenda)` (colunas por dia; no celular, uma data sim, outra não).
+Lista de pendências: `.lista-atencao` + `.lista-atencao__item--perigo | --aviso`.
+
+Datas na tela: `{{ data|hora_local }}` (o banco guarda em UTC); `data_por_extenso(dia)`
+("quarta-feira, 24 de setembro"). Números: `numero(1250)` ("1.250"),
+`porcentagem(0.4)` ("menos de 1%": nunca "0%" para algo que existe).
 
 Atalhos de teclado: todo botão com atalho declara `aria-keyshortcuts`; os atalhos nunca
 disparam enquanto a pessoa digita num campo; Z e D são reservados na anotação.
