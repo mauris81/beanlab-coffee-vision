@@ -164,3 +164,69 @@
     {%- if caller is defined %}<div class="linha">{{ caller() }}</div>{% endif %}
 </header>
 {%- endmacro %}
+
+
+{#- ------------------------------------------------------------- GRÁFICOS
+    Sem biblioteca: barras em HTML/CSS, com os números sempre escritos ao lado
+    (a barra ajuda a comparar; o número é a informação). Leitores de tela leem a
+    tabela ou o texto oculto, nunca a barra. -#}
+
+{#- Distribuição das classes de um tipo de amostra (tabela com barras).
+    fatias: lista de FatiaDeClasse (app/servicos/painel.py). -#}
+{% macro grafico_classes(fatias, legenda) -%}
+<table class="tabela grafico-classes">
+    <caption class="visualmente-oculto">{{ legenda }}</caption>
+    <thead><tr><th scope="col">Classe</th><th scope="col">Regiões</th><th scope="col"><span class="visualmente-oculto">Barra</span></th></tr></thead>
+    <tbody>
+        {%- for fatia in fatias %}
+        <tr>
+            <th scope="row"><span class="chip-classe__cor" style="--cor-classe: {{ fatia.classe.cor }}" aria-hidden="true"></span>{{ fatia.classe.nome }}
+                {%- if not fatia.classe.ativa %} <span class="texto-suave">(desativada)</span>{% endif %}</th>
+            <td class="grafico-classes__numero">{{ numero(fatia.quantidade) }} <span class="texto-suave">· {{ porcentagem(fatia.percentual) }}</span></td>
+            <td class="grafico-classes__trilho" aria-hidden="true"><span style="--valor: {{ fatia.percentual }}%; --cor-classe: {{ fatia.classe.cor }}"></span></td>
+        </tr>
+        {%- endfor %}
+    </tbody>
+</table>
+{%- endmacro %}
+
+
+{#- Barra empilhada com as classes mais anotadas e uma legenda curta (cartões do painel). -#}
+{% macro barra_classes(fatias, maximo_na_legenda=3) -%}
+{%- set com_regioes = fatias|selectattr('quantidade')|sort(attribute='quantidade', reverse=true)|list -%}
+<div class="barra-classes">
+    <div class="barra-classes__trilho" aria-hidden="true">
+        {%- for fatia in com_regioes %}<span style="--valor: {{ fatia.percentual }}%; --cor-classe: {{ fatia.classe.cor }}"></span>{% endfor -%}
+    </div>
+    <ul class="barra-classes__legenda">
+        {%- for fatia in com_regioes[:maximo_na_legenda] %}
+        <li><span class="chip-classe__cor" style="--cor-classe: {{ fatia.classe.cor }}" aria-hidden="true"></span>{{ fatia.classe.nome }} <strong>{{ porcentagem(fatia.percentual) }}</strong></li>
+        {%- endfor %}
+        {%- if com_regioes|length > maximo_na_legenda %}
+        <li class="texto-suave">e mais {{ plural(com_regioes|length - maximo_na_legenda, 'classe') }}</li>
+        {%- endif %}
+    </ul>
+</div>
+{%- endmacro %}
+
+
+{#- Quantidade por dia (colunas), do mais antigo para hoje. dias: lista de Dia. -#}
+{% macro grafico_dias(dias, legenda, unidade=('anotação', 'anotações')) -%}
+{%- set maior = dias|map(attribute='anotacoes')|max or 1 -%}
+<figure class="grafico-dias">
+    <figcaption class="grafico-dias__legenda">{{ legenda }}</figcaption>
+    <ol class="grafico-dias__colunas">
+        {%- for dia in dias %}
+        <li class="grafico-dias__dia{% if loop.last %} grafico-dias__dia--hoje{% endif %}">
+            <span class="grafico-dias__area" aria-hidden="true">
+                <span class="grafico-dias__barra" style="--valor: {{ '%.1f'|format(100 * dia.anotacoes / maior) }}%">
+                    {%- if dia.anotacoes %}<span class="grafico-dias__valor">{{ numero(dia.anotacoes) }}</span>{% endif -%}
+                </span>
+            </span>
+            <span class="grafico-dias__data" aria-hidden="true">{{ 'hoje' if loop.last else dia.data.day }}</span>
+            <span class="visualmente-oculto">{{ 'Hoje, ' if loop.last }}{{ data_por_extenso(dia.data) }}: {{ plural(dia.anotacoes, unidade[0], unidade[1]) }}</span>
+        </li>
+        {%- endfor %}
+    </ol>
+</figure>
+{%- endmacro %}

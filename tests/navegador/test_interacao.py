@@ -83,10 +83,10 @@ def test_avisos_somem_sozinhos_exceto_os_de_erro(abrir):
 # --------------------------------------------------------- menu e layout
 
 def test_menu_no_topo_no_computador(abrir):
-    pagina = abrir('/guia-visual', 'computador')
+    pagina = abrir('/coletas', 'computador')
     assert pagina.is_visible('.topo .navegacao')
     assert not pagina.is_visible('.navegacao-inferior')
-    assert pagina.get_attribute('.topo [aria-current="page"]', 'href') == '/guia-visual'
+    assert pagina.get_attribute('.topo [aria-current="page"]', 'href') == '/coletas'
 
 
 def test_menu_na_base_da_tela_no_celular(abrir):

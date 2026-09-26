@@ -38,12 +38,15 @@ def test_desfazer_ultima_migracao_com_dados_no_banco(app):
         assert conexao.exec_driver_sql('PRAGMA foreign_key_check').fetchall() == []
 
 
-def test_pagina_inicial_mostra_tipos_e_classes(logado):
+def test_painel_mostra_tipos_e_as_classes_de_cada_um(logado):
     resposta = logado.get('/')
     assert resposta.status_code == 200
     html = resposta.get_data(as_text=True)
-    for texto in ['Grãos', 'Folhas', 'Flores', 'Frutos', 'Ferrugem', 'Verde-cana']:
+    for texto in ['Grãos', 'Folhas', 'Flores', 'Frutos']:
         assert texto in html
+    # As classes de cada tipo aparecem no painel do tipo, mesmo sem nada anotado.
+    assert 'Ferrugem' in logado.get('/?tipo=folhas').get_data(as_text=True)
+    assert 'Verde-cana' in logado.get('/?tipo=frutos').get_data(as_text=True)
 
 
 def test_api_de_saude(cliente):

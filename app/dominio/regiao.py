@@ -102,7 +102,8 @@ class Anotacao(db.Model):
     )
     confianca: Mapped[float | None]  # quão segura a pessoa está (0 a 1)
     observacao: Mapped[str | None] = mapped_column(Text)
-    criada_em: Mapped[datetime] = mapped_column(default=agora_utc)
+    # Índice: o painel conta as anotações dos últimos dias (app/servicos/painel.py).
+    criada_em: Mapped[datetime] = mapped_column(default=agora_utc, index=True)
 
     regiao: Mapped[Regiao] = relationship(back_populates='anotacoes')
     classe: Mapped[Classe] = relationship()

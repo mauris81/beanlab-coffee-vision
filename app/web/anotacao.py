@@ -36,8 +36,11 @@ def anotar_lote(coleta_id):
     coleta = _coleta_ou_404(coleta_id)
     mostrar = request.args.get('mostrar', 'pendentes')
     regioes = situacao_das_regioes(coleta.id)
+    duvidas = sum(r.duvida for r in regioes)
     if mostrar == 'pendentes':
         regioes = [r for r in regioes if r.classe is None]
+    elif mostrar == 'duvidas':  # para revisar (link "Revisar" do painel)
+        regioes = [r for r in regioes if r.duvida]
     elif mostrar != 'todas':
         regioes = [r for r in regioes if r.classe == mostrar]
     pagina = max(1, request.args.get('pagina', 1, type=int))
@@ -51,6 +54,7 @@ def anotar_lote(coleta_id):
         'lote.html', coleta=coleta, classes=coleta.tipo_amostra.classes_ativas,
         regioes=visiveis, quantidade=len(regioes), mostrar=mostrar, pagina=pagina,
         total_paginas=total_paginas, por_pagina=POR_PAGINA_LOTE, progresso=progresso_da_coleta(coleta.id),
+        duvidas=duvidas,
         nomes_classes={c.codigo: c for c in coleta.tipo_amostra.classes},
         ultimo_lote=ultimo_lote,
     )

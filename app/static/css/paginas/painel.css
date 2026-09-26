@@ -1,0 +1,13 @@
+/* Painel (página inicial): só o arranjo da página; os componentes vêm de componentes.css. */
+
+/* Duas colunas lado a lado no computador; uma embaixo da outra no celular. */
+.painel__colunas { display: grid; gap: var(--espaco-7); align-items: start; }
+@media (min-width: 1000px) {
+    .painel__colunas { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+}
+
+/* "Como funciona" (primeira vez) */
+.passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--espaco-4); margin: 0; padding: 0; list-style: none; }
+.passos .cartao { display: flex; align-items: flex-start; gap: var(--espaco-3); }
+.passos h3 { margin: 0 0 var(--espaco-1); font-size: var(--texto-lg); }
+.passos p { margin: 0; }

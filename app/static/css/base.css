@@ -291,5 +291,5 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .estreito { max-width: 44rem; }
 .lista-sem-marcador { margin: 0; padding: 0; list-style: none; }
-.grade--estatisticas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+.grade--estatisticas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); }
 .grade--campos { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }

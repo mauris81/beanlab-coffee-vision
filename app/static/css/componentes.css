@@ -482,9 +482,11 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 .tabela-rolagem:focus-visible { outline-offset: 2px; }
 .tabela { width: 100%; border-collapse: collapse; }
 .tabela th, .tabela td { padding: var(--espaco-3) var(--espaco-4); text-align: left; vertical-align: middle; border-bottom: 1px solid var(--cor-borda); }
-.tabela tr:last-child td { border-bottom: none; }
+.tabela tr:last-child td, .tabela tr:last-child th { border-bottom: none; }
+.tabela tbody th[scope="row"] { color: var(--cor-texto); font-size: var(--texto-md); font-weight: var(--peso-medio); white-space: normal; }
 .tabela th { color: var(--cor-texto-suave); font-size: var(--texto-sm); font-weight: var(--peso-forte); white-space: nowrap; }
 .tabela form { margin: 0; }
+.tabela__numero { text-align: right !important; font-variant-numeric: tabular-nums; }
 .acoes-pessoa { flex-wrap: nowrap; }
 .acoes-pessoa .botao { white-space: nowrap; }
 
@@ -497,3 +499,72 @@ select.entrada { appearance: none; padding-right: var(--espaco-7); cursor: point
 
 /* --- Tela de entrar ------------------------------------------------------------ */
 .entrar__marca { display: flex; flex-direction: column; align-items: flex-start; gap: var(--espaco-4); }
+
+/* --- Gráficos (barras em HTML; números sempre escritos ao lado) -------------- */
+/* Distribuição das classes: tabela com uma barra por classe (macro grafico_classes) */
+.grafico-classes th[scope="row"] .chip-classe__cor { display: inline-block; margin-right: var(--espaco-2); vertical-align: -1px; }
+.grafico-classes__numero { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.grafico-classes__trilho { width: 40%; }
+.grafico-classes__trilho span {
+    display: block; width: var(--valor); height: 12px;
+    border-radius: var(--raio-pilula); background: var(--cor-classe);
+}
+@media (max-width: 480px) {
+    .grafico-classes th, .grafico-classes td { padding-inline: var(--espaco-2); }
+    .grafico-classes__trilho { width: 30%; }
+}
+
+/* Barra empilhada com as classes mais anotadas (macro barra_classes) */
+.barra-classes { display: flex; flex-direction: column; gap: var(--espaco-2); }
+.barra-classes__trilho {
+    display: flex; height: 12px; overflow: hidden;
+    border-radius: var(--raio-pilula); background: var(--cor-superficie-2);
+}
+.barra-classes__trilho span { width: var(--valor); background: var(--cor-classe); }
+.barra-classes__trilho span + span { border-left: 2px solid var(--cor-superficie); } /* separa cores parecidas */
+.barra-classes__legenda {
+    display: flex; flex-wrap: wrap; gap: var(--espaco-1) var(--espaco-4);
+    margin: 0; padding: 0; list-style: none; font-size: var(--texto-sm);
+}
+.barra-classes__legenda li { display: inline-flex; align-items: center; gap: var(--espaco-2); }
+
+/* Colunas por dia (macro grafico_dias) */
+.grafico-dias { margin: 0; }
+.grafico-dias__legenda { margin-bottom: var(--espaco-2); color: var(--cor-texto-suave); font-size: var(--texto-sm); }
+.grafico-dias__colunas {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px;
+    height: 10rem; margin: 0; padding: var(--espaco-5) 0 0; list-style: none; /* espaço para o número da coluna mais alta */
+}
+.grafico-dias__dia { display: flex; flex-direction: column; align-items: center; gap: var(--espaco-1); min-width: 0; }
+.grafico-dias__area { display: flex; flex: 1; align-items: flex-end; justify-content: center; width: 100%; min-height: 0; border-bottom: 1px solid var(--cor-borda-controle); }
+.grafico-dias__barra {
+    position: relative; width: 100%; max-width: 1.75rem; height: var(--valor); min-height: 2px;
+    border-radius: 3px 3px 0 0; background: var(--cor-primaria);
+}
+.grafico-dias__valor {
+    position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+    color: var(--cor-texto-suave); font-size: var(--texto-xs); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.grafico-dias__data { color: var(--cor-texto-suave); font-size: var(--texto-xs); font-variant-numeric: tabular-nums; }
+.grafico-dias__dia--hoje .grafico-dias__data { color: var(--cor-texto); font-weight: var(--peso-forte); }
+@media (max-width: 600px) {
+    /* No celular não cabem 14 datas: mostra uma sim, outra não (sempre "hoje"). O leitor
+       de tela continua lendo todas (texto oculto de cada coluna). */
+    .grafico-dias__dia:nth-last-child(2n) .grafico-dias__data { visibility: hidden; }
+}
+
+/* --- Lista "precisa de atenção" ---------------------------------------------- */
+.lista-atencao { display: flex; flex-direction: column; gap: var(--espaco-2); margin: 0; padding: 0; list-style: none; }
+.lista-atencao__item {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-2) var(--espaco-3);
+    padding: var(--espaco-3) var(--espaco-4);
+    border: 1px solid var(--cor-borda); border-left-width: 4px; border-radius: var(--raio-md);
+    background: var(--cor-superficie);
+}
+.lista-atencao__item > .icone { width: 22px; height: 22px; flex: none; color: var(--cor-info); }
+.lista-atencao__item > span { flex: 1 1 14rem; }
+.lista-atencao__item > a { font-weight: var(--peso-medio); white-space: nowrap; }
+.lista-atencao__item--perigo { border-left-color: var(--cor-perigo); }
+.lista-atencao__item--perigo > .icone { color: var(--cor-perigo); }
+.lista-atencao__item--aviso { border-left-color: var(--cor-aviso); }
+.lista-atencao__item--aviso > .icone { color: var(--cor-aviso); }

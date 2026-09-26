@@ -40,6 +40,9 @@
         <ul class="filtros">
             <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar='pendentes') }}"{% if mostrar == 'pendentes' %} aria-current="page"{% endif %}>Pendentes ({{ progresso.pendentes }})</a></li>
             <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar='todas') }}"{% if mostrar == 'todas' %} aria-current="page"{% endif %}>Todas ({{ progresso.total }})</a></li>
+            {%- if duvidas or mostrar == 'duvidas' %}
+            <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar='duvidas') }}"{% if mostrar == 'duvidas' %} aria-current="page"{% endif %}>Em dúvida ({{ duvidas }})</a></li>
+            {%- endif %}
             {% for classe in classes %}
             <li><a class="filtro" href="{{ url_for('web.anotar_lote', coleta_id=coleta.id, mostrar=classe.codigo) }}"{% if mostrar == classe.codigo %} aria-current="page"{% endif %}>
                 <span class="chip-classe__cor" style="--cor-classe: {{ classe.cor }}" aria-hidden="true"></span>{{ classe.nome }} ({{ progresso.por_classe.get(classe.codigo, 0) }})</a></li>

@@ -14,7 +14,7 @@
     ('principios', 'Princípios'), ('cores', 'Cores'), ('tipografia', 'Tipografia'),
     ('espacos', 'Espaços e formas'), ('icones', 'Ícones'), ('botoes', 'Botões'),
     ('formularios', 'Formulários'), ('escolhas', 'Escolhas e listas'), ('status', 'Status'), ('classes', 'Classes'),
-    ('progresso', 'Progresso e números'), ('mensagens', 'Mensagens'),
+    ('progresso', 'Progresso e números'), ('graficos', 'Gráficos'), ('mensagens', 'Mensagens'),
     ('atalhos', 'Atalhos de teclado'), ('carregando', 'Carregando'),
 ] %}
 
@@ -310,6 +310,37 @@
             {{ c.progresso(150, 200, 'Folhas · lote B') }}
             {{ c.progresso(200, 200, 'Flores · concluída', 'sucesso') }}
         </div>
+    </section>
+
+    {# ------------------------------------------------------------------ #}
+    <section id="graficos" class="guia__secao" aria-labelledby="t-graficos">
+        <h2 id="t-graficos">Gráficos</h2>
+        <p class="texto-suave">Barras em HTML, sem biblioteca. O número vai sempre escrito ao lado:
+           a barra ajuda a comparar, o número é a informação. Dados de exemplo.</p>
+        {%- if exemplo_fatias %}
+        <div class="grade grade--larga">
+            <div class="cartao pilha">
+                <h3>Classes de um tipo <code>grafico_classes</code></h3>
+                {{ c.grafico_classes(exemplo_fatias, 'Exemplo: regiões por classe') }}
+            </div>
+            <div class="pilha">
+                <div class="cartao pilha">
+                    <h3>Resumo das classes <code>barra_classes</code></h3>
+                    {{ c.barra_classes(exemplo_fatias) }}
+                </div>
+                <div class="cartao pilha">
+                    <h3>Por dia <code>grafico_dias</code></h3>
+                    {{ c.grafico_dias(exemplo_dias, 'Exemplo: anotações por dia, nos últimos 14 dias') }}
+                </div>
+            </div>
+        </div>
+        {%- endif %}
+        <h3>Lista "precisa de atenção" <code>.lista-atencao</code></h3>
+        <ul class="lista-atencao">
+            <li class="lista-atencao__item">{{ icone('processando') }}<span>3 fotos sendo segmentadas agora.</span></li>
+            <li class="lista-atencao__item lista-atencao__item--perigo">{{ icone('erro') }}<span><strong>Talhão 7</strong>: 1 foto com erro na segmentação.</span><a href="#graficos">Ver fotos</a></li>
+            <li class="lista-atencao__item lista-atencao__item--aviso">{{ icone('alerta') }}<span><strong>Talhão 3</strong>: 5 regiões em dúvida.</span><a href="#graficos">Revisar</a></li>
+        </ul>
     </section>
 
     {# ------------------------------------------------------------------ #}

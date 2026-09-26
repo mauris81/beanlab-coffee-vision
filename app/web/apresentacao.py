@@ -5,7 +5,7 @@ Manter isso num lugar só garante que "pronta" tenha sempre o mesmo texto, cor e
 ícone em todas as telas.
 """
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from flask import request, url_for
 from markupsafe import Markup, escape
@@ -26,10 +26,15 @@ def icone(nome: str, rotulo: str | None = None, classe: str = '') -> Markup:
                   f'<use href="{href}"></use></svg>')
 
 
+def numero(quantidade: int) -> str:
+    """1250 -> "1.250" (separador de milhar brasileiro)."""
+    return f'{quantidade:,}'.replace(',', '.')
+
+
 def plural(quantidade: int, singular: str, forma_plural: str | None = None) -> str:
     """"1 foto", "3 fotos", "1.250 regiões": número com separador brasileiro + palavra certa."""
     palavra = singular if quantidade == 1 else (forma_plural or singular + 's')
-    return f'{quantidade:,}'.replace(',', '.') + f' {palavra}'
+    return f'{numero(quantidade)} {palavra}'
 
 
 def hora_local(valor: datetime | None, formato: str = '%d/%m/%Y %H:%M') -> str:
@@ -37,6 +42,24 @@ def hora_local(valor: datetime | None, formato: str = '%d/%m/%Y %H:%M') -> str:
     if valor is None:
         return ''
     return valor.replace(tzinfo=timezone.utc).astimezone().strftime(formato)
+
+
+_MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto',
+          'setembro', 'outubro', 'novembro', 'dezembro']
+_DIAS_DA_SEMANA = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira',
+                   'sábado', 'domingo']
+
+
+def data_por_extenso(dia: date) -> str:
+    """"quarta-feira, 24 de setembro", sem depender do idioma configurado no Windows."""
+    return f'{_DIAS_DA_SEMANA[dia.weekday()]}, {dia.day} de {_MESES[dia.month - 1]}'
+
+
+def porcentagem(valor: float) -> str:
+    """"35%"; abaixo de 1% (mas acima de zero), "menos de 1%", para não parecer que é zero."""
+    if 0 < valor < 1:
+        return 'menos de 1%'
+    return f'{round(valor)}%'
 
 
 _ICONE_POR_TIPO = {'graos': 'grao', 'folhas': 'folha', 'flores': 'flor', 'frutos': 'fruto'}
@@ -73,10 +96,10 @@ def apresentar_status(status) -> Apresentacao:
 # --- Menu ----------------------------------------------------------------------
 # Só entram páginas que já existem. Cada fase acrescenta as suas aqui.
 # (endpoint, texto, ícone)
+# O guia visual (ferramenta de quem programa) fica no rodapé, fora do menu.
 ITENS_DE_NAVEGACAO = [
     ('web.inicio', 'Início', 'inicio'),
     ('web.coletas', 'Coletas', 'imagem'),
-    ('web.guia_visual', 'Guia visual', 'paleta'),
 ]
 ITENS_DA_ADMINISTRACAO = [
     ('web.pessoas', 'Pessoas', 'usuario'),

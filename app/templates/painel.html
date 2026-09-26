@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% import 'componentes.html' as c %}
+{#- Painel (página inicial): como está o trabalho, no geral ou de um tipo de amostra.
+    Os números vêm de app/servicos/painel.py. -#}
+
+{% block titulo %}{{ 'Painel de ' ~ painel.tipo.nome|lower if painel.tipo else 'Painel' }} · BeanLab{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{{ url_for('static', filename='css/paginas/painel.css') }}">{% endblock %}
+
+{% block conteudo %}
+{%- set n = painel.numeros %}
+{%- set tipo = painel.tipo %}
+<div class="pilha pilha--grande">
+    {% call c.cabecalho_pagina('Painel de ' ~ tipo.nome|lower if tipo else 'Painel',
+                               sobretitulo='Olá, ' ~ primeiro_nome, descricao=resumo) %}
+        {%- if painel.para_continuar %}
+        {{ c.botao('Continuar anotando', href=url_for('web.anotar', coleta_id=painel.para_continuar[0].coleta.id),
+                   icone_nome='seta-direita', icone_depois=True) }}
+        {{ c.botao('Nova coleta', 'secundario', href=url_for('web.nova_coleta', tipo=tipo.codigo if tipo else ''), icone_nome='mais') }}
+        {%- else %}
+        {{ c.botao('Nova coleta', href=url_for('web.nova_coleta', tipo=tipo.codigo if tipo else ''), icone_nome='mais') }}
+        {%- endif %}
+    {% endcall %}
+
+    <nav aria-label="Mostrar o painel de">
+        <ul class="filtros">
+            <li><a class="filtro" href="{{ url_for('web.inicio') }}"{% if not tipo %} aria-current="page"{% endif %}>Todos</a></li>
+            {%- for resumo_tipo in painel.por_tipo %}
+            <li><a class="filtro" href="{{ url_for('web.inicio', tipo=resumo_tipo.tipo.codigo) }}"{% if tipo and tipo.id == resumo_tipo.tipo.id %} aria-current="page"{% endif %}>
+                {{- icone(icone_do_tipo(resumo_tipo.tipo.codigo)) }}{{ resumo_tipo.tipo.nome }}</a></li>
+            {%- endfor %}
+        </ul>
+    </nav>
+
+    {#- Aparece só onde dá para instalar (js/aplicativo.js escolhe a explicação certa). -#}
+    <section class="cartao pilha" data-instalar hidden aria-labelledby="titulo-instalar">
+        <div class="cartao__cabecalho">
+            <span class="cartao__icone">{{ icone('instalar') }}</span>
+            <div>
+                <h2 id="titulo-instalar">Use como aplicativo no celular</h2>
+                <p class="texto-suave">Ícone na tela inicial, abre em tela cheia e guarda as fotos
+                   quando o sinal cai no campo.</p>
+            </div>
+        </div>
+        <div data-instalar-modo="botao" hidden>
+            {{ c.botao('Instalar o aplicativo', icone_nome='instalar', attrs={'data-instalar-agora': ''}) }}
+        </div>
+        <p data-instalar-modo="ios" hidden>No iPhone ou iPad: toque em <strong>Compartilhar</strong> e
+           depois em <strong>Adicionar à Tela de Início</strong>.</p>
+        {%- if config.ENDERECO_PUBLICO %}
+        <p data-instalar-modo="sem-https" hidden>Para instalar, abra no celular o endereço seguro:
+           <a href="{{ config.ENDERECO_PUBLICO }}">{{ config.ENDERECO_PUBLICO }}</a></p>
+        {%- endif %}
+    </section>
+
+    {% if not n.coletas %}
+    {# ------------------------------------------------------ primeira vez #}
+    {% call c.vazio('Nenhuma coleta ' ~ ('de ' ~ tipo.nome|lower ~ ' ' if tipo) ~ 'ainda',
+                    'Uma coleta junta as fotos de um mesmo lugar e dia.', icone_do_tipo(tipo.codigo) if tipo else 'imagem') %}
+        {{ c.botao('Criar coleta', href=url_for('web.nova_coleta', tipo=tipo.codigo if tipo else ''), icone_nome='mais') }}
+    {% endcall %}
+    {%- if not tipo %}
+    <section class="pilha" aria-labelledby="titulo-como-funciona">
+        <h2 id="titulo-como-funciona">Como funciona</h2>
+        <ol class="passos">
+            <li class="cartao"><span class="cartao__icone">{{ icone('camera') }}</span>
+                <div><h3>1. Fotografe</h3><p class="texto-suave">Crie a coleta e envie as fotos pelo celular, mesmo sem sinal.</p></div></li>
+            <li class="cartao"><span class="cartao__icone">{{ icone('processando') }}</span>
+                <div><h3>2. A plataforma separa</h3><p class="texto-suave">Cada grão, folha ou flor da foto vira uma região.</p></div></li>
+            <li class="cartao"><span class="cartao__icone">{{ icone('check') }}</span>
+                <div><h3>3. Anote</h3><p class="texto-suave">Diga o que é cada região com um toque ou uma tecla.</p></div></li>
+        </ol>
+    </section>
+    {%- endif %}
+    {% else %}
+
+    {# ----------------------------------------------------------- números #}
+    <section class="pilha" aria-labelledby="titulo-numeros">
+        <h2 id="titulo-numeros" class="visualmente-oculto">Números</h2>
+        <div class="grade grade--estatisticas">
+            {{ c.estatistica('Coletas', numero(n.coletas)) }}
+            {{ c.estatistica('Fotos', numero(n.fotos),
+                             plural(n.fotos_na_fila, 'na fila', 'na fila') if n.fotos_na_fila else None) }}
+            {{ c.estatistica('Anotadas', porcentagem(n.percentual), numero(n.anotadas) ~ ' de ' ~ plural(n.regioes, 'região', 'regiões')) }}
+            {{ c.estatistica('Em dúvida', numero(n.duvidas), 'para revisar' if n.duvidas else 'nenhuma') }}
+        </div>
+        {% if n.regioes %}{{ c.progresso(n.anotadas, n.regioes, 'Regiões anotadas', 'sucesso' if not n.pendentes else None) }}{% endif %}
+    </section>
+    {% endif %}
+
+    {% if tipo %}
+    {# ------------------------------------ classes do tipo (sempre, até zeradas) #}
+    <section class="cartao pilha" aria-labelledby="titulo-classes">
+        <div>
+            <h2 id="titulo-classes">Classes</h2>
+            <p class="texto-suave">Quantas regiões de {{ tipo.nome|lower }} têm cada classe (vale a anotação
+               mais recente de cada região).{% if not n.anotadas %} Nenhuma anotada ainda.{% endif %}</p>
+        </div>
+        {{ c.grafico_classes(painel.fatias, 'Regiões de ' ~ tipo.nome|lower ~ ' por classe') }}
+    </section>
+    {% elif n.coletas %}
+    {# ---------------------------------------------------- por tipo (geral) #}
+    <section class="pilha" aria-labelledby="titulo-tipos">
+        <h2 id="titulo-tipos">Por tipo de amostra</h2>
+        <ul class="grade lista-sem-marcador">
+            {%- for item in painel.por_tipo %}
+            <li class="cartao cartao--interativo pilha pilha--pequena">
+                <div class="cartao__cabecalho">
+                    <span class="cartao__icone">{{ icone(icone_do_tipo(item.tipo.codigo)) }}</span>
+                    <div>
+                        <h3 class="cartao__titulo"><a class="cartao__link" href="{{ url_for('web.inicio', tipo=item.tipo.codigo) }}">{{ item.tipo.nome }}</a></h3>
+                        <span class="texto-suave">{{ plural(item.numeros.coletas, 'coleta') }} · {{ plural(item.numeros.regioes, 'região', 'regiões') }}</span>
+                    </div>
+                </div>
+                {%- if item.numeros.regioes %}
+                {{ c.progresso(item.numeros.anotadas, item.numeros.regioes, 'Anotadas', 'sucesso' if not item.numeros.pendentes else None) }}
+                {%- endif %}
+                {%- if item.numeros.anotadas %}
+                {{ c.barra_classes(item.fatias) }}
+                {%- else %}
+                <p class="texto-suave">{{ 'Nenhuma região anotada ainda.' if item.numeros.coletas else 'Nenhuma coleta ainda.' }}</p>
+                {%- endif %}
+            </li>
+            {%- endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if n.coletas %}
+    <div class="painel__colunas">
+        {# ------------------------------------------------ continuar anotando #}
+        <section class="pilha" aria-labelledby="titulo-continuar">
+            <h2 id="titulo-continuar">Continuar anotando</h2>
+            {% if painel.para_continuar %}
+            <ul class="pilha lista-sem-marcador">
+                {%- for item in painel.para_continuar %}
+                <li class="cartao pilha pilha--pequena">
+                    <div class="linha linha--entre">
+                        <div>
+                            <h3 class="cartao__titulo"><a href="{{ url_for('web.coleta', coleta_id=item.coleta.id) }}">{{ item.coleta.nome }}</a></h3>
+                            <span class="texto-suave">{{ item.coleta.tipo_amostra.nome }} · {{ plural(item.pendentes, 'região pendente', 'regiões pendentes') }}</span>
+                        </div>
+                        {{ c.botao('Anotar', 'secundario', href=url_for('web.anotar', coleta_id=item.coleta.id), icone_nome='seta-direita',
+                                   icone_depois=True, attrs={'aria-label': 'Anotar ' ~ item.coleta.nome}) }}
+                    </div>
+                    {{ c.progresso(item.anotadas, item.regioes, 'Anotadas') }}
+                </li>
+                {%- endfor %}
+            </ul>
+            {%- if painel.coletas_pendentes > painel.para_continuar|length %}
+            <p><a href="{{ url_for('web.coletas', tipo=tipo.codigo if tipo else None) }}">Ver todas as {{ plural(painel.coletas_pendentes, 'coleta') }} com pendências</a></p>
+            {%- endif %}
+            {% else %}
+                {{ c.vazio('Nada pendente', 'Todas as regiões encontradas já foram anotadas.', 'check') }}
+            {% endif %}
+        </section>
+
+        {# ---------------------------------------------- precisa de atenção #}
+        <section class="pilha" aria-labelledby="titulo-atencao">
+            <h2 id="titulo-atencao">Precisa de atenção</h2>
+            {% if painel.precisa_de_atencao %}
+            <ul class="lista-atencao">
+                {%- if n.fotos_na_fila %}
+                <li class="lista-atencao__item">{{ icone('processando') }}
+                    <span>{{ plural(n.fotos_na_fila, 'foto sendo segmentada', 'fotos sendo segmentadas') }} agora. As regiões aparecem sozinhas.</span></li>
+                {%- endif %}
+                {%- for item in painel.com_erro %}
+                <li class="lista-atencao__item lista-atencao__item--perigo">{{ icone('erro') }}
+                    <span><strong>{{ item.coleta.nome }}</strong>: {{ plural(item.fotos_com_erro, 'foto', 'fotos') }} com erro na segmentação.</span>
+                    <a href="{{ url_for('web.coleta', coleta_id=item.coleta.id) }}#fotos">Ver fotos<span class="visualmente-oculto"> de {{ item.coleta.nome }}</span></a></li>
+                {%- endfor %}
+                {%- for item in painel.com_duvidas %}
+                <li class="lista-atencao__item lista-atencao__item--aviso">{{ icone('alerta') }}
+                    <span><strong>{{ item.coleta.nome }}</strong>: {{ plural(item.duvidas, 'região', 'regiões') }} em dúvida.</span>
+                    <a href="{{ url_for('web.anotar_lote', coleta_id=item.coleta.id, mostrar='duvidas') }}">Revisar<span class="visualmente-oculto"> dúvidas de {{ item.coleta.nome }}</span></a></li>
+                {%- endfor %}
+                {%- for item in painel.sem_fotos %}
+                <li class="lista-atencao__item">{{ icone('camera') }}
+                    <span><strong>{{ item.coleta.nome }}</strong> ainda não tem fotos.</span>
+                    <a href="{{ url_for('web.coleta', coleta_id=item.coleta.id) }}#enviar">Enviar fotos<span class="visualmente-oculto"> para {{ item.coleta.nome }}</span></a></li>
+                {%- endfor %}
+            </ul>
+            {% else %}
+                {{ c.vazio('Tudo em ordem', 'Nenhuma foto com erro, nenhuma dúvida para revisar.', 'check') }}
+            {% endif %}
+        </section>
+    </div>
+    {% endif %}
+
+
+    {# ------------------------------------------------------------ atividade #}
+    <div class="painel__colunas">
+        <section class="cartao pilha" aria-labelledby="titulo-atividade">
+            <div>
+                <h2 id="titulo-atividade">Atividade</h2>
+                <p class="texto-suave">Você: <strong>{{ plural(painel.minhas_hoje, 'anotação', 'anotações') }} hoje</strong> ·
+                   {{ numero(painel.minhas_na_semana) }} nos últimos 7 dias.</p>
+            </div>
+            {{ c.grafico_dias(painel.atividade, 'Anotações da equipe' ~ (' em ' ~ tipo.nome|lower if tipo) ~ ' por dia, nos últimos ' ~ painel.atividade|length ~ ' dias') }}
+        </section>
+
+        {% if painel.por_pessoa is not none %}
+        <section class="cartao pilha" aria-labelledby="titulo-equipe">
+            <div>
+                <h2 id="titulo-equipe">Quem anotou</h2>
+                <p class="texto-suave">Últimos 30 dias{{ ', em ' ~ tipo.nome|lower if tipo }}. Só a administração vê.</p>
+            </div>
+            {% if painel.por_pessoa %}
+            <table class="tabela">
+                <caption class="visualmente-oculto">Anotações por pessoa nos últimos 30 dias</caption>
+                <thead><tr><th scope="col">Pessoa</th><th scope="col" class="tabela__numero">Anotações</th></tr></thead>
+                <tbody>
+                    {%- for nome, quantidade in painel.por_pessoa %}
+                    <tr><th scope="row">{{ nome }}</th><td class="tabela__numero">{{ numero(quantidade) }}</td></tr>
+                    {%- endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Ninguém anotou nos últimos 30 dias.</p>
+            {% endif %}
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
