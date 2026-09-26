@@ -57,3 +57,4 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | Não havia como tirar os dados da plataforma para analisar ou treinar | Exportar: planilha, COCO, YOLO e recortes num .zip, com LEIAME e manifesto | 7 | `tests/test_exportacao.py` |
 | **Arquivo temporário da exportação ficaria no disco** (achado durante a fase: com `send_file`, a limpeza registrada nunca roda) | Iterador próprio que apaga o arquivo ao fim do envio | 7 | `test_pagina_mostra_coletas_e_baixa_o_zip`, `test_baixar_exportacao` |
 | Não havia guia de uso para quem está no campo | Ajuda dentro da plataforma, que abre sem sinal | 7 | `test_ajuda_*`, `test_sem_sinal_a_ajuda_abre_do_celular` |
+| **Foto de 12 MP (direto do celular) gastaria vários GB de memória na IA** (achado ao testar a foto de flores) | Os modelos trabalham numa cópia de 1600 px; os contornos voltam à escala original | 6 | `test_ia_em_foto_grande_de_celular`, `test_contornos_voltam_para_a_resolucao_original` |

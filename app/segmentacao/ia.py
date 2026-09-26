@@ -51,6 +51,10 @@ MODELOS = (
 
 @dataclass(frozen=True)
 class ParametrosIA:
+    # Os modelos trabalham numa cópia com este lado maior (o SAM reduz para 1024 por dentro
+    # de qualquer jeito). Uma foto de celular de 12 MP no tamanho original gastaria vários GB
+    # de memória por lote. Os contornos voltam para a resolução original no fim.
+    lado_de_trabalho: int = 1600
     tamanho_deteccao: int = 1600       # px: o FastSAM vê a foto neste tamanho (grão pequeno pede mais)
     confianca_minima: float = 0.25     # FastSAM: abaixo disso, não é objeto
     iou_repeticao: float = 0.7         # FastSAM: caixas mais sobrepostas que isso são a mesma
@@ -107,24 +111,29 @@ class MotorIA:
         detector, contornador = self._carregar()
         import torch
         torch.set_num_threads(self.p.nucleos)
-        bgr = np.ascontiguousarray(rgb[..., ::-1])  # o Ultralytics espera a ordem do OpenCV
+        escala = min(1.0, self.p.lado_de_trabalho / max(rgb.shape[:2]))
+        trabalho = rgb if escala == 1 else cv2.resize(rgb, None, fx=escala, fy=escala, interpolation=cv2.INTER_AREA)
+        bgr = np.ascontiguousarray(trabalho[..., ::-1])  # o Ultralytics espera a ordem do OpenCV
         deteccao = detector(bgr, device='cpu', imgsz=self.p.tamanho_deteccao, conf=self.p.confianca_minima,
                             iou=self.p.iou_repeticao, max_det=self.p.maximo_objetos, verbose=False)[0]
         if deteccao.boxes is None or not len(deteccao.boxes):
             return []
         caixas, confiancas = deteccao.boxes.xyxy.numpy(), deteccao.boxes.conf.numpy()
 
-        candidatas = []
+        forma = trabalho.shape[:2]
+        candidatas = []  # já recortadas: a máscara da foto inteira é descartada logo (memória)
         with torch.inference_mode():
-            contornador.set_image(rgb)
+            contornador.set_image(trabalho)
             for inicio in range(0, len(caixas), self.p.lote_contornos):
                 lote = slice(inicio, inicio + self.p.lote_contornos)
                 mascaras, notas, _ = contornador.predict(box=caixas[lote], multimask_output=False)
                 if mascaras.ndim == 4:
                     mascaras = mascaras[:, 0]
-                candidatas += [(m.astype(bool), float(c * n))
-                               for m, c, n in zip(mascaras, confiancas[lote], np.ravel(notas))]
-        return filtrar_mascaras(candidatas, rgb.shape[:2], self.p)
+                for mascara, confianca, nota in zip(mascaras, confiancas[lote], np.ravel(notas)):
+                    if (candidata := preparar_mascara(mascara > 0, float(confianca * nota), forma, self.p)):
+                        candidatas.append(candidata)
+        regioes = escolher_regioes(candidatas, forma, self.p)
+        return regioes if escala == 1 else [_na_escala_original(r, escala, rgb.shape[:2]) for r in regioes]
 
     def _carregar(self):
         """Carrega os modelos uma vez por processo (~0,5 GB de memória) e reaproveita."""
@@ -160,26 +169,41 @@ def filtrar_mascaras(candidatas: list[tuple[np.ndarray, float]], forma: tuple[in
     máscara já cobre o mesmo objeto; vence a de maior pontuação). De cada máscara fica só
     o maior pedaço contínuo.
     """
+    preparadas = [preparar_mascara(mascara, pontuacao, forma, p) for mascara, pontuacao in candidatas]
+    return escolher_regioes([c for c in preparadas if c], forma, p)
+
+
+def preparar_mascara(mascara: np.ndarray, pontuacao: float, forma: tuple[int, int], p: ParametrosIA):
+    """Recorta a máscara na caixa do objeto (maior pedaço contínuo) e descarta o que não tem
+    tamanho nem forma de objeto. Devolve (pontuação, área, y0, x0, recorte, contorno) ou None."""
+    if not mascara.any():
+        return None
+    ys, xs = np.nonzero(mascara)
+    y0, x0 = ys.min(), xs.min()
+    recorte = mascara[y0:ys.max() + 1, x0:xs.max() + 1].astype(np.uint8)
+    quantos, rotulos, estatisticas, _ = cv2.connectedComponentsWithStats(recorte, connectivity=8)
+    maior = 1 + int(np.argmax(estatisticas[1:quantos, cv2.CC_STAT_AREA]))
+    recorte = rotulos == maior
+    area = int(estatisticas[maior, cv2.CC_STAT_AREA])
     area_da_foto = forma[0] * forma[1]
-    boas = []
-    for mascara, pontuacao in candidatas:
-        if not mascara.any():
-            continue
-        ys, xs = np.nonzero(mascara)
-        y0, x0 = ys.min(), xs.min()
-        recorte = mascara[y0:ys.max() + 1, x0:xs.max() + 1].astype(np.uint8)
-        quantos, rotulos, estatisticas, _ = cv2.connectedComponentsWithStats(recorte, connectivity=8)
-        maior = 1 + int(np.argmax(estatisticas[1:quantos, cv2.CC_STAT_AREA]))
-        recorte = rotulos == maior
-        area = int(estatisticas[maior, cv2.CC_STAT_AREA])
-        if not p.area_minima * area_da_foto <= area <= p.area_maxima * area_da_foto:
-            continue
-        contornos, _ = cv2.findContours(recorte.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contorno = max(contornos, key=cv2.contourArea)
-        casca = cv2.contourArea(cv2.convexHull(contorno))
-        if casca == 0 or cv2.contourArea(contorno) / casca < p.solidez_minima:
-            continue
-        boas.append((pontuacao, area, y0, x0, recorte, contorno + [x0, y0]))
+    if not p.area_minima * area_da_foto <= area <= p.area_maxima * area_da_foto:
+        return None
+    contornos, _ = cv2.findContours(recorte.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contorno = max(contornos, key=cv2.contourArea)
+    casca = cv2.contourArea(cv2.convexHull(contorno))
+    if casca == 0 or cv2.contourArea(contorno) / casca < p.solidez_minima:
+        return None
+    return pontuacao, area, y0, x0, recorte, contorno + [x0, y0]
+
+
+def _na_escala_original(regiao: RegiaoEncontrada, escala: float, forma: tuple[int, int]) -> RegiaoEncontrada:
+    altura, largura = forma
+    poligono = [[min(round(x / escala), largura - 1), min(round(y / escala), altura - 1)] for x, y in regiao.poligono]
+    return RegiaoEncontrada(poligono=poligono, area_px=round(regiao.area_px / escala ** 2), pontuacao=regiao.pontuacao)
+
+
+def escolher_regioes(boas: list, forma: tuple[int, int], p: ParametrosIA) -> list[RegiaoEncontrada]:
+    """Das candidatas preparadas: tamanho típico desta foto e sem repetições."""
     if not boas:
         return []
     mediana = float(np.median([b[1] for b in boas]))

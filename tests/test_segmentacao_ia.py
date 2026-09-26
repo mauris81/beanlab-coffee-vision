@@ -190,3 +190,30 @@ def test_foto_enviada_e_segmentada_pela_ia(ia_de_verdade):
     db.session.refresh(job)
     assert job.status == StatusJob.CONCLUIDO and job.motor == 'ia' and job.parametros['nucleos'] == 3
     assert {r.motor for r in imagem.regioes} == {'ia'} and len(imagem.regioes) >= 5
+
+
+def test_contornos_voltam_para_a_resolucao_original():
+    """Fotos grandes são trabalhadas reduzidas; o contorno e a área voltam à escala da foto."""
+    from app.segmentacao.base import RegiaoEncontrada
+    from app.segmentacao.ia import _na_escala_original
+    reduzida = RegiaoEncontrada(poligono=[[10, 20], [110, 20], [110, 120]], area_px=5000, pontuacao=0.8)
+    original = _na_escala_original(reduzida, 0.4, (4032, 3024))
+    assert original.poligono == [[25, 50], [275, 50], [275, 300]]
+    assert original.area_px == 31250 and original.pontuacao == 0.8
+    na_borda = _na_escala_original(RegiaoEncontrada([[0, 0], [1209, 1612], [5, 1612]], 10), 0.4, (4032, 3024))
+    assert max(x for x, _ in na_borda.poligono) <= 3023 and max(y for _, y in na_borda.poligono) <= 4031
+
+
+@pytest.mark.ia
+def test_ia_em_foto_grande_de_celular(ia_de_verdade):
+    """Foto de 12 MP (como a do celular) não pode estourar a memória nem perder a escala."""
+    from PIL import Image
+    pequena = Image.open(io.BytesIO(foto_de_graos(linhas=4, colunas=6))).convert('RGB')
+    fator = 4032 / max(pequena.size)
+    grande = np.array(pequena.resize((round(pequena.width * fator), round(pequena.height * fator))))
+    regioes = ia_de_verdade.segmentar(grande)
+    centros = [(x * fator, y * fator) for x, y in centros_dos_graos(linhas=4, colunas=6)]
+    achados = sum(any(cv2.pointPolygonTest(np.array(r.poligono, np.int32), (float(x), float(y)), False) >= 0
+                      for r in regioes) for x, y in centros)
+    assert achados >= 22 and len(regioes) <= 26
+    assert max(x for r in regioes for x, _ in r.poligono) > 1600  # contornos na escala da foto original

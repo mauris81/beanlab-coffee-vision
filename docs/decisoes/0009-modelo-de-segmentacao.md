@@ -54,6 +54,9 @@ da equipe. Para repetir o teste com outras fotos: `ferramentas/avaliar_segmentac
   validação ele poderia encher a anotação de regiões erradas.
 - **Cada segmentação guarda os parâmetros usados** (`JobSegmentacao.parametros`): a
   pesquisa sabe exatamente com que modelo e configuração cada região foi feita.
+- **Fotos grandes** (12 MP, direto do celular) são trabalhadas numa cópia com lado de
+  1600 px; os contornos voltam à resolução original. Sem isso, cada lote do SAM gastaria
+  vários GB de memória. Fotos de até 1600 px, como a de grãos, não mudam.
 - **3 dos 4 núcleos**: um fica livre para a plataforma continuar respondendo durante a
   segmentação. Com isso, cerca de 2 minutos por foto em vez de 1,5.
 - **Nada vai para a internet durante o uso**: as estatísticas de uso do Ultralytics
@@ -61,6 +64,20 @@ da equipe. Para repetir o teste com outras fotos: `ferramentas/avaliar_segmentac
 - **Fotos segmentadas por um motor antigo** mostram **"Segmentar de novo"**. O diálogo
   avisa quantas regiões e anotações serão substituídas; regiões feitas à mão ou
   importadas não mudam.
+
+## Primeiro teste com flores (26/09/2026)
+A equipe mandou uma foto real de flores: a **planta inteira no campo**, em plena florada
+(12 MP). A IA, do jeito que foi ajustada para grãos, **não serve para esse tipo de foto**:
+- marcou folhas, pedaços do céu e torrões de terra;
+- nas flores, marcou **cachos inteiros**. Cada flor tem só ~60 a 100 px na foto original.
+
+Olhando um trecho em resolução cheia, com um filtro de cor branca, separou só parte das
+flores (32 num trecho com bem mais de 100) e às vezes marcou pétalas soltas. As imagens
+estão em `C:\CafeData\avaliacao-fase6\flores`.
+
+**Conclusão:** flores continuam **sem motor**. O próximo passo depende de como a equipe
+vai fotografar: fotos de perto de um ramo tendem a funcionar como os grãos; fotos da planta
+inteira pedem outro tipo de anotação ou um modelo treinado com dados da própria equipe.
 
 ## Licença
 O FastSAM usa o Ultralytics, que é **AGPL-3.0**. O responsável escolheu esse caminho,
