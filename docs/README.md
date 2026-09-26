@@ -12,8 +12,8 @@
 | [PROBLEMAS_CONHECIDOS.md](PROBLEMAS_CONHECIDOS.md) | Todos | Bugs conhecidos e em que fase serão resolvidos |
 | [decisoes/](decisoes/) | Quem programa | Registro de decisões técnicas (ADRs) |
 
-Um **guia do usuário** (para quem coleta e anota na fazenda) será escrito na Fase 7,
-quando as telas novas estiverem prontas.
+O **guia de uso** (para quem coleta e anota na fazenda) fica **dentro da plataforma**,
+no menu **Ajuda** (`app/templates/ajuda.html`), e abre até sem sinal no celular.
 
 ## Como manter esta documentação
 

@@ -31,7 +31,7 @@ salvo num banco de dados e pode ser exportado para treinar modelos.
  3. Anota cada região       ──►   Tela de anotação (API JSON) ─► serviço  ✅ ──► banco
     (uma por vez ou em lote)       recortes e foto média em cache no disco  ✅
  4. Acompanha no painel     ◄──   Quanto falta, classes, pendências, atividade ✅
- 5. Exporta                 ◄──   CSV · COCO · YOLO · recortes por classe
+ 5. Exporta (administração) ◄──   planilha · COCO · YOLO · recortes por classe (.zip) ✅
 ```
 
 ## Na internet e no celular ✅
@@ -47,8 +47,9 @@ do PC: [PUBLICACAO.md](PUBLICACAO.md)).
 
 - **Aplicativo (PWA):** `static/manifest.json` + ícones em `static/aplicativo/`.
 - **Service worker** (`templates/sw.js`, servido por `web/aplicativo.py` em `/sw.js`):
-  guarda os arquivos de `static/` e a página genérica **"Fotos no celular"**; sem sinal
-  (ou após 15 s), mostra essa página. A versão é um hash dos arquivos: mudou algo, o
+  guarda os arquivos de `static/`, a página genérica **"Fotos no celular"** e a **Ajuda**
+  (versão `?offline=1`); sem sinal (ou após 15 s), `/ajuda` abre a cópia guardada e as
+  demais páginas mostram "Fotos no celular". A versão é um hash dos arquivos: mudou algo, o
   celular atualiza sozinho. **Páginas com dados nunca ficam guardadas.**
 - **Fila de fotos** (`static/js/fila-fotos.js`, IndexedDB): usada pela página da coleta
   (envio que falha ou "Guardar no celular"), por "Fotos no celular" e pelo service
@@ -108,14 +109,16 @@ app/
 ├── servicos/          ✅ CASOS DE USO: anotações, ingestão (fotos, recortes, COCO), imagens
 │                         (EXIF, orientação, miniaturas), recortes (cache por geometria),
 │                         segmentação (jobs), taxonomias, contas (login e exclusão), coletas
-│                         (quem pode excluir e o quê), painel (números da
+│                         (quem pode excluir e o quê), exportacao (.zip para análise e treino),
+│                         painel (números da
 │                         página inicial, contados no banco)
 ├── armazenamento/     ✅ onde e como as fotos são gravadas no disco
 ├── segmentacao/       ✅ motores com interface comum (base.py): clássico (watershed) e ia
 │                         (FastSAM + SAM 2.1, opcional)
 ├── web/               ✅ rotas que devolvem PÁGINAS, por assunto: paginas.py, identidade.py
 │                         (login + CSRF), admin.py (Pessoas), coletas.py, anotacao.py,
-│                         aplicativo.py (service worker, "Fotos no celular");
+│                         aplicativo.py (service worker, "Fotos no celular", Ajuda),
+│                         exportacao.py (Exportar, só administração);
 │                         apresentacao.py = ícones, menu, status, plural
 ├── api/               ✅ rotas que devolvem DADOS em JSON: saude.py, anotacao.py
 │                         (regiões da coleta, anotar, desfazer), coletas.py (lista p/ celular)

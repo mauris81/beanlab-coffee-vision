@@ -36,6 +36,7 @@ verdade**. Nada toca em `C:\CafeData`. Rode os testes antes de cada commit.
 | `tests/test_contas.py` | Senhas, login, bloqueio, "nunca sem administração", código do primeiro acesso |
 | `tests/test_web_login.py` | Porta de entrada, primeiro acesso, senha provisória, administração, desconectar outros aparelhos, redirecionamento seguro |
 | `tests/test_seguranca.py` | Cabeçalhos (CSP), nenhuma página com código embutido, proxy só de 127.0.0.1, cookie seguro, limite por IP, modo desenvolvimento fora da internet, erros em JSON para o JavaScript |
+| `tests/test_exportacao.py` | Planilhas (Excel pt-BR, histórico), regras de treino, COCO (ida e volta pela importação), YOLO (arranjo padrão; com `-m ia`, lido pelo próprio Ultralytics), recortes, foto girada, quem pode, temporário apagado, comando de terminal |
 | `tests/test_segmentacao_ia.py` | Motor de IA sem precisar do PyTorch: filtro das máscaras (uma região por objeto, foto de longe e de perto), escolha do motor pelo YAML, parâmetros guardados, download com conferência de hash, "Segmentar de novo". Com `-m ia`: os modelos de verdade |
 | `tests/test_exclusao.py` | Excluir coleta (cascata, arquivos compartilhados, quem pode, confirmação pelo nome) e conta (apagar ou tornar anônima, sair dos aparelhos, usuário liberado) |
 | `tests/test_painel.py` | Números do painel (anotação vigente, dúvida, classes desativadas), ordem do "Continuar anotando", pendências, atividade por dia, quem vê "Quem anotou", consultas que não crescem com o número de coletas |
@@ -104,6 +105,9 @@ $env:CAFE_DEBUG = "1"; .\.venv\Scripts\python.exe run.py
 .\.venv\Scripts\flask.exe --app app baixar-modelos
 .\.venv\Scripts\flask.exe --app app verificar-ia
 .\.venv\Scripts\python.exe -m pytest -m ia        # testes com os modelos de verdade (minutos)
+
+# Exportar sem abrir a plataforma (útil para conjuntos grandes)
+.\.venv\Scripts\flask.exe --app app exportar graos --saida C:\CafeData\graos.zip
 
 # Comparar motores em fotos reais (contagem à mão num recorte como gabarito)
 .\.venv\Scripts\python.exe ferramentas\avaliar_segmentacao.py FOTO.jpg --recorte 460 760 260 --contagem 33

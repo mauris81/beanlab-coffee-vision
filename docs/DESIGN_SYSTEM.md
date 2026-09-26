@@ -153,4 +153,5 @@ Comportamentos sem JS na página: `data-abrir-dialogo="id"`, `data-fechar-dialog
 - [ ] Testada no celular (390 px) e no computador, nos dois temas
 - [ ] Página adicionada à lista de `tests/navegador/test_acessibilidade.py`
 - [ ] Nenhum `<script>` com código nem `onclick` no HTML (a política de segurança bloqueia)
+- [ ] Mudou como se usa algo? Atualize a **Ajuda** (`templates/ajuda.html`)
 - [ ] Novo componente? Macro + CSS + exemplo no `/guia-visual`

@@ -54,3 +54,6 @@ Encontrados na análise de 25/09/2026 e atualizados a cada fase.
 | **Motor clássico perdia ~1/3 dos grãos numa foto real** (grãos claros e com defeito; contornos serrilhados; só fundo azul) | Motor de IA (FastSAM + SAM 2.1): 33 de ~33 grãos no recorte, qualquer fundo | 6 | `tests/test_segmentacao_ia.py`, decisão 0009 |
 | Filtro de tamanho da IA calibrado só para "muitos grãos pequenos" (foto de perto: 0 de 12) | Tamanho relativo à mediana da própria foto | 6 | `test_filtro_se_adapta_a_foto_de_perto` |
 | Fotos segmentadas por um motor antigo não tinham como ser refeitas | "Segmentar de novo", avisando o que será substituído | 6 | `test_foto_de_motor_antigo_oferece_segmentar_de_novo` |
+| Não havia como tirar os dados da plataforma para analisar ou treinar | Exportar: planilha, COCO, YOLO e recortes num .zip, com LEIAME e manifesto | 7 | `tests/test_exportacao.py` |
+| **Arquivo temporário da exportação ficaria no disco** (achado durante a fase: com `send_file`, a limpeza registrada nunca roda) | Iterador próprio que apaga o arquivo ao fim do envio | 7 | `test_pagina_mostra_coletas_e_baixa_o_zip`, `test_baixar_exportacao` |
+| Não havia guia de uso para quem está no campo | Ajuda dentro da plataforma, que abre sem sinal | 7 | `test_ajuda_*`, `test_sem_sinal_a_ajuda_abre_do_celular` |

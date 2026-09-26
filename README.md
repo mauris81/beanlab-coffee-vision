@@ -51,6 +51,10 @@ usuário e uma senha provisória, e cria a própria senha no primeiro acesso.
    Dá para ver só um tipo de amostra (Grãos, Folhas...).
 7. **Excluir:** uma foto, pela lixeira no cartão dela; a coleta inteira, no fim da página
    da coleta; uma conta, em **Pessoas** (só a administração).
+8. **Exportar** (administração): um .zip com a planilha (abre no Excel) e os formatos
+   para treinar modelos (COCO, YOLO, recortes por classe). O LEIAME.txt explica tudo.
+
+Dúvidas de uso: menu **Ajuda**, dentro da plataforma (abre até sem sinal no celular).
 
 ### No celular, como aplicativo, e fora do Wi-Fi
 
